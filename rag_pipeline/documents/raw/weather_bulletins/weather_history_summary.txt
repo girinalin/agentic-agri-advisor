@@ -1,0 +1,6 @@
+HISTORICAL CLIMATE PATTERNS & PRECIPITATION RECORD
+
+Date: 2025-06-01 | Region: Midwest | Temp: 21.5C | Humidity: 65% | Rain: 0.0mm
+Date: 2025-06-02 | Region: Midwest | Temp: 23.0C | Humidity: 70% | Rain: 4.2mm
+Date: 2025-06-03 | Region: Midwest | Temp: 20.5C | Humidity: 85% | Rain: 18.5mm
+Date: 2025-06-04 | Region: Midwest | Temp: 19.0C | Humidity: 90% | Rain: 12.0mm

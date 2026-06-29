@@ -1,0 +1,61 @@
+# Agentic Agriculture Advisor (AAA) - Python Agent Registry
+agents:
+  - name: coordinator_agent
+    class_path: agents.coordinator.agent.coordinator_agent
+    description: "Main orchestrator agent that triages farmer queries and routes to specialists."
+    role: "coordinator"
+    status: "active"
+
+  - name: crop_analyst_agent
+    class_path: agents.crop_analyst.agent.crop_analyst_agent
+    description: "Agronomy expert for soil chemistry, health checks, and crop disease diagnosis."
+    role: "specialist"
+    status: "active"
+
+  - name: weather_advisor_agent
+    class_path: agents.weather_advisor.agent.weather_advisor_agent
+    description: "Meteorology advisor to assess weather impact on crops and plan planting/harvesting."
+    role: "specialist"
+    status: "active"
+
+  - name: market_advisor_agent
+    class_path: agents.market_advisor.agent.market_advisor_agent
+    description: "Commodity analyst tracking crop prices, trading volumes, and harvest-sale windows."
+    role: "specialist"
+    status: "active"
+
+  - name: irrigation_advisor_agent
+    class_path: agents.irrigation_advisor.agent.irrigation_advisor_agent
+    description: "Irrigation Optimization Agent advising on water schedules and soil moisture thresholds."
+    role: "specialist"
+    status: "active"
+
+  - name: pest_detector_agent
+    class_path: agents.pest_detector.agent.pest_detector_agent
+    description: "Pest Detection Agent analyzing crop images for anomalies and prescribing treatments."
+    role: "specialist"
+    status: "active"
+
+  - name: farmer_interaction_agent
+    class_path: agents.farmer_interaction.agent.farmer_interaction_agent
+    description: "Farmer Interaction Agent handling voice/audio interfaces in multiple languages."
+    role: "interface"
+    status: "active"
+
+  - name: knowledge_retriever_agent
+    class_path: agents.knowledge_retriever.agent.knowledge_retriever_agent
+    description: "Knowledge Retrieval Agent querying OKF SPARQL endpoints and RAG indexes."
+    role: "retriever"
+    status: "active"
+
+  - name: simulation_agent
+    class_path: agents.simulation_agent.agent.simulation_agent
+    description: "Simulation Agent managing farm simulation execution runs and soil state predictions."
+    role: "simulator"
+    status: "active"
+
+  - name: dashboard_agent
+    class_path: agents.dashboard_agent.agent.dashboard_agent
+    description: "A2UI Dashboard Agent generating declarative UI cards and telemetry charts."
+    role: "interface"
+    status: "active"

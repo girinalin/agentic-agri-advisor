@@ -1,0 +1,79 @@
+{
+  "type": "card",
+  "title": "Farm Simulator Sandbox",
+  "theme": "simulation",
+  "components": [
+    {
+      "type": "text",
+      "value": "Model daily crop health factors by adjusting irrigation and nutrient volume feeds."
+    },
+    {
+      "type": "grid",
+      "columns": 5,
+      "items": [
+        {
+          "type": "metric",
+          "label": "Simulation Day",
+          "value": "Day 0",
+          "status": "normal"
+        },
+        {
+          "type": "metric",
+          "label": "Crop Stage",
+          "value": "germination",
+          "status": "normal"
+        },
+        {
+          "type": "metric",
+          "label": "Soil Moisture",
+          "value": "40%",
+          "status": "optimal"
+        },
+        {
+          "type": "metric",
+          "label": "Crop Health",
+          "value": "100%",
+          "status": "optimal"
+        },
+        {
+          "type": "metric",
+          "label": "Pest Risk Index",
+          "value": "5.0%",
+          "status": "optimal"
+        }
+      ]
+    },
+    {
+      "type": "form",
+      "fields": [
+        {
+          "type": "select",
+          "name": "crop_type",
+          "label": "Select Crop to Simulate",
+          "options": [
+            "Corn",
+            "Wheat",
+            "Soybeans"
+          ]
+        },
+        {
+          "type": "input",
+          "name": "water_liters",
+          "label": "Irrigation volume (liters)",
+          "placeholder": "10.0"
+        },
+        {
+          "type": "input",
+          "name": "fertilizer_kg",
+          "label": "Nitrogen fertilizer (kg)",
+          "placeholder": "5.0"
+        }
+      ]
+    },
+    {
+      "type": "button",
+      "label": "🎮 Step Simulation (1 Day)",
+      "action": "run_sim_step"
+    }
+  ]
+}

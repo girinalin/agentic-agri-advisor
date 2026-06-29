@@ -1,0 +1,19 @@
+# Production Environment Configuration Settings
+environment: "production"
+debug: false
+logging_level: "INFO"
+
+# LLM Config
+llm:
+  model: "gemini-3.5-flash"
+  temperature: 0.2
+  max_output_tokens: 1024
+
+# Databases
+databases:
+  okf_sparql_endpoint: "https://sparql.agriculture-advisor.gcp.internal/query"
+  vector_db_path: "gs://aaa-production-assets/vector_index.faiss"
+
+# Simulation Enabled
+simulation:
+  enabled: false

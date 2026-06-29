@@ -1,0 +1,4 @@
+Soil_Type,pH,Drainage_Type,Clay_Percentage,Organic_Matter_Percentage
+Loam,6.5,Good,20,4.5
+Clay,7.2,Poor,45,3.0
+Sand,5.8,Excellent,10,1.5

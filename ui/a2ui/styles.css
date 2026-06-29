@@ -1,0 +1,177 @@
+/* A2UI Style System */
+:root {
+  --bg-dark: #0f172a;
+  --panel-bg: #1e293b;
+  --text-main: #f8fafc;
+  --text-sub: #94a3b8;
+  --accent: #10b981;
+  --accent-hover: #059669;
+  --border: #334155;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  font-family: 'Outfit', sans-serif;
+}
+
+.app-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+header {
+  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 1rem;
+}
+
+h1 {
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+}
+
+.subtitle {
+  color: var(--text-sub);
+  margin: 0;
+}
+
+.grid-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.panel {
+  background-color: var(--panel-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.panel h2 {
+  font-size: 1.25rem;
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: var(--text-sub);
+}
+
+textarea {
+  flex-grow: 1;
+  min-height: 300px;
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem;
+  font-family: monospace;
+  font-size: 0.9rem;
+  resize: vertical;
+  margin-bottom: 1rem;
+}
+
+.btn {
+  padding: 0.75rem 1.5rem;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 600;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.primary-btn {
+  background-color: var(--accent);
+  color: #fff;
+}
+
+.primary-btn:hover {
+  background-color: var(--accent-hover);
+}
+
+.canvas-box {
+  flex-grow: 1;
+  background-color: var(--bg-dark);
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.placeholder-text {
+  color: var(--text-sub);
+}
+
+/* Declarative Component Styles */
+.a2ui-card {
+  width: 100%;
+  background-color: var(--panel-bg);
+  border-left: 6px solid var(--accent);
+  border-radius: 6px;
+  padding: 1.25rem;
+  box-sizing: border-box;
+}
+
+.a2ui-card.warning {
+  border-left-color: var(--warning);
+}
+
+.a2ui-card.danger {
+  border-left-color: var(--danger);
+}
+
+.a2ui-card-title {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  font-size: 1.2rem;
+}
+
+.a2ui-text {
+  color: var(--text-sub);
+  line-height: 1.5;
+  margin-bottom: 1rem;
+}
+
+.a2ui-metric {
+  display: inline-block;
+  background-color: var(--bg-dark);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.a2ui-metric.critical {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.a2ui-btn {
+  display: block;
+  width: 100%;
+  padding: 0.75rem;
+  background-color: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.a2ui-btn:hover {
+  background-color: var(--accent-hover);
+}
+
+.error-text {
+  color: var(--danger);
+}

@@ -1,0 +1,24 @@
+{
+  "crop_yield_ton_ha": {
+    "corn": {
+      "historical_yield_ton_ha": 9.8,
+      "historical_npk_fertilizer_kg_ha": 150.0,
+      "avg_growing_rainfall_mm": 650.0
+    },
+    "wheat": {
+      "historical_yield_ton_ha": 3.4,
+      "historical_npk_fertilizer_kg_ha": 90.0,
+      "avg_growing_rainfall_mm": 450.0
+    },
+    "soybeans": {
+      "historical_yield_ton_ha": 2.9,
+      "historical_npk_fertilizer_kg_ha": 60.0,
+      "avg_growing_rainfall_mm": 550.0
+    }
+  },
+  "commodity_base_prices_usd": {
+    "corn": 4.21,
+    "wheat": 5.9,
+    "soybeans": 11.56
+  }
+}

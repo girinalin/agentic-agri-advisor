@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AAA Advisor - Hybrid Workspace</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="dashboard-grid hybrid-layout">
+    <!-- Left Pane: Dynamic UI Workspace -->
+    <aside class="workspace-pane">
+      <header class="workspace-header">
+        <div class="logo">AAA Workspace</div>
+        <div class="date-selector">Rabi Season 2026</div>
+      </header>
+      
+      <!-- Dynamic A2UI Canvas -->
+      <div class="canvas-container">
+        <div id="agui-canvas"></div>
+      </div>
+      
+      <!-- Floating Action Buttons (FABs) -->
+      <div class="fab-container">
+        <button id="fab-diagnose" class="fab-btn" title="Diagnose Crop Disease">🚨 Diagnose Crop</button>
+        <button id="fab-refresh" class="fab-btn" title="Refresh Live Data">🔄 Refresh Data</button>
+        <button id="fab-run" class="fab-btn" title="Advance Simulation Step">🎮 Run Simulation</button>
+      </div>
+    </aside>
+
+    <!-- Right Pane: Persistent Assistant Chat Panel -->
+    <main class="chat-pane">
+      <header class="chat-header">
+        <h2>Advisor Chat Portal</h2>
+        <div class="system-status">
+          <span class="status-indicator online"></span>
+          <span class="status-text">Agents Online</span>
+        </div>
+      </header>
+
+      <section class="chat-container">
+        <div id="chat-messages" class="chat-box">
+          <div class="message system-msg">
+            <strong>System:</strong> Connected to AAA Coordinator. Interactive dashboard widgets will show on the left workspace panel automatically as we discuss weather, pricing, alerts, or simulator settings.
+          </div>
+        </div>
+        
+        <div class="chat-input-bar">
+          <input type="text" id="user-input-field" placeholder="Ask the advisor a question or trigger a tool...">
+          <button id="mic-btn" class="mic-btn" title="Record Voice Input">🎙️</button>
+          <button id="send-btn" class="send-btn">Send</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <script src="../a2ui/app.js"></script>
+  <script src="panel_router.js"></script>
+  <script src="dashboard.js"></script>
+</body>
+</html>

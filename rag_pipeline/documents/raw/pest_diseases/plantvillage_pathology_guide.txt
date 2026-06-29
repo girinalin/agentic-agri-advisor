@@ -1,0 +1,19 @@
+PLANTVILLAGE DIAGNOSTIC METADATA & TREATMENT MANUAL
+
+DISEASE/PEST ID: tomato_late_blight
+Common Name: Late Blight | Scientific Pathogen Name: Phytophthora infestans
+Symptoms: Dark water-soaked leaf spots with white downy spores
+Chemical Treatment: Copper hydroxide fungicide
+Biological Treatment: Bacillus subtilis biopesticide
+
+DISEASE/PEST ID: bean_spider_mites
+Common Name: Spider Mite Damage | Scientific Pathogen Name: Tetranychus urticae
+Symptoms: Fine webbing on leaves and yellow stippling
+Chemical Treatment: Abamectin miticide
+Biological Treatment: Release of Phytoseiulus persimilis predatory mites
+
+DISEASE/PEST ID: corn_armyworms
+Common Name: Fall Armyworm Damage | Scientific Pathogen Name: Spodoptera frugiperda
+Symptoms: Ragged chewed leaves and leaf whorl destruction
+Chemical Treatment: Chlorantraniliprole insecticide
+Biological Treatment: Bacillus thuringiensis spray

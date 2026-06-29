@@ -1,0 +1,16 @@
+{
+  "name": "aaa-ui-agents",
+  "version": "0.1.0",
+  "description": "Optional JS/TS ADK UI Agents for the Agentic Agriculture Advisor (AAA) dashboard",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@google/adk": "^1.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

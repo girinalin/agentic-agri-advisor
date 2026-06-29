@@ -1,0 +1,16 @@
+# RAG Pipeline Configuration
+embedding_model: "text-embedding-004"
+chunk_size: 500
+chunk_overlap: 50
+index_type: "faiss"
+vector_dimension: 768
+db_path: "embeddings/index/agriculture_index.faiss"
+
+# Document Categories
+document_sources:
+  - "documents/raw/pest_diseases"
+  - "documents/raw/government_advisories"
+  - "documents/raw/weather_bulletins"
+  - "documents/raw/market_news"
+  - "documents/raw/farmer_qa"
+  - "documents/raw/research_papers"

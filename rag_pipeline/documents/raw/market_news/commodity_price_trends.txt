@@ -1,0 +1,5 @@
+HISTORICAL COMMODITY FUTURES PRICING DATA
+
+Commodity: Corn | Date: 2026-06 | Futures Price: $4.21/bu | Trend: Harvest Seasonal Dip
+Commodity: Wheat | Date: 2026-06 | Futures Price: $5.9/bu | Trend: Steady winter futures
+Commodity: Soybeans | Date: 2026-06 | Futures Price: $11.56/bu | Trend: High South American harvest pressure

@@ -1,0 +1,68 @@
+{
+  "mcp_servers": {
+    "okf": {
+      "type": "stdio",
+      "command": "python",
+      "args": [
+        "mcp_servers/okf/server.py"
+      ],
+      "description": "Exposes agricultural ontology and knowledge graph query tools."
+    },
+    "rag": {
+      "type": "stdio",
+      "command": "python",
+      "args": [
+        "mcp_servers/rag/server.py"
+      ],
+      "description": "Exposes semantic search tools over agronomy manuals and documents."
+    },
+    "weather": {
+      "type": "stdio",
+      "command": "python",
+      "args": [
+        "mcp_servers/weather/server.py"
+      ],
+      "description": "Exposes local weather forecast and microclimate analysis tools."
+    },
+    "market": {
+      "type": "stdio",
+      "command": "python",
+      "args": [
+        "mcp_servers/market/server.py"
+      ],
+      "description": "Exposes crop pricing, supply charts, and financial tools."
+    },
+    "image_analysis": {
+      "type": "stdio",
+      "command": "python",
+      "args": [
+        "mcp_servers/image_analysis/server.py"
+      ],
+      "description": "Exposes multimodal image diagnostics for plant disease identification."
+    },
+    "tts": {
+      "type": "stdio",
+      "command": "python",
+      "args": [
+        "mcp_servers/tts/server.py"
+      ],
+      "description": "Exposes text-to-speech tools for audio farmer readouts."
+    },
+    "stt": {
+      "type": "stdio",
+      "command": "python",
+      "args": [
+        "mcp_servers/stt/server.py"
+      ],
+      "description": "Exposes speech-to-text transcription tools for voice queries."
+    },
+    "translation": {
+      "type": "stdio",
+      "command": "python",
+      "args": [
+        "mcp_servers/translation/server.py"
+      ],
+      "description": "Exposes Gemini-driven translation services for multilingual farmer queries."
+    }
+  }
+}

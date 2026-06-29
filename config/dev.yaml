@@ -1,0 +1,20 @@
+# Development Environment Configuration Settings
+environment: "development"
+debug: true
+logging_level: "DEBUG"
+
+# LLM Config
+llm:
+  model: "gemini-3.5-flash"
+  temperature: 0.7
+  max_output_tokens: 2048
+
+# Databases
+databases:
+  okf_sparql_endpoint: "http://localhost:3030/ds/query"
+  vector_db_path: "rag_pipeline/embeddings/index/agriculture_index.faiss"
+
+# Simulation Enabled
+simulation:
+  enabled: true
+  config_path: "simulation/config.yaml"

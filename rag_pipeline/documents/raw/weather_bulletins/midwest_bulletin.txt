@@ -1,0 +1,7 @@
+REGIONAL WEATHER FORECAST: MIDWEST CORN BELT
+Date: June 27, 2026
+Outlook: A high-pressure system will dominate the region for the next 10 days, keeping conditions warm and dry.
+Temperatures: Highs between 28-32°C; lows around 16°C.
+Humidity: Dropping to 45% during peak afternoon hours, reducing immediate spore risk for late blight.
+Rainfall: Low probability of precipitation (<10%). Soil moisture levels are expected to drop by 3.5% daily.
+Alerts: None. Frost risk is 0%.

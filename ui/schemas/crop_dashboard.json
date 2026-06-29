@@ -1,0 +1,44 @@
+{
+  "type": "card",
+  "title": "Crop Health & Telemetry",
+  "theme": "success",
+  "components": [
+    {
+      "type": "text",
+      "value": "Real-time crop vigor metrics and OKF soil target profiles."
+    },
+    {
+      "type": "grid",
+      "columns": 3,
+      "items": [
+        {
+          "type": "metric",
+          "label": "Crop Health Index",
+          "value": "94%",
+          "status": "optimal"
+        },
+        {
+          "type": "metric",
+          "label": "Soil Moisture",
+          "value": "35%",
+          "status": "optimal"
+        },
+        {
+          "type": "metric",
+          "label": "Soil Temp",
+          "value": "23\u00b0C",
+          "status": "optimal"
+        }
+      ]
+    },
+    {
+      "type": "chart",
+      "label": "NPK Nutrient Levels (N Target: 40-60 PPM)",
+      "data": {
+        "N": 45,
+        "P": 22,
+        "K": 160
+      }
+    }
+  ]
+}

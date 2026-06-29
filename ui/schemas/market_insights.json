@@ -1,0 +1,40 @@
+{
+  "type": "card",
+  "title": "Commodity Market Pricing",
+  "theme": "market",
+  "components": [
+    {
+      "type": "text",
+      "value": "Live Chicago Board of Trade (CBOT) futures rates and export volume trends."
+    },
+    {
+      "type": "grid",
+      "columns": 3,
+      "items": [
+        {
+          "type": "metric",
+          "label": "CBOT Corn / bu",
+          "value": "$4.19",
+          "status": "optimal"
+        },
+        {
+          "type": "metric",
+          "label": "CBOT Wheat / bu",
+          "value": "$5.91",
+          "status": "warning"
+        },
+        {
+          "type": "metric",
+          "label": "CBOT Soy / bu",
+          "value": "$11.53",
+          "status": "optimal"
+        }
+      ]
+    },
+    {
+      "type": "button",
+      "label": "\ud83d\udcca Export Market Analysis",
+      "action": "export_market"
+    }
+  ]
+}

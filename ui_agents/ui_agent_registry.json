@@ -1,0 +1,11 @@
+{
+  "ui_agents": [
+    {
+      "name": "dashboard_coordinator",
+      "class": "AgricultureUiAgent",
+      "module": "./dist/ui-agent.js",
+      "description": "Orchestrates interactive maps, sensor logs, and charts on the AGUI farm dashboard.",
+      "status": "ready"
+    }
+  ]
+}

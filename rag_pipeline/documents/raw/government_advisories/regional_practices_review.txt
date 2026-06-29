@@ -1,0 +1,4 @@
+USDA REGIONAL CROP CONSERVATION PRACTICES SURVEY
+
+Region: Midwest | Main Crop: Corn | Irrigation: Center Pivot | Conservation: Winter Rye cover crop
+Region: Northeast | Main Crop: Vegetables | Irrigation: Drip Irrigation | Conservation: Hairy Vetch cover crop

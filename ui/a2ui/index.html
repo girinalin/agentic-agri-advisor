@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>A2UI - Agentic Agriculture Advisor</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    <header>
+      <h1>Agent-to-User Interface (A2UI)</h1>
+      <p class="subtitle">Declarative JSON UI Schema Parser and Renderer</p>
+    </header>
+
+    <main class="grid-layout">
+      <!-- Left side: JSON editor/previewer -->
+      <section class="panel editor-panel">
+        <h2>Declarative Agent Payload (JSON)</h2>
+        <textarea id="json-input" placeholder="Paste agent UI JSON payload here...">
+{
+  "type": "card",
+  "title": "Soil Moisture Warning",
+  "theme": "warning",
+  "components": [
+    {
+      "type": "text",
+      "value": "Sensor Node 12 (North Field) reports critically low soil moisture levels (14%). Immediate irrigation is recommended."
+    },
+    {
+      "type": "metric",
+      "label": "Soil Moisture",
+      "value": "14%",
+      "status": "critical"
+    },
+    {
+      "type": "button",
+      "label": "Activate Irrigation Valve",
+      "action": "activate_valve_12"
+    }
+  ]
+}
+        </textarea>
+        <button id="render-btn" class="btn primary-btn">Render Interface</button>
+      </section>
+
+      <!-- Right side: Render output canvas -->
+      <section class="panel canvas-panel">
+        <h2>Rendered Output</h2>
+        <div id="render-canvas" class="canvas-box">
+          <!-- Dynamic rendering goes here -->
+          <div class="placeholder-text">Click "Render Interface" to see the output.</div>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
