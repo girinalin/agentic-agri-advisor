@@ -68,3 +68,21 @@ Launch the local web environment / playground:
 ```bash
 agents-cli playground
 ```
+
+## 🌾 Running the Krishi Sampark Frontend Dashboard
+
+To launch the web interface and converse with the **Krishi Sastri** advisor agent:
+
+1. **Start the backend agent playground (port 8080)**:
+   ```bash
+   uv run agents-cli playground
+   ```
+2. **Start the FastAPI web app server (port 8000)**:
+   ```bash
+   uv run python -m app.fast_api_app
+   ```
+3. **Access the Interface**:
+   Open your browser and navigate to:
+   *   **Krishi Sampark Dashboard (Recommended):** `http://localhost:8000/agui/index.html`
+   *   **Standard A2UI Client:** `http://localhost:8000/a2ui/index.html`
+
