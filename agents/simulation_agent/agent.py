@@ -1,6 +1,9 @@
 from google.adk.agents import Agent
-from . import tools
+
 from agents.dashboard_agent.tools import get_ui_schema
+
+from . import tools
+
 
 def simulation_agent() -> Agent:
     """Creates the Simulation Agent."""

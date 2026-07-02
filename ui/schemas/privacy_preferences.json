@@ -1,0 +1,56 @@
+{
+  "type": "card",
+  "titleKey": "privacy.title",
+  "theme": "primary",
+  "components": [
+    {
+      "type": "header",
+      "titleKey": "privacy.title",
+      "subtitleKey": "privacy.subtitle"
+    },
+    {
+      "type": "select",
+      "name": "location_sharing",
+      "labelKey": "privacy.location.label",
+      "options": [
+        { "labelKey": "privacy.consent.enable", "value": "1" },
+        { "labelKey": "privacy.consent.disable", "value": "0" }
+      ]
+    },
+    {
+      "type": "select",
+      "name": "image_retention",
+      "labelKey": "privacy.image.label",
+      "options": [
+        { "labelKey": "privacy.consent.enable", "value": "1" },
+        { "labelKey": "privacy.consent.disable", "value": "0" }
+      ]
+    },
+    {
+      "type": "select",
+      "name": "voice_retention",
+      "labelKey": "privacy.voice.label",
+      "options": [
+        { "labelKey": "privacy.consent.enable", "value": "1" },
+        { "labelKey": "privacy.consent.disable", "value": "0" }
+      ]
+    },
+    {
+      "type": "select",
+      "name": "regional_outbreak_participation",
+      "labelKey": "privacy.outbreak.label",
+      "options": [
+        { "labelKey": "privacy.consent.enable", "value": "1" },
+        { "labelKey": "privacy.consent.disable", "value": "0" }
+      ]
+    },
+    {
+      "type": "actions",
+      "items": [
+        { "labelKey": "privacy.action.save", "action": "SAVE_PRIVACY_PREFERENCES", "theme": "primary" },
+        { "labelKey": "privacy.action.export", "action": "NAVIGATE_DATA_EXPORT", "theme": "secondary" },
+        { "labelKey": "privacy.action.delete", "action": "NAVIGATE_DATA_DELETION", "theme": "danger" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "type": "card",
+  "titleKey": "outbreak.details.title",
+  "theme": "primary",
+  "components": [
+    {
+      "type": "header",
+      "titleKey": "outbreak.details.title",
+      "subtitleKey": "outbreak.details.subtitle"
+    },
+    {
+      "type": "grid",
+      "items": [
+        {
+          "labelKey": "outbreak.details.symptoms.label",
+          "value": "Leaf margin yellowing / spots",
+          "valueKey": "outbreak.details.symptoms.val",
+          "status": "warning"
+        },
+        {
+          "labelKey": "outbreak.details.weather.label",
+          "value": "Temp rise 32C, Humidity 85%",
+          "valueKey": "outbreak.details.weather.val",
+          "status": "warning"
+        }
+      ]
+    },
+    {
+      "type": "actions",
+      "items": [
+        { "labelKey": "outbreak.action.back", "action": "CLOSE_OUTBREAK_DETAILS", "theme": "secondary" }
+      ]
+    }
+  ]
+}

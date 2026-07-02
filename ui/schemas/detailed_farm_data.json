@@ -1,0 +1,54 @@
+{
+  "type": "card",
+  "titleKey": "farm.details.title",
+  "theme": "success",
+  "components": [
+    {
+      "type": "metric",
+      "labelKey": "farm.details.nitrogen",
+      "value": "45 PPM (N Target: 40-60 PPM)",
+      "status": "optimal"
+    },
+    {
+      "type": "metric",
+      "labelKey": "farm.details.phosphorus",
+      "value": "22 PPM",
+      "status": "warning"
+    },
+    {
+      "type": "metric",
+      "labelKey": "farm.details.potassium",
+      "value": "160 PPM",
+      "status": "optimal"
+    },
+    {
+      "type": "metric",
+      "labelKey": "farm.details.telemetryTime",
+      "value": "10:15 AM (Today)",
+      "status": "normal"
+    },
+    {
+      "type": "metric",
+      "labelKey": "farm.details.sensorSource",
+      "value": "LoRa Mesh Sensor #12",
+      "status": "normal"
+    },
+    {
+      "type": "metric",
+      "labelKey": "farm.details.confidence",
+      "value": "92% Confidence",
+      "status": "normal"
+    },
+    {
+      "type": "metric",
+      "labelKey": "farm.details.knowledgeSource",
+      "value": "ICAR Wheat Package of Practices 2026",
+      "status": "normal"
+    },
+    {
+      "type": "button",
+      "labelKey": "farm.details.back",
+      "action": "OPEN_IRRIGATION_ADVICE"
+    }
+  ]
+}

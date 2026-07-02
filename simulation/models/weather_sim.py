@@ -1,6 +1,7 @@
 # Placeholder for weather forecast and condition simulators
 import random
 
+
 class WeatherSimulator:
     def __init__(self, rain_probability: float = 0.15):
         self.rain_probability = rain_probability

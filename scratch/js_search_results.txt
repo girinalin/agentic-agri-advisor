@@ -1,0 +1,189 @@
+translations.js:30 -> 'nav_crop_dashboard': '🌾 Health',
+translations.js:57 -> 'nav_crop_dashboard': '🌾 स्वास्थ्य',
+translations.js:84 -> 'nav_crop_dashboard': '🌾 पिकाची तब्येत',
+translations.js:111 -> 'nav_crop_dashboard': '🌾 Afya ya Mazao',
+translations.js:138 -> 'nav_crop_dashboard': '🌾 ఆరోగ్యం',
+translations.js:191 -> 'privacy.image.label': 'Retain Uploaded Crop Images',
+translations.js:223 -> 'home.alert.desc': 'Soil moisture is very dry (35%). Crop impact possible.',
+translations.js:227 -> 'home.quickActions.photo.label': 'Take Crop Photo',
+translations.js:251 -> 'more.items.whatif.desc': 'Simulate crop scenarios',
+translations.js:259 -> 'farm.cropHealth.title': 'Crop Health',
+translations.js:260 -> 'farm.cropHealth.good': 'Optimal',
+translations.js:263 -> 'farm.recommendation.title': "Today's Advisory",
+translations.js:365 -> 'farm.cropHealth.title': 'फसल स्वास्थ्य',
+translations.js:366 -> 'farm.cropHealth.good': 'इष्टतम',
+translations.js:424 -> 'farm.cropHealth.title': 'पिकाचे आरोग्य',
+translations.js:425 -> 'farm.cropHealth.good': 'उत्तम',
+translations.js:483 -> 'farm.cropHealth.title': 'Afya ya Mazao',
+translations.js:484 -> 'farm.cropHealth.good': 'Nzuri sana',
+translations.js:542 -> 'farm.cropHealth.title': 'పంట ఆరోగ్యం',
+translations.js:543 -> 'farm.cropHealth.good': 'చాలా బాగుంది',
+translations.js:714 -> if (typeof window.updateAgentsStatus === 'function') {
+translations.js:715 -> window.updateAgentsStatus();
+translations.js:744 -> else if (schemaName === 'crop_dashboard' || schemaName === 'my_farm_summary' || schemaName === 'detailed_farm_data' || schemaName === 'irrigation_advice' || schemaName === 'pest_alert' || schemaName === 'irrigation_planner') tabId = 'farm';
+expert_dashboards.js:74 -> <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;">Crop: ${c.crop_context} · Lang: ${c.language}</div>
+expert_dashboards.js:105 -> <p><strong>Crop & Field:</strong> ${c.crop_context} (${c.field_context})</p>
+expert_dashboards.js:219 -> <th>Crop Variety</th>
+expert_dashboards.js:246 -> <td>${r.crop_variety}</td>
+camera.js:1 -> class CropCamera {
+camera.js:103 -> window.CropCamera = CropCamera;
+dashboard.js:95 -> const cropCamera = new window.CropCamera();
+dashboard.js:135 -> const statusIndicator = document.getElementById('agents-status-indicator');
+dashboard.js:136 -> const statusText = document.getElementById('agents-status-text');
+dashboard.js:362 -> // Bind Ask microphone panel buttons
+dashboard.js:363 -> // Microphone event listener and recognition logic are loaded from voice.js
+dashboard.js:368 -> // State variable for crop diagnosis workflow state machine
+dashboard.js:369 -> let cropDiagnosisState = {
+dashboard.js:392 -> async function initCropDiagnosisState() {
+dashboard.js:396 -> cropDiagnosisState = cached;
+dashboard.js:397 -> console.log('[Crop Diagnosis] Restored cached state from IndexedDB:', cropDiagnosisState);
+dashboard.js:401 -> console.warn('[Crop Diagnosis] Failed to restore state:', err);
+dashboard.js:407 -> let schemaName = 'crop_photo_start';
+dashboard.js:412 -> switch(cropDiagnosisState.step) {
+dashboard.js:413 -> case 1: schemaName = 'crop_photo_start'; break;
+dashboard.js:414 -> case 2: schemaName = 'crop_photo_guidance'; break;
+dashboard.js:415 -> case 3: schemaName = 'crop_photo_capture'; break;
+dashboard.js:416 -> case 4: schemaName = 'crop_photo_quality'; break;
+dashboard.js:417 -> case 5: schemaName = 'crop_photo_progress'; break;
+dashboard.js:418 -> case 6: schemaName = 'crop_diagnosis_result'; break;
+dashboard.js:419 -> case 7: schemaName = 'crop_safe_actions'; break;
+dashboard.js:424 -> if (cropDiagnosisState.step === 3) {
+dashboard.js:432 -> cropDiagnosisState.step = 6;
+dashboard.js:434 -> const area = cropDiagnosisState.affectedArea || 'leaf';
+dashboard.js:462 -> organic = "Improve drainage, rotate crops, apply neem cake powder.";
+dashboard.js:467 -> cropDiagnosisState.diagnosis = {
+dashboard.js:475 -> await localDb.saveDiagnosisState(cropDiagnosisState);
+dashboard.js:478 -> const chatMsgText = `🔬 Edge AI diagnosed **${disease}** (${confidence} confidence) on crop ${area}. Organic remedy: ${organic}`;
+dashboard.js:491 -> if (action === 'TAKE_CROP_PHOTO' || action === 'START_CROP_DIAGNOSIS') {
+dashboard.js:492 -> cropDiagnosisState = { step: 1, affectedArea: null, photos: [], currentPhoto: null, diagnosis: null };
+dashboard.js:493 -> localDb.saveDiagnosisState(cropDiagnosisState);
+dashboard.js:498 -> cropDiagnosisState.affectedArea = area;
+dashboard.js:499 -> cropDiagnosisState.step = 2;
+dashboard.js:500 -> localDb.saveDiagnosisState(cropDiagnosisState);
+dashboard.js:503 -> cropDiagnosisState.step = 3;
+dashboard.js:504 -> localDb.saveDiagnosisState(cropDiagnosisState);
+dashboard.js:507 -> if (cropDiagnosisState.currentPhoto) {
+dashboard.js:508 -> cropDiagnosisState.photos.push(cropDiagnosisState.currentPhoto);
+dashboard.js:509 -> cropDiagnosisState.currentPhoto = null;
+dashboard.js:511 -> if (cropDiagnosisState.photos.length === 3) {
+dashboard.js:514 -> cropDiagnosisState.step = 5;
+dashboard.js:515 -> localDb.saveDiagnosisState(cropDiagnosisState);
+dashboard.js:519 -> cropDiagnosisState.currentPhoto = null;
+dashboard.js:520 -> cropDiagnosisState.step = 3;
+dashboard.js:521 -> localDb.saveDiagnosisState(cropDiagnosisState);
+dashboard.js:524 -> cropDiagnosisState.step = 3;
+dashboard.js:525 -> localDb.saveDiagnosisState(cropDiagnosisState);
+dashboard.js:528 -> cropDiagnosisState.step = 7;
+dashboard.js:529 -> localDb.saveDiagnosisState(cropDiagnosisState);
+dashboard.js:533 -> const dName = cropDiagnosisState.diagnosis ? cropDiagnosisState.diagnosis.disease_name : "Crop Disease";
+dashboard.js:537 -> if (cropDiagnosisState.diagnosis) {
+dashboard.js:538 -> speakText(cropDiagnosisState.diagnosis.disease_name + ". Remedy is: " + cropDiagnosisState.diagnosis.organic_remedy);
+dashboard.js:540 -> speakText("Follow the visual instructions on screen to capture clear crop photos.");
+dashboard.js:566 -> const crop = activeField && activeField.planting ? activeField.planting.crop_type : 'corn';
+dashboard.js:567 -> speakText(`Based on your ${crop} crop twin, we recommend immediate watering of this field.`);
+dashboard.js:841 -> const cropType = activeField && activeField.planting ? activeField.planting.crop_type.toLowerCase() : 'corn';
+dashboard.js:842 -> const cropSpec = okfDatabaseFallback[cropType] || okfDatabaseFallback['corn'];
+dashboard.js:843 -> const optimalMoisture = cropSpec.soil_moisture.optimal_pct;
+dashboard.js:861 -> if (item.labelKey === 'farm.cropHealth.title') {
+dashboard.js:908 -> const cropType = activeField && activeField.planting ? activeField.planting.crop_type.toLowerCase() : 'corn';
+dashboard.js:909 -> const cropSpec = okfDatabaseFallback[cropType] || okfDatabaseFallback['corn'];
+dashboard.js:914 -> comp.value = `45 PPM (Target: ${cropSpec.npk_ratio.nitrogen_ppm} PPM)`;
+dashboard.js:916 -> comp.value = `22 PPM (Target: ${cropSpec.npk_ratio.phosphorus_ppm} PPM)`;
+dashboard.js:918 -> comp.value = `160 PPM (Target: ${cropSpec.npk_ratio.potassium_ppm} PPM)`;
+dashboard.js:927 -> const cropType = activeField && activeField.planting ? activeField.planting.crop_type.toLowerCase() : 'corn';
+dashboard.js:928 -> const cropSpec = okfDatabaseFallback[cropType] || okfDatabaseFallback['corn'];
+dashboard.js:929 -> const optimalMoisture = cropSpec.soil_moisture.optimal_pct;
+dashboard.js:967 -> function bindCropDiagnosisResultState(schema) {
+dashboard.js:968 -> const result = cropDiagnosisState.diagnosis;
+dashboard.js:988 -> function bindCropSafeActionsState(schema) {
+dashboard.js:989 -> const result = cropDiagnosisState.diagnosis;
+dashboard.js:1025 -> } else if (schemaName === 'crop_diagnosis_result') {
+dashboard.js:1026 -> bindCropDiagnosisResultState(data);
+dashboard.js:1027 -> } else if (schemaName === 'crop_safe_actions') {
+dashboard.js:1028 -> bindCropSafeActionsState(data);
+dashboard.js:1034 -> else if (schemaName === 'crop_dashboard') canvasId = 'farm-canvas';
+dashboard.js:1055 -> function updateAgentsStatus() {
+dashboard.js:1056 -> const indicator = document.getElementById('agents-status-indicator');
+dashboard.js:1057 -> const text = document.getElementById('agents-status-text');
+dashboard.js:1133 -> opt.textContent = `${f.name} (${f.planting ? f.planting.crop_type : 'No Crop'})`;
+dashboard.js:1185 -> // Smart Triage Router: Route simple/local questions to local Gemma edge skills, complex to cloud agents
+dashboard.js:1211 -> textToSend = `[Context: Farmer Name: ${profile.farmer_name || 'unnamed'}, Language: ${preferredLang}, Location: ${profile.region}, Acres: ${profile.acres}, Soil: ${profile.soil_type}, Crop: ${profile.primary_crop}, Drip Irrigation: ${profile.has_drip}]\n\n${text}`;
+dashboard.js:1346 -> crop: profile.primary_crop || 'corn',
+dashboard.js:1370 -> initCropDiagnosisState();
+dashboard.js:1374 -> updateAgentsStatus();
+dashboard.js:1481 -> userInputField.value = "Refresh live crop data. Use get_ui_schema tool to load 'crop_dashboard' card.";
+dashboard.js:1562 -> const cropInput = document.querySelector('select[name="crop_type"]') || document.querySelector('input[name="crop_type"]');
+dashboard.js:1566 -> const cropType = cropInput ? cropInput.value : 'corn';
+dashboard.js:1642 -> const statusPrompt = `Simulation Advanced: Day ${simState.day}, Crop: ${cropType}, Stage: ${simState.stage}, Soil Moisture: ${simState.soilMoisture.toFixed(1)}%, Crop Health: ${simState.health.toFixed(1)}%, Pest Level: ${simState.pestIndex.toFixed(1)}%. Advise on irrigation or nutrient needs.`;
+dashboard.js:1683 -> const prompt = `Profile updated: saved profile details for farmer. Name is ${profile.farmer_name || 'unnamed'}, Location is ${profile.region}, Size is ${profile.acres} acres, Soil is ${profile.soil_type}, Crop is ${profile.primary_crop}, Drip Irrigation is ${profile.has_drip}. Please acknowledge and update your advisory guidelines.`;
+dashboard.js:1700 -> const prompt = `Profile updated: saved profile details for farmer. Name is ${profile.farmer_name || 'unnamed'}, Location is ${profile.region}, Size is ${profile.acres} acres, Soil is ${profile.soil_type}, Crop is ${profile.primary_crop}, Drip Irrigation is ${profile.has_drip}. Please acknowledge and update your advisory guidelines.`;
+dashboard.js:1753 -> const success = await cropCamera.start(cameraViewfinder);
+dashboard.js:1824 -> // Camera event listeners re-targeted to the crop wizard steps
+dashboard.js:1827 -> cropDiagnosisState = { step: 1, affectedArea: null, photos: [], currentPhoto: null, diagnosis: null };
+dashboard.js:1828 -> localDb.saveDiagnosisState(cropDiagnosisState);
+dashboard.js:1837 -> cropCamera.stop();
+dashboard.js:1844 -> activeDataUrl = cropCamera.capture(cameraCanvas);
+dashboard.js:1846 -> cropDiagnosisState.currentPhoto = activeDataUrl;
+dashboard.js:1850 -> cropCamera.stop();
+dashboard.js:1855 -> cropDiagnosisState.step = 4;
+dashboard.js:1856 -> localDb.saveDiagnosisState(cropDiagnosisState);
+dashboard.js:1860 -> cropDiagnosisState.photos.push(activeDataUrl);
+dashboard.js:1861 -> cropDiagnosisState.currentPhoto = null;
+dashboard.js:1862 -> if (cropDiagnosisState.photos.length === 3) {
+dashboard.js:1865 -> cropDiagnosisState.step = 5;
+dashboard.js:1866 -> localDb.saveDiagnosisState(cropDiagnosisState);
+dashboard.js:1888 -> cropDiagnosisState.currentPhoto = activeDataUrl;
+dashboard.js:1892 -> cropCamera.stop();
+dashboard.js:1897 -> cropDiagnosisState.step = 4;
+dashboard.js:1898 -> localDb.saveDiagnosisState(cropDiagnosisState);
+dashboard.js:1902 -> cropDiagnosisState.photos.push(activeDataUrl);
+dashboard.js:1903 -> cropDiagnosisState.currentPhoto = null;
+dashboard.js:1904 -> if (cropDiagnosisState.photos.length === 3) {
+dashboard.js:1907 -> cropDiagnosisState.step = 5;
+dashboard.js:1908 -> localDb.saveDiagnosisState(cropDiagnosisState);
+dashboard.js:1924 -> cropCamera.stop();
+dashboard.js:2112 -> window.updateAgentsStatus = updateAgentsStatus;
+voice.js:63 -> function triggerMicrophoneListen() {
+voice.js:131 -> triggerMicrophoneListen();
+voice.js:138 -> window.triggerMicrophoneListen = triggerMicrophoneListen;
+local_db.js:41 -> // Store for structured Open Knowledge Format crop parameters
+local_db.js:43 -> db.createObjectStore('okf_knowledge', { keyPath: 'crop_type' });
+local_db.js:46 -> // Store for guided crop-photo diagnosis state persistence
+local_db.js:340 -> console.log('[IndexedDB] Pre-seeding OKF crop parameters with multilingual diagnostics...');
+local_db.js:343 -> crop_type: "wheat",
+local_db.js:347 -> description: "Staple winter crop requiring moderate temperature and moisture."
+local_db.js:391 -> crop_type: "corn",
+local_db.js:395 -> description: "Warm season crop requiring high nitrogen and consistent watering."
+local_db.js:446 -> console.log('[IndexedDB] Pre-seeded 2 OKF crop guides with multilingual schemas.');
+local_db.js:450 -> * Retrieves an OKF crop guide
+local_db.js:451 -> * @param {string} cropType
+local_db.js:454 -> async getOkfGuide(cropType) {
+local_db.js:455 -> if (!cropType) return null;
+local_db.js:460 -> const request = store.get(cropType.toLowerCase());
+panel_router.js:25 -> schema: 'crop_dashboard',
+local_models.js:3 -> * In-browser Local LLM (Gemma 2B) and TFLite Crop Disease Classification management.
+local_models.js:16 -> crops: {
+local_models.js:23 -> health: "Wheat crop is in vegetative phase. Leaf index shows slight nitrogen deficiency.",
+local_models.js:179 -> const crop = (context.crop || 'corn').toLowerCase();
+local_models.js:187 -> okfGuide = await localDb.getOkfGuide(crop);
+local_models.js:195 -> metadata: { name: crop === 'wheat' ? 'Wheat' : 'Corn' },
+local_models.js:213 -> crop: "crop.",
+local_models.js:229 -> pathologistName: "Crop Pathologist",
+local_models.js:233 -> analystName: "Crop Analyst",
+local_models.js:245 -> crop: "फसल के लिए।",
+local_models.js:265 -> analystName: "फसल विश्लेषक (Crop Analyst)",
+local_models.js:277 -> crop: "पिकासाठी.",
+local_models.js:293 -> pathologistName: "पीक रोग तज्ञ (Crop Pathologist)",
+local_models.js:297 -> analystName: "पीक विश्लेषक (Crop Analyst)",
+local_models.js:309 -> crop: "పంట కోసం.",
+local_models.js:325 -> pathologistName: "పంట నిపుణుడు (Crop Pathologist)",
+local_models.js:329 -> analystName: "పంట విశ్లేషకుడు (Crop Analyst)",
+local_models.js:341 -> crop: "zao.",
+local_models.js:357 -> pathologistName: "Mtaalamu wa Magonjwa (Crop Pathologist)",
+local_models.js:361 -> analystName: "Mchambuzi wa Mazao (Crop Analyst)",
+local_models.js:371 -> let activeSkill = "General Advisory";
+local_models.js:383 -> symptom: { English: "General crop leaf damage and pest sightings." },
+local_models.js:384 -> organic_remedy: { English: "Spray neem oil solution (5ml/L) early in the morning and isolate infected crops." }
+local_models.js:390 -> response = `[Offline AI - ${activeAgent}] ${dict.pranam} ${dict.triggered} **${activeSkill}** ${dict.skillFor} ${okfGuide.metadata.name} ${dict.crop} \n\n📋 **${dict.symptomLabel}:** ${symptomVal}\n🌱 **${dict.organicLabel}:** ${remedyVal}`;
+local_models.js:397 -> response = `[Offline AI - ${activeAgent}] ${dict.ramram} **${activeSkill}** ${dict.skillFor} ${okfGuide.metadata.name} ${dict.crop} \n\n💧 **${dict.optimalMoisture}:** ${specs.soil_moisture.optimal_pct}%\n📉 **${dict.criticalLimit}:** ${specs.soil_moisture.min_pct}%\n🧬 **${dict.dripStrategy}:** ${dict.strategyDesc}`;
+local_models.js:405 -> response = `[Offline AI - ${activeAgent}] ${dict.namaste} **${activeSkill}** ${dict.skillFor} ${okfGuide.metadata.name} ${dict.crop} \n\n🧪 **${dict.targetNpk}:** ${dict.nitrogen}: ${NPK.nitrogen_ppm}, ${dict.phosphorus}: ${NPK.phosphorus_ppm}, ${dict.potassium}: ${NPK.potassium_ppm}\n🧪 **${dict.optimalPh}:** ${specs.optimal_soil_ph}`;

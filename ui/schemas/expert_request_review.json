@@ -1,0 +1,55 @@
+{
+  "type": "card",
+  "titleKey": "escalate.review.title",
+  "theme": "warning",
+  "components": [
+    {
+      "type": "header",
+      "titleKey": "escalate.review.title",
+      "subtitleKey": "escalate.review.subtitle"
+    },
+    {
+      "type": "grid",
+      "items": [
+        {
+          "labelKey": "escalate.review.question.label",
+          "value": "Why do my corn leaves have yellow margins?",
+          "valueKey": "escalate.review.question.val",
+          "status": "warning"
+        },
+        {
+          "labelKey": "escalate.review.diagnosis.label",
+          "value": "Possible Nutrient Deficiency (Nitrogen)",
+          "valueKey": "escalate.review.diagnosis.val",
+          "status": "warning"
+        },
+        {
+          "labelKey": "escalate.review.confidence.label",
+          "value": "78% Confidence",
+          "valueKey": "escalate.review.confidence.val",
+          "status": "optimal"
+        },
+        {
+          "labelKey": "escalate.review.field.label",
+          "value": "North Hillside (5.0 acres, Drip)",
+          "valueKey": "escalate.review.field.val",
+          "status": "optimal"
+        }
+      ]
+    },
+    {
+      "type": "input",
+      "name": "escalation_comments",
+      "labelKey": "escalate.review.comments.label",
+      "placeholderKey": "escalate.review.comments.placeholder",
+      "inputType": "textarea"
+    },
+    {
+      "type": "actions",
+      "items": [
+        { "labelKey": "escalate.action.submit", "action": "SUBMIT_EXPERT_ESCALATION", "theme": "primary" },
+        { "labelKey": "escalate.action.cancel", "action": "CANCEL_EXPERT_ESCALATION", "theme": "secondary" }
+      ]
+    }
+  ]
+}

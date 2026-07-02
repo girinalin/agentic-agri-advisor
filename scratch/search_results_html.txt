@@ -1,0 +1,2 @@
+69: <span id="agents-status-indicator" class="status-indicator online"></span>
+70: <span id="agents-status-text" class="status-text">Connected</span>

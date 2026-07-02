@@ -1,5 +1,4 @@
 # Tools for irrigation optimization
-from google.adk.tools import ToolContext
 
 def calculate_irrigation_demand(crop: str, soil_moisture: float, weather_temp: float) -> dict:
     """Calculate required water volume (liters/acre) based on crop and current metrics.

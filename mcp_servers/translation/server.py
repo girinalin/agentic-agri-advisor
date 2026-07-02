@@ -1,7 +1,7 @@
 import os
-from mcp.server.fastmcp import FastMCP
+
 from google import genai
-from google.genai import types
+from mcp.server.fastmcp import FastMCP
 
 mcp = FastMCP("Translation-Server")
 
@@ -35,7 +35,7 @@ async def translate_text(text: str, target_lang: str) -> str:
             client = genai.Client()
     except Exception as e:
         print(f"Warning: Could not initialize Google GenAI Client: {e}")
-        
+
     if client:
         try:
             prompt = f"Translate the following text to language code '{target_lang}'. Output only the translation: {text}"
@@ -46,16 +46,16 @@ async def translate_text(text: str, target_lang: str) -> str:
             return response.text.strip()
         except Exception as e:
             print(f"Gemini translation failed: {e}")
-            
+
     lang = target_lang.lower().strip()
     words = text.lower().split()
     translated = []
-    
+
     for word in words:
         clean = word.strip(".,!?")
         if lang in MOCK_TRANSLATIONS and clean in MOCK_TRANSLATIONS[lang]:
             translated.append(MOCK_TRANSLATIONS[lang][clean])
         else:
             translated.append(word)
-            
+
     return f"[Mock Translation to {lang}]: " + " ".join(translated)

@@ -1,0 +1,69 @@
+{
+  "type": "card",
+  "titleKey": "farm.title",
+  "theme": "success",
+  "components": [
+    {
+      "type": "grid",
+      "columns": 2,
+      "items": [
+        {
+          "type": "metric",
+          "labelKey": "farm.cropHealth.title",
+          "valueKey": "farm.cropHealth.good",
+          "status": "optimal"
+        },
+        {
+          "type": "metric",
+          "labelKey": "farm.soilMoisture.title",
+          "valueKey": "farm.soilMoisture.waterSoon",
+          "status": "warning"
+        },
+        {
+          "type": "metric",
+          "labelKey": "farm.nutrition.title",
+          "valueKey": "farm.nutrition.attention",
+          "status": "warning"
+        },
+        {
+          "type": "metric",
+          "labelKey": "farm.pestRisk.title",
+          "valueKey": "farm.pestRisk.low",
+          "status": "optimal"
+        }
+      ]
+    },
+    {
+      "type": "alert_card",
+      "severity": "info",
+      "titleKey": "farm.recommendation.title",
+      "descriptionKey": "farm.recommendation.desc"
+    },
+    {
+      "type": "grid",
+      "columns": 3,
+      "items": [
+        {
+          "type": "button",
+          "labelKey": "farm.recommendation.setReminder",
+          "action": "CREATE_IRRIGATION_REMINDER"
+        },
+        {
+          "type": "button",
+          "labelKey": "farm.recommendation.alreadyWatered",
+          "action": "MARK_IRRIGATION_COMPLETED"
+        },
+        {
+          "type": "button",
+          "labelKey": "farm.recommendation.hearAdvice",
+          "action": "PLAY_IRRIGATION_ADVICE"
+        }
+      ]
+    },
+    {
+      "type": "button",
+      "labelKey": "farm.details.button",
+      "action": "OPEN_DETAILED_FARM_DATA"
+    }
+  ]
+}

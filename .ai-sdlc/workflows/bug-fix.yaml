@@ -1,0 +1,36 @@
+name: Bug Fix Workflow
+description: Incident response pipeline to reproduce, verify, and minimally hotfix
+  bugs.
+stages:
+- id: reproduce
+  name: Failure Reproduction
+  actor: Test Agent
+  description: Create failing regression test based on bug report.
+- id: root-cause-analysis
+  name: Root Cause Diagnosis
+  actor: Developer Agent
+  description: Trace and isolate codebase logic error.
+- id: regression-test
+  name: Hotfix Validation Plan
+  actor: Test Agent
+  description: Ensure regression test fails before coding fix.
+- id: minimal-fix
+  name: Minimal Fix Coding
+  actor: Developer Agent
+  description: Write target code fix with minimal churn.
+- id: test
+  name: Fix Verification Run
+  actor: Test Agent
+  description: Ensure regression test now passes, run full suite.
+- id: security-review
+  name: Patch Security Audit
+  actor: Security Agent
+  description: Scan hotfix code changes for new vulnerabilities.
+- id: documentation
+  name: Incident Log Update
+  actor: Documentation Agent
+  description: Document root cause and fix details in runbooks.
+- id: pr-review
+  name: PR Merging Approval
+  actor: Developer Agent
+  description: Verify code changes and merge to main branch.

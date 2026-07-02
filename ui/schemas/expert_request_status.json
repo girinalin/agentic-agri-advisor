@@ -1,0 +1,41 @@
+{
+  "type": "card",
+  "titleKey": "escalate.status.title",
+  "theme": "primary",
+  "components": [
+    {
+      "type": "header",
+      "titleKey": "escalate.status.title",
+      "subtitleKey": "escalate.status.subtitle"
+    },
+    {
+      "type": "grid",
+      "items": [
+        {
+          "labelKey": "escalate.status.ticket.label",
+          "value": "TKT-4927",
+          "valueKey": "escalate.status.ticket.val",
+          "status": "optimal"
+        },
+        {
+          "labelKey": "escalate.status.state.label",
+          "value": "assigned",
+          "valueKey": "escalate.status.state.val",
+          "status": "warning"
+        },
+        {
+          "labelKey": "escalate.status.expert.label",
+          "value": "Dr. Ramesh (Chief Agronomist)",
+          "valueKey": "escalate.status.expert.val",
+          "status": "optimal"
+        }
+      ]
+    },
+    {
+      "type": "actions",
+      "items": [
+        { "labelKey": "escalate.action.back", "action": "CANCEL_EXPERT_ESCALATION", "theme": "secondary" }
+      ]
+    }
+  ]
+}

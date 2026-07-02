@@ -1,0 +1,64 @@
+name: Feature Delivery Workflow
+description: Standard multi-agent pipeline for feature request intake, implementation,
+  and human approval.
+stages:
+- id: intake
+  name: Feature Intake
+  actor: Product Agent
+  description: Gather raw request and initial scope details.
+- id: requirement-analysis
+  name: Requirements Formulation
+  actor: Product Agent
+  description: Output REQ document and acceptance criteria.
+- id: risk-classification
+  name: Risk Assessment
+  actor: Product Agent
+  description: Classify requirement risks (Low/Medium/High).
+- id: architecture-impact
+  name: Architectural Evaluation
+  actor: Architecture Agent
+  description: Assess schema/service impact, write ADR.
+- id: human-approval-requirements
+  name: 'Human Gate: Requirements Sign-off'
+  actor: Product Owner (Human)
+  description: Review and sign-off on requirements and architecture impact.
+- id: implementation
+  name: Coding and Execution
+  actor: Developer Agent
+  description: Write source changes, document API, preserve compatibility.
+- id: developer-selfcheck
+  name: Code Self-Check
+  actor: Developer Agent
+  description: Developer run basic local checks before PR.
+- id: test-generation
+  name: Test Case Formulation
+  actor: Test Agent
+  description: Develop new unit/integration/E2E test scripts.
+- id: test-execution
+  name: Test Execution
+  actor: Test Agent
+  description: Run pytest suite and collect coverage statistics.
+- id: security-review
+  name: Security Audit
+  actor: Security Agent
+  description: Run SAST, dependency, secret, and privacy audits.
+- id: safety-review
+  name: Agricultural Safety Audit
+  actor: Safety Agent
+  description: Verify prescriptions conform to Safety Kernel registry.
+- id: documentation-update
+  name: Documentation Compilation
+  actor: Documentation Agent
+  description: Update READMEs, runbooks, and installation guidelines.
+- id: pr-review
+  name: Code Review and Verification
+  actor: Developer Agent
+  description: Peer code review checks.
+- id: release-readiness
+  name: Release Audit
+  actor: Release Agent
+  description: Assess evidence package, compile scorecard.
+- id: human-release-approval
+  name: 'Human Gate: Final Release Board'
+  actor: Release Board (Human)
+  description: Verify readiness report and sign off production deploy.

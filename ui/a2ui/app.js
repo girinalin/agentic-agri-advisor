@@ -28,7 +28,145 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function renderComponent(comp, container) {
-    if (comp.type === 'text') {
+    if (comp.type === 'greeting') {
+      const div = document.createElement('div');
+      div.className = 'a2ui-greeting';
+      div.style.marginBottom = '1.25rem';
+      div.innerHTML = `<h2 style="margin:0;font-size:1.6rem;color:var(--accent);">${comp.title}</h2>
+                       <p style="margin:4px 0 0 0;font-size:0.95rem;color:var(--text-sub);">${comp.subtitle}</p>`;
+      container.appendChild(div);
+    } else if (comp.type === 'header') {
+      const div = document.createElement('div');
+      div.className = 'a2ui-header-comp';
+      div.style.marginBottom = '1.25rem';
+      div.innerHTML = `<h2 style="margin:0;font-size:1.4rem;color:var(--text-main);">${comp.title}</h2>
+                       <p style="margin:2px 0 0 0;font-size:0.85rem;color:var(--text-sub);">${comp.subtitle}</p>`;
+      container.appendChild(div);
+    } else if (comp.type === 'alert_card') {
+      const div = document.createElement('div');
+      div.className = `a2ui-card alert-${comp.severity || 'info'}`;
+      div.style.padding = '1rem';
+      div.style.marginBottom = '1rem';
+      div.style.borderRadius = '12px';
+      div.style.borderLeft = `5px solid ${comp.severity === 'warning' ? 'var(--warning)' : comp.severity === 'critical' ? 'var(--danger)' : 'var(--info)'}`;
+      div.style.backgroundColor = 'var(--panel-bg)';
+      div.innerHTML = `
+        <div style="font-weight:bold;color:var(--text-main);margin-bottom:0.25rem;">⚠️ ${comp.title}</div>
+        <div style="font-size:0.9rem;color:var(--text-sub);">${comp.description}</div>
+      `;
+      container.appendChild(div);
+    } else if (comp.type === 'action_card') {
+      const div = document.createElement('div');
+      div.className = 'a2ui-card';
+      div.style.padding = '1.25rem';
+      div.style.marginBottom = '1rem';
+      div.style.borderRadius = '12px';
+      div.style.backgroundColor = 'var(--panel-bg)';
+      div.style.border = '1.5px solid var(--accent)';
+      
+      const textNode = document.createElement('div');
+      textNode.style.fontWeight = '600';
+      textNode.style.fontSize = '1.05rem';
+      textNode.style.color = 'var(--text-main)';
+      textNode.style.marginBottom = '0.5rem';
+      textNode.textContent = comp.title;
+      div.appendChild(textNode);
+      
+      if (comp.description) {
+        const descNode = document.createElement('div');
+        descNode.style.fontSize = '0.85rem';
+        descNode.style.color = 'var(--text-sub)';
+        descNode.style.marginBottom = '0.75rem';
+        descNode.textContent = comp.description;
+        div.appendChild(descNode);
+      }
+      
+      if (comp.action) {
+        const btn = document.createElement('button');
+        btn.className = 'a2ui-btn';
+        btn.style.width = '100%';
+        btn.style.padding = '0.75rem';
+        btn.style.borderRadius = '24px';
+        btn.style.backgroundColor = 'var(--accent)';
+        btn.style.color = 'white';
+        btn.style.border = 'none';
+        btn.style.fontWeight = 'bold';
+        btn.style.cursor = 'pointer';
+        btn.textContent = comp.action.label;
+        btn.addEventListener('click', () => {
+          const event = new CustomEvent('a2ui-action', {
+            detail: { action: comp.action.commandId, button: btn }
+          });
+          document.dispatchEvent(event);
+        });
+        div.appendChild(btn);
+      }
+      container.appendChild(div);
+    } else if (comp.type === 'metric_card') {
+      const div = document.createElement('div');
+      div.className = 'a2ui-card';
+      div.style.padding = '1rem';
+      div.style.marginBottom = '1rem';
+      div.style.borderRadius = '12px';
+      div.style.backgroundColor = 'var(--panel-bg)';
+      div.style.border = '1px solid var(--border)';
+      div.innerHTML = `
+        <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.25rem;">
+          <span style="font-size:1.2rem;">${comp.icon || ''}</span>
+          <strong style="font-size:0.95rem;color:var(--text-sub);">${comp.title}</strong>
+        </div>
+        <div style="font-size:1.6rem;font-weight:bold;color:var(--text-main);margin-bottom:0.25rem;">${comp.value}</div>
+        <div style="font-size:0.85rem;color:var(--text-sub);">${comp.description || ''}</div>
+      `;
+      container.appendChild(div);
+    } else if (comp.type === 'option_grid') {
+      const wrapper = document.createElement('div');
+      wrapper.style.marginBottom = '1.25rem';
+      
+      if (comp.title) {
+        const title = document.createElement('h3');
+        title.style.fontSize = '1.05rem';
+        title.style.marginBottom = '0.75rem';
+        title.style.color = 'var(--text-main)';
+        title.textContent = comp.title;
+        wrapper.appendChild(title);
+      }
+      
+      const grid = document.createElement('div');
+      grid.style.display = 'grid';
+      grid.style.gridTemplateColumns = 'repeat(2, 1fr)';
+      grid.style.gap = '0.75rem';
+      
+      comp.items.forEach(item => {
+        const box = document.createElement('div');
+        box.className = 'a2ui-card';
+        box.style.padding = '0.75rem';
+        box.style.borderRadius = '12px';
+        box.style.backgroundColor = 'var(--panel-bg)';
+        box.style.border = '1px solid var(--border)';
+        box.style.cursor = 'pointer';
+        box.style.display = 'flex';
+        box.style.flexDirection = 'column';
+        box.style.gap = '0.25rem';
+        box.style.transition = 'all 0.2s ease';
+        
+        box.addEventListener('click', () => {
+          const event = new CustomEvent('a2ui-action', {
+            detail: { action: item.commandId, button: box }
+          });
+          document.dispatchEvent(event);
+        });
+        
+        box.innerHTML = `
+          <div style="font-size:1.3rem;">${item.icon || ''}</div>
+          <strong style="font-size:0.9rem;color:var(--text-main);">${item.label}</strong>
+          <span style="font-size:0.75rem;color:var(--text-sub);">${item.description || ''}</span>
+        `;
+        grid.appendChild(box);
+      });
+      wrapper.appendChild(grid);
+      container.appendChild(wrapper);
+    } else if (comp.type === 'text') {
       const p = document.createElement('p');
       p.className = 'a2ui-text';
       p.textContent = comp.value;

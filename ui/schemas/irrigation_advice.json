@@ -1,0 +1,105 @@
+{
+  "type": "card",
+  "titleKey": "irrigation.title",
+  "theme": "info",
+  "components": [
+    {
+      "type": "text",
+      "valueKey": "irrigation.desc"
+    },
+    {
+      "type": "grid",
+      "columns": 2,
+      "items": [
+        {
+          "type": "metric",
+          "labelKey": "irrigation.duration.label",
+          "valueKey": "irrigation.duration.value",
+          "status": "normal"
+        },
+        {
+          "type": "metric",
+          "labelKey": "irrigation.water.label",
+          "valueKey": "irrigation.water.value",
+          "status": "normal"
+        }
+      ]
+    },
+    {
+      "type": "option_grid",
+      "titleKey": "irrigation.unitSelector.title",
+      "items": [
+        {
+          "labelKey": "irrigation.unit.hours",
+          "icon": "⏳",
+          "commandId": "CHANGE_UNIT_HOURS"
+        },
+        {
+          "labelKey": "irrigation.unit.litres",
+          "icon": "💧",
+          "commandId": "CHANGE_UNIT_LITRES"
+        },
+        {
+          "labelKey": "irrigation.unit.tanks",
+          "icon": "🚚",
+          "commandId": "CHANGE_UNIT_TANKS"
+        },
+        {
+          "labelKey": "irrigation.unit.mm",
+          "icon": "🌧️",
+          "commandId": "CHANGE_UNIT_MM"
+        }
+      ]
+    },
+    {
+      "type": "list",
+      "items": [
+        {
+          "titleKey": "irrigation.reasons.label",
+          "descKey": "irrigation.reason1",
+          "status": "warning"
+        },
+        {
+          "titleKey": "irrigation.reasons.label",
+          "descKey": "irrigation.reason2",
+          "status": "normal"
+        },
+        {
+          "titleKey": "irrigation.reasons.label",
+          "descKey": "irrigation.reason3",
+          "status": "normal"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "valueKey": "irrigation.weatherStatus.cached"
+    },
+    {
+      "type": "grid",
+      "columns": 2,
+      "items": [
+        {
+          "type": "button",
+          "labelKey": "irrigation.action.setReminder",
+          "action": "CREATE_IRRIGATION_REMINDER"
+        },
+        {
+          "type": "button",
+          "labelKey": "irrigation.action.wateredToday",
+          "action": "MARK_IRRIGATION_COMPLETED"
+        },
+        {
+          "type": "button",
+          "labelKey": "irrigation.action.changeTime",
+          "action": "CHANGE_IRRIGATION_TIME"
+        },
+        {
+          "type": "button",
+          "labelKey": "irrigation.action.hearAdvice",
+          "action": "PLAY_IRRIGATION_ADVICE"
+        }
+      ]
+    }
+  ]
+}

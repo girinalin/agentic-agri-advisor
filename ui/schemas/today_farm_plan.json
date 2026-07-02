@@ -1,0 +1,53 @@
+{
+  "type": "card",
+  "titleKey": "plan.title",
+  "theme": "primary",
+  "components": [
+    {
+      "type": "header",
+      "titleKey": "plan.title",
+      "subtitleKey": "plan.subtitle"
+    },
+    {
+      "type": "grid",
+      "items": [
+        {
+          "labelKey": "plan.task1.title",
+          "value": "plan_1",
+          "valueKey": "plan.task1.desc",
+          "status": "danger",
+          "actions": [
+            { "labelKey": "plan.action.complete", "action": "COMPLETE_TASK", "params": { "plan_id": "plan_1" } },
+            { "labelKey": "plan.action.snooze", "action": "SNOOZE_TASK", "params": { "plan_id": "plan_1" } },
+            { "labelKey": "plan.action.skip", "action": "SKIP_TASK", "params": { "plan_id": "plan_1" } },
+            { "labelKey": "plan.action.explain", "action": "EXPLAIN_TASK", "params": { "plan_id": "plan_1", "explainKey": "plan.task1.explain" } }
+          ]
+        },
+        {
+          "labelKey": "plan.task2.title",
+          "value": "plan_2",
+          "valueKey": "plan.task2.desc",
+          "status": "warning",
+          "actions": [
+            { "labelKey": "plan.action.complete", "action": "COMPLETE_TASK", "params": { "plan_id": "plan_2" } },
+            { "labelKey": "plan.action.snooze", "action": "SNOOZE_TASK", "params": { "plan_id": "plan_2" } },
+            { "labelKey": "plan.action.skip", "action": "SKIP_TASK", "params": { "plan_id": "plan_2" } },
+            { "labelKey": "plan.action.explain", "action": "EXPLAIN_TASK", "params": { "plan_id": "plan_2", "explainKey": "plan.task2.explain" } }
+          ]
+        },
+        {
+          "labelKey": "plan.task3.title",
+          "value": "plan_3",
+          "valueKey": "plan.task3.desc",
+          "status": "optimal",
+          "actions": [
+            { "labelKey": "plan.action.complete", "action": "COMPLETE_TASK", "params": { "plan_id": "plan_3" } },
+            { "labelKey": "plan.action.snooze", "action": "SNOOZE_TASK", "params": { "plan_id": "plan_3" } },
+            { "labelKey": "plan.action.skip", "action": "SKIP_TASK", "params": { "plan_id": "plan_3" } },
+            { "labelKey": "plan.action.explain", "action": "EXPLAIN_TASK", "params": { "plan_id": "plan_3", "explainKey": "plan.task3.explain" } }
+          ]
+        }
+      ]
+    }
+  ]
+}

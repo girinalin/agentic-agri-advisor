@@ -1,5 +1,5 @@
-import urllib.request
 import json
+
 from mcp.server.fastmcp import FastMCP
 
 mcp = FastMCP("Weather-Advisory-Server")
@@ -29,28 +29,28 @@ async def fetch_weather_forecast(location: str, days: int = 5) -> dict:
                 lon = float(results[0]["longitude"])
     except Exception:
         pass
-        
+
     try:
         url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current_weather=true&daily=temperature_2m_max,temperature_2m_min,relative_humidity_2m_max,precipitation_sum&timezone=auto"
         res = urllib.request.urlopen(url, timeout=5)
         data = json.loads(res.read().decode())
-        
+
         current = data.get("current_weather", {})
         daily = data.get("daily", {})
-        
+
         forecast = []
         for i in range(min(days, len(daily.get("time", [])))):
             temp_max = daily.get("temperature_2m_max", [])[i]
             temp_min = daily.get("temperature_2m_min", [])[i]
             humidity = daily.get("relative_humidity_2m_max", [])[i]
             rain = daily.get("precipitation_sum", [])[i]
-            
+
             frost_risk = "low"
             if temp_min < 4.0:
                 frost_risk = "high"
             elif temp_min < 8.0 and humidity > 85.0:
                 frost_risk = "medium"
-                
+
             forecast.append({
                 "day": i + 1,
                 "date": daily.get("time", [])[i],
@@ -60,7 +60,7 @@ async def fetch_weather_forecast(location: str, days: int = 5) -> dict:
                 "rain_mm": rain,
                 "frost_risk": frost_risk
             })
-            
+
         return {
             "location": f"{lat},{lon}",
             "current_temp_c": current.get("temperature"),

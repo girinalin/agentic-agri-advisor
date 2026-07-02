@@ -1,11 +1,11 @@
 {
   "type": "card",
-  "title": "Farmer Digital Twin Profile",
+  "titleKey": "profile.title",
   "theme": "info",
   "components": [
     {
       "type": "text",
-      "value": "Configure your farm parameters to enable micro-personalized advisory updates from the agents."
+      "valueKey": "profile.desc"
     },
     {
       "type": "form",
@@ -13,61 +13,61 @@
         {
           "type": "input",
           "name": "farmer_name",
-          "label": "Farmer Name",
-          "placeholder": "Enter your name"
+          "labelKey": "profile.name.label",
+          "placeholder": "profile.name.placeholder"
         },
         {
           "type": "select",
           "name": "region",
-          "label": "Farm Location / District",
+          "labelKey": "profile.region.label",
           "options": [
-            "Maharashtra (India)",
-            "Punjab (India)",
-            "Rift Valley (Kenya)",
-            "West Region (Ghana)"
+            "profile.region.mh",
+            "profile.region.pb",
+            "profile.region.ke",
+            "profile.region.gh"
           ]
         },
         {
           "type": "input",
           "name": "acres",
-          "label": "Farm Size (Acres)",
-          "placeholder": "e.g. 5"
+          "labelKey": "profile.acres.label",
+          "placeholder": "profile.acres.placeholder"
         },
         {
           "type": "select",
           "name": "soil_type",
-          "label": "Soil Composition",
+          "labelKey": "profile.soil.label",
           "options": [
-            "Black Clay (Cotton Soil)",
-            "Red Sandy Loam",
-            "Alluvial",
-            "Clay Loam"
+            "profile.soil.blackClay",
+            "profile.soil.redSandy",
+            "profile.soil.alluvial",
+            "profile.soil.clayLoam"
           ]
         },
         {
           "type": "select",
           "name": "primary_crop",
-          "label": "Current Crop Type",
+          "labelKey": "profile.crop.label",
           "options": [
-            "Corn",
-            "Wheat",
-            "Soybeans"
+            "profile.crop.corn",
+            "profile.crop.wheat",
+            "profile.crop.soybeans"
           ]
         },
         {
           "type": "select",
           "name": "has_drip",
-          "label": "Has Drip Irrigation System?",
+          "labelKey": "profile.drip.label",
           "options": [
-            "Yes",
-            "No"
+            "profile.drip.yes",
+            "profile.drip.no"
           ]
         }
       ]
     },
     {
       "type": "button",
-      "label": "💾 Save & Sync Profile",
+      "labelKey": "profile.saveAction",
       "action": "save_farmer_profile"
     }
   ]

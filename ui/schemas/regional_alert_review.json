@@ -1,0 +1,27 @@
+{
+  "type": "card",
+  "titleKey": "outbreak.review.title",
+  "theme": "warning",
+  "components": [
+    {
+      "type": "header",
+      "titleKey": "outbreak.review.title",
+      "subtitleKey": "outbreak.review.subtitle"
+    },
+    {
+      "type": "grid",
+      "items": [
+        {
+          "labelKey": "outbreak.review.item1.label",
+          "value": "out_1",
+          "valueKey": "outbreak.review.item1.desc",
+          "status": "warning",
+          "actions": [
+            { "labelKey": "outbreak.action.verify", "action": "VERIFY_OUTBREAK_ALERT", "params": { "outbreak_id": "out_1", "status": "confirmed" } },
+            { "labelKey": "outbreak.action.dismiss", "action": "VERIFY_OUTBREAK_ALERT", "params": { "outbreak_id": "out_1", "status": "dismissed" } }
+          ]
+        }
+      ]
+    }
+  ]
+}

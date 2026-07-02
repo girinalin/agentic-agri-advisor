@@ -1,11 +1,11 @@
 {
   "type": "card",
-  "title": "Farm Simulator Sandbox",
+  "titleKey": "sim.title",
   "theme": "simulation",
   "components": [
     {
       "type": "text",
-      "value": "Model daily crop health factors by adjusting irrigation and nutrient volume feeds."
+      "valueKey": "sim.desc"
     },
     {
       "type": "grid",
@@ -13,31 +13,31 @@
       "items": [
         {
           "type": "metric",
-          "label": "Simulation Day",
+          "labelKey": "sim.day",
           "value": "Day 0",
           "status": "normal"
         },
         {
           "type": "metric",
-          "label": "Crop Stage",
+          "labelKey": "sim.stage",
           "value": "germination",
           "status": "normal"
         },
         {
           "type": "metric",
-          "label": "Soil Moisture",
+          "labelKey": "sim.moisture",
           "value": "40%",
           "status": "optimal"
         },
         {
           "type": "metric",
-          "label": "Crop Health",
+          "labelKey": "sim.health",
           "value": "100%",
           "status": "optimal"
         },
         {
           "type": "metric",
-          "label": "Pest Risk Index",
+          "labelKey": "sim.pest",
           "value": "5.0%",
           "status": "optimal"
         }
@@ -49,30 +49,30 @@
         {
           "type": "select",
           "name": "crop_type",
-          "label": "Select Crop to Simulate",
+          "labelKey": "sim.cropSelector.label",
           "options": [
-            "Corn",
-            "Wheat",
-            "Soybeans"
+            "sim.crop.corn",
+            "sim.crop.wheat",
+            "sim.crop.soybeans"
           ]
         },
         {
           "type": "input",
           "name": "water_liters",
-          "label": "Irrigation volume (liters)",
+          "labelKey": "sim.water.label",
           "placeholder": "10.0"
         },
         {
           "type": "input",
           "name": "fertilizer_kg",
-          "label": "Nitrogen fertilizer (kg)",
+          "labelKey": "sim.fertilizer.label",
           "placeholder": "5.0"
         }
       ]
     },
     {
       "type": "button",
-      "label": "🎮 Step Simulation (1 Day)",
+      "labelKey": "sim.stepAction",
       "action": "run_sim_step"
     }
   ]

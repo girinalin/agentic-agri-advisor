@@ -1,0 +1,51 @@
+{
+  "type": "card",
+  "titleKey": "escalation.title",
+  "theme": "warning",
+  "components": [
+    {
+      "type": "header",
+      "titleKey": "escalation.title",
+      "subtitleKey": "escalation.subtitle"
+    },
+    {
+      "type": "form",
+      "fields": [
+        {
+          "type": "text",
+          "name": "escalation_crop",
+          "labelKey": "escalation.fields.crop.label",
+          "value": ""
+        },
+        {
+          "type": "text",
+          "name": "escalation_diagnosis",
+          "labelKey": "escalation.fields.diagnosis.label",
+          "value": ""
+        },
+        {
+          "type": "textarea",
+          "name": "escalation_comments",
+          "labelKey": "escalation.fields.comments.label",
+          "placeholderKey": "escalation.fields.comments.placeholder",
+          "value": ""
+        }
+      ]
+    },
+    {
+      "type": "buttons",
+      "items": [
+        {
+          "labelKey": "escalation.action.submit",
+          "commandId": "SUBMIT_EXPERT_ESCALATION",
+          "variant": "primary"
+        },
+        {
+          "labelKey": "escalation.action.cancel",
+          "commandId": "CANCEL_EXPERT_ESCALATION",
+          "variant": "secondary"
+        }
+      ]
+    }
+  ]
+}

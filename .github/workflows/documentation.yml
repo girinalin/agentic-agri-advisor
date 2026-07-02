@@ -1,0 +1,26 @@
+name: Documentation Audit
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  audit-docs:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+        
+    - name: Verify Documentation Layout
+      run: |
+        test -f README.md
+        test -f AGENTS.md
+        test -f .ai-sdlc/README.md
+        echo "✅ Documentation verified successfully."

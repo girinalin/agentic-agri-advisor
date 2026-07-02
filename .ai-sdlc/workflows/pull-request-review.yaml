@@ -1,0 +1,27 @@
+name: Pull Request Review Pipeline
+description: Automated guidelines for checking code changes before merging.
+reviewAspects:
+- aspect: requirement-alignment
+  description: Verify all changes link back to a valid requirement ID.
+- aspect: architecture-consistency
+  description: Ensure modifications match existing ADR principles.
+- aspect: code-quality
+  description: Enforce ruff formatting and type check completeness.
+- aspect: test-adequacy
+  description: Verify statement coverage is at least 80%.
+- aspect: security
+  description: Assert no secrets or vulnerable libraries are merged.
+- aspect: privacy
+  description: Confirm location/PII tracking complies with consent preferences.
+- aspect: localization
+  description: Scan translations.js for complete language dictionaries.
+- aspect: accessibility
+  description: Ensure proper ARIA controls and touch targets.
+- aspect: offline-behavior
+  description: Ensure Offline Gemma/PWA services run without network crashes.
+- aspect: agricultural-safety
+  description: Assert that prescriptive outputs go through the Safety Kernel.
+- aspect: documentation
+  description: Confirm runbooks and comments are matching changes.
+- aspect: rollback-impact
+  description: Ensure SQL migrations and config allow graceful rollbacks.

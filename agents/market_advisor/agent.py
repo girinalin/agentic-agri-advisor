@@ -1,7 +1,8 @@
 from google.adk.agents import Agent
 from google.adk.models import Gemini
 from google.genai import types
-from agents.dashboard_agent.tools import refresh_market_schema, get_ui_schema
+
+from agents.dashboard_agent.tools import get_ui_schema, refresh_market_schema
 
 market_advisor_agent = Agent(
     name="market_advisor_agent",

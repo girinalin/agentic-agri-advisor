@@ -1,0 +1,51 @@
+name: Release Workflow
+description: Release assembly pipeline to package, verify, and authorize product deployment.
+stages:
+- id: version-validation
+  name: Release Version Check
+  actor: Release Agent
+  description: Assert release tag meets semantic versioning.
+- id: changelog
+  name: Release Changelog Compilation
+  actor: Release Agent
+  description: Compile git diff logs into public release notes.
+- id: full-test-suite
+  name: Full Test Run
+  actor: Test Agent
+  description: Execute pytest suite (functional, offline, localization).
+- id: security-scans
+  name: Pre-Release SAST audit
+  actor: Security Agent
+  description: Run secret detection and codespell across all files.
+- id: dependency-scan
+  name: Vulnerability Check
+  actor: Security Agent
+  description: Audit uv lockfile dependencies.
+- id: container-build
+  name: Container Packaging
+  actor: DevOps Agent
+  description: Build deployment Docker image.
+- id: smoke-test
+  name: E2E PWA Smoke Test
+  actor: DevOps Agent
+  description: Spin up container locally and verify core static endpoints.
+- id: migration-review
+  name: Database Schema Audit
+  actor: Architecture Agent
+  description: Review SQL and IndexedDB upgrade scripts.
+- id: configuration-validation
+  name: Env Config Check
+  actor: DevOps Agent
+  description: Check staging/production config files.
+- id: release-evidence
+  name: Evidence Pack Assembly
+  actor: Release Agent
+  description: Assemble requirements, tests, security, safety, and build JSONs.
+- id: rollback-plan
+  name: Rollback Execution Check
+  actor: DevOps Agent
+  description: Verify rollback runbooks allow safe recovery.
+- id: human-release-gate
+  name: 'Human Gate: Production Board Approval'
+  actor: Release Board (Human)
+  description: Final human review and deployment authorization.

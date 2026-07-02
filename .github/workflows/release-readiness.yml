@@ -1,0 +1,36 @@
+name: Release Readiness Evaluation
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  evaluate-readiness:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install uv
+        uv pip install --system -r pyproject.toml
+        
+    - name: Compile Release Evidence
+      run: |
+        python -m tools.ai_sdlc.cli evidence
+        python -m tools.ai_sdlc.cli release --report --version "${{ github.event.release.tag_name }}"
+        
+    - name: Archive Evidence Packages
+      uses: actions/upload-artifact@v4
+      with:
+        name: release-evidence
+        path: |
+          .ai-sdlc/evidence/
+          .ai-sdlc/reports/

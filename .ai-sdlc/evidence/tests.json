@@ -1,0 +1,43 @@
+{
+    "status": "passed",
+    "total_tests": 14,
+    "failed_tests": 0,
+    "suites": [
+        {
+            "path": "tests/integration/test_activities.py",
+            "status": "passed"
+        },
+        {
+            "path": "tests/integration/test_agent.py",
+            "status": "passed"
+        },
+        {
+            "path": "tests/integration/test_collapsible_nav.py",
+            "status": "passed"
+        },
+        {
+            "path": "tests/integration/test_localization.py",
+            "status": "passed"
+        },
+        {
+            "path": "tests/integration/test_phase4.py",
+            "status": "passed"
+        },
+        {
+            "path": "tests/integration/test_phase5.py",
+            "status": "passed"
+        },
+        {
+            "path": "tests/integration/test_server_e2e.py",
+            "status": "passed"
+        },
+        {
+            "path": "tests/unit/test_dummy.py",
+            "status": "passed"
+        }
+    ],
+    "coverage": {
+        "statement_coverage_pct": 82.5,
+        "required_pct": 80.0
+    }
+}

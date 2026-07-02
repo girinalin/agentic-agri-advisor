@@ -1,0 +1,11 @@
+{
+  "type": "card",
+  "titleKey": "photo.guidance.openCamera",
+  "theme": "success",
+  "components": [
+    {
+      "type": "text",
+      "valueKey": "photo.progress.analyzing"
+    }
+  ]
+}

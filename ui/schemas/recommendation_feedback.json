@@ -1,0 +1,52 @@
+{
+  "type": "card",
+  "titleKey": "feedback.title",
+  "theme": "primary",
+  "components": [
+    {
+      "type": "header",
+      "titleKey": "feedback.title",
+      "subtitleKey": "feedback.subtitle"
+    },
+    {
+      "type": "select",
+      "name": "followed_recommendation",
+      "labelKey": "feedback.followed.label",
+      "options": [
+        { "labelKey": "feedback.followed.yes", "value": "1" },
+        { "labelKey": "feedback.followed.no", "value": "0" }
+      ]
+    },
+    {
+      "type": "select",
+      "name": "outcome",
+      "labelKey": "feedback.outcome.label",
+      "options": [
+        { "labelKey": "feedback.outcome.improved", "value": "improved" },
+        { "labelKey": "feedback.outcome.nochange", "value": "no_change" },
+        { "labelKey": "feedback.outcome.worse", "value": "got_worse" }
+      ]
+    },
+    {
+      "type": "input",
+      "name": "time_to_outcome",
+      "labelKey": "feedback.time.label",
+      "placeholderKey": "feedback.time.placeholder",
+      "inputType": "text"
+    },
+    {
+      "type": "input",
+      "name": "comment",
+      "labelKey": "feedback.comment.label",
+      "placeholderKey": "feedback.comment.placeholder",
+      "inputType": "text"
+    },
+    {
+      "type": "actions",
+      "items": [
+        { "labelKey": "feedback.action.submit", "action": "SUBMIT_FEEDBACK", "theme": "primary" },
+        { "labelKey": "feedback.action.cancel", "action": "CANCEL_FEEDBACK", "theme": "secondary" }
+      ]
+    }
+  ]
+}

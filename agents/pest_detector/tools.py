@@ -1,5 +1,4 @@
 # Tools for pest & disease detection
-from google.adk.tools import ToolContext
 
 def prescribe_treatment(pest_name: str, crop: str) -> dict:
     """Prescribe biological or chemical treatment for a detected pest/disease.

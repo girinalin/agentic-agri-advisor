@@ -1,0 +1,36 @@
+{
+  "name": "Krishi Sampark - Traditional Agriculture Advisor",
+  "short_name": "Krishi Sampark",
+  "description": "Multi-agent agricultural intelligence and local edge diagnostics for smallholder farmers.",
+  "start_url": "/agui/index.html",
+  "display": "standalone",
+  "background_color": "#F3F7F2",
+  "theme_color": "#2C6B37",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/agui/icons/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/agui/icons/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Diagnose Crop",
+      "url": "/agui/index.html?action=diagnose",
+      "icons": [{ "src": "/agui/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Irrigation Planner",
+      "url": "/agui/index.html?action=irrigation",
+      "icons": [{ "src": "/agui/icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

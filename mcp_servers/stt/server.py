@@ -1,8 +1,8 @@
 import os
+
 import litert_lm
-from mcp.server.fastmcp import FastMCP
 from google import genai
-from google.genai import types
+from mcp.server.fastmcp import FastMCP
 
 mcp = FastMCP("STT-Voice-Server")
 
@@ -33,7 +33,7 @@ async def speech_to_text(audio_path: str) -> str:
     """
     if not os.path.exists(audio_path):
         return f"Error: Audio file {audio_path} not found."
-        
+
     # 1. Try local on-device Gemma-4-12B transcription first
     if engine:
         try:
@@ -61,7 +61,7 @@ async def speech_to_text(audio_path: str) -> str:
             client = genai.Client()
     except Exception as e:
         print(f"Warning: Could not initialize Google GenAI Client: {e}")
-        
+
     if client:
         try:
             uploaded_file = client.files.upload(file=audio_path)
@@ -72,5 +72,5 @@ async def speech_to_text(audio_path: str) -> str:
             return response.text
         except Exception as e:
             return f"Error transcribing via Gemini: {e}"
-            
+
     return "Farmer Query (Mocked): What is the best treatment for late blight on potatoes?"

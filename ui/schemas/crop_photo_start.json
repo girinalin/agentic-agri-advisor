@@ -1,0 +1,47 @@
+{
+  "type": "card",
+  "titleKey": "photo.start.title",
+  "theme": "success",
+  "components": [
+    {
+      "type": "header",
+      "titleKey": "photo.start.question",
+      "subtitleKey": "photo.start.subtitle"
+    },
+    {
+      "type": "option_grid",
+      "items": [
+        {
+          "labelKey": "photo.start.leaf",
+          "icon": "🍃",
+          "commandId": "SELECT_AREA_LEAF"
+        },
+        {
+          "labelKey": "photo.start.stem",
+          "icon": "🌿",
+          "commandId": "SELECT_AREA_STEM"
+        },
+        {
+          "labelKey": "photo.start.fruit",
+          "icon": "🍎",
+          "commandId": "SELECT_AREA_FRUIT"
+        },
+        {
+          "labelKey": "photo.start.root",
+          "icon": "🥕",
+          "commandId": "SELECT_AREA_ROOT"
+        },
+        {
+          "labelKey": "photo.start.whole",
+          "icon": "🌳",
+          "commandId": "SELECT_AREA_WHOLE"
+        },
+        {
+          "labelKey": "photo.start.notsure",
+          "icon": "❓",
+          "commandId": "SELECT_AREA_NOTSURE"
+        }
+      ]
+    }
+  ]
+}

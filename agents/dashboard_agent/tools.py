@@ -1,8 +1,8 @@
-import os
 import json
-import yaml
+import os
 import urllib.request
 
+import yaml
 
 SCHEMAS_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../ui/schemas"))
 OKF_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../okf"))
@@ -13,13 +13,13 @@ def refresh_market_schema() -> str:
     schema_path = os.path.join(SCHEMAS_DIR, "market_insights.json")
     if not os.path.exists(schema_path):
         return f"Error: market_insights.json schema not found at {schema_path}."
-        
+
     try:
-        with open(schema_path, "r", encoding="utf-8") as f:
+        with open(schema_path, encoding="utf-8") as f:
             schema = json.load(f)
     except Exception as e:
         return f"Error reading market_insights.json: {e}"
-        
+
     prices = {"corn": 4.50, "wheat": 6.12, "soybeans": 11.20}
     headers = {'User-Agent': 'Mozilla/5.0'}
     for crop, ticker in [("corn", "ZC=F"), ("wheat", "ZW=F"), ("soybeans", "ZS=F")]:
@@ -32,7 +32,7 @@ def refresh_market_schema() -> str:
             prices[crop] = round(raw_price / 100.0, 2)
         except Exception as e:
             print(f"Warning: Failed to fetch pricing for {crop} ({e}). Using base rate.")
-            
+
     for comp in schema.get("components", []):
         if comp.get("type") == "grid":
             for item in comp.get("items", []):
@@ -43,7 +43,7 @@ def refresh_market_schema() -> str:
                     item["value"] = f"${prices['wheat']}"
                 elif "soy" in label:
                     item["value"] = f"${prices['soybeans']}"
-                    
+
     try:
         with open(schema_path, "w", encoding="utf-8") as f:
             json.dump(schema, f, indent=2)
@@ -57,18 +57,18 @@ def refresh_crop_schema() -> str:
     schema_path = os.path.join(SCHEMAS_DIR, "crop_dashboard.json")
     if not os.path.exists(schema_path):
         return f"Error: crop_dashboard.json schema not found at {schema_path}."
-        
+
     try:
-        with open(schema_path, "r", encoding="utf-8") as f:
+        with open(schema_path, encoding="utf-8") as f:
             schema = json.load(f)
     except Exception as e:
         return f"Error reading crop_dashboard.json: {e}"
-        
+
     nitrogen_ppm = "40-60"
     nutrient_path = os.path.join(OKF_DIR, "soil/nutrients/nitrogen.md")
     if os.path.exists(nutrient_path):
         try:
-            with open(nutrient_path, "r", encoding="utf-8") as f:
+            with open(nutrient_path, encoding="utf-8") as f:
                 content = f.read()
             if "---" in content:
                 parts = content.split("---", 2)
@@ -76,7 +76,7 @@ def refresh_crop_schema() -> str:
                 nitrogen_ppm = str(meta.get("properties", {}).get("optimal_ppm", nitrogen_ppm))
         except Exception as e:
             print(f"Warning: Failed to parse nutrient concept ({e}).")
-            
+
     temp_c = "22°C"
     try:
         url = "https://api.open-meteo.com/v1/forecast?latitude=41.85&longitude=-87.65&current_weather=true"
@@ -85,7 +85,7 @@ def refresh_crop_schema() -> str:
         temp_c = f"{round(data['current_weather']['temperature'])}°C"
     except Exception as e:
         print(f"Warning: Failed to fetch live weather temp ({e}).")
-        
+
     for comp in schema.get("components", []):
         if comp.get("type") == "grid":
             for item in comp.get("items", []):
@@ -94,7 +94,7 @@ def refresh_crop_schema() -> str:
                     item["value"] = temp_c
         elif comp.get("type") == "chart":
             comp["label"] = f"NPK Nutrient Levels (N Target: {nitrogen_ppm} PPM)"
-            
+
     try:
         with open(schema_path, "w", encoding="utf-8") as f:
             json.dump(schema, f, indent=2)
@@ -105,7 +105,7 @@ def refresh_crop_schema() -> str:
 
 def get_ui_schema(schema_name: str) -> str:
     """Read a declarative UI schema template from disk.
-    
+
     Args:
         schema_name: The name of the schema file without extension (e.g. 'crop_dashboard', 'irrigation_planner', 'market_insights', 'pest_alert', 'simulation', 'voice_interface').
     """
@@ -114,13 +114,36 @@ def get_ui_schema(schema_name: str) -> str:
         schema_path = os.path.join(SCHEMAS_DIR, f"{schema_name}.json")
     else:
         schema_path = os.path.join(SCHEMAS_DIR, schema_name)
-        
+
     if not os.path.exists(schema_path):
         return f"Error: UI schema '{schema_name}' not found."
-        
+
     try:
-        with open(schema_path, "r", encoding="utf-8") as f:
+        with open(schema_path, encoding="utf-8") as f:
             return f.read()
     except Exception as e:
         return f"Error reading UI schema '{schema_name}': {e}"
+
+
+def get_local_mandi_prices(region: str) -> dict:
+    """Retrieve localized mandi commodity prices for the farmer's region.
+
+    Args:
+        region: The district or mandi region (e.g. 'Nagpur', 'Indore', 'Pune', 'Eldoret', 'Nakuru').
+
+    Returns:
+        dict: Localized crop prices.
+    """
+    region_str = region.lower() if region else ""
+    if "nagpur" in region_str:
+        return {"wheat": "₹2,450/quintal", "corn": "₹1,980/quintal", "soybeans": "₹4,200/quintal"}
+    elif "pune" in region_str:
+        return {"wheat": "₹2,600/quintal", "corn": "₹2,100/quintal", "soybeans": "₹4,400/quintal"}
+    elif "indore" in region_str:
+        return {"wheat": "₹2,380/quintal", "corn": "₹1,850/quintal", "soybeans": "₹4,100/quintal"}
+    elif "eldoret" in region_str or "nakuru" in region_str or "kenya" in region_str:
+        return {"wheat": "KES 3,800/bag", "corn": "KES 2,900/bag", "soybeans": "KES 5,500/bag"}
+    else:
+        # Default fallback
+        return {"wheat": "₹2,450/quintal", "corn": "₹1,980/quintal", "soybeans": "₹4,200/quintal"}
 

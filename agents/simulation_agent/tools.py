@@ -1,7 +1,6 @@
 import os
 import sys
 
-
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../simulation")))
 
 from env import FarmSimulationEnv
@@ -31,14 +30,14 @@ def step_farm_simulation(days: int = 1, irrigation_liters: float = 0.0, treatmen
     global env_session
     if env_session is None:
         env_session = FarmSimulationEnv("corn")
-        
+
     latest_state = {}
     for _ in range(days):
         latest_state = env_session.step({
             "irrigation_liters": irrigation_liters,
             "treatment_applied": treatment_applied
         })
-        
+
     return {
         "status": "success",
         "current_day": len(env_session.history),

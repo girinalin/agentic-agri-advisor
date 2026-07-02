@@ -1,0 +1,19 @@
+{
+  "type": "card",
+  "titleKey": "privacy.delete.title",
+  "theme": "danger",
+  "components": [
+    {
+      "type": "header",
+      "titleKey": "privacy.delete.title",
+      "subtitleKey": "privacy.delete.subtitle"
+    },
+    {
+      "type": "actions",
+      "items": [
+        { "labelKey": "privacy.delete.action.trigger", "action": "TRIGGER_DATA_DELETION", "theme": "danger" },
+        { "labelKey": "privacy.action.cancel", "action": "CANCEL_PRIVACY_ACTION", "theme": "secondary" }
+      ]
+    }
+  ]
+}

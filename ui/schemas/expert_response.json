@@ -1,0 +1,35 @@
+{
+  "type": "card",
+  "titleKey": "escalate.response.title",
+  "theme": "success",
+  "components": [
+    {
+      "type": "header",
+      "titleKey": "escalate.response.title",
+      "subtitleKey": "escalate.response.subtitle"
+    },
+    {
+      "type": "grid",
+      "items": [
+        {
+          "labelKey": "escalate.response.diagnosis.label",
+          "value": "Potassium Deficiency / Leaf Blight",
+          "valueKey": "escalate.response.diagnosis.val",
+          "status": "optimal"
+        },
+        {
+          "labelKey": "escalate.response.solution.label",
+          "value": "Apply potassium-rich organic mulch; ensure balanced water drainage",
+          "valueKey": "escalate.response.solution.val",
+          "status": "optimal"
+        }
+      ]
+    },
+    {
+      "type": "actions",
+      "items": [
+        { "labelKey": "escalate.action.acknowledge", "action": "ACKNOWLEDGE_EXPERT_RESPONSE", "theme": "primary" }
+      ]
+    }
+  ]
+}

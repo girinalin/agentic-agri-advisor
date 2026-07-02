@@ -1,0 +1,53 @@
+{
+  "type": "card",
+  "titleKey": "photo.guidance.title",
+  "theme": "success",
+  "components": [
+    {
+      "type": "list",
+      "items": [
+        {
+          "titleKey": "photo.guidance.step1",
+          "descKey": "photo.guidance.step1.desc",
+          "status": "normal"
+        },
+        {
+          "titleKey": "photo.guidance.step2",
+          "descKey": "photo.guidance.step2.desc",
+          "status": "normal"
+        },
+        {
+          "titleKey": "photo.guidance.step3",
+          "descKey": "photo.guidance.step3.desc",
+          "status": "normal"
+        },
+        {
+          "titleKey": "photo.guidance.step4",
+          "descKey": "photo.guidance.step4.desc",
+          "status": "normal"
+        }
+      ]
+    },
+    {
+      "type": "grid",
+      "columns": 3,
+      "items": [
+        {
+          "type": "button",
+          "labelKey": "photo.guidance.openCamera",
+          "action": "OPEN_CAMERA"
+        },
+        {
+          "type": "button",
+          "labelKey": "photo.guidance.choosePhoto",
+          "action": "SELECT_EXISTING_IMAGE"
+        },
+        {
+          "type": "button",
+          "labelKey": "photo.guidance.hearInstructions",
+          "action": "PLAY_DIAGNOSIS_RESULT"
+        }
+      ]
+    }
+  ]
+}

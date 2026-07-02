@@ -1,5 +1,4 @@
 # Placeholder script to ingest agricultural facts into the OKF knowledge graph
-import sys
 
 def main():
     print("Ingesting entity files from data/entities/...")

@@ -86,3 +86,22 @@ To launch the web interface and converse with the **Krishi Sastri** advisor agen
    *   **Krishi Sampark Dashboard (Recommended):** `http://localhost:8000/agui/index.html`
    *   **Standard A2UI Client:** `http://localhost:8000/a2ui/index.html`
 
+## 📚 Project Documentation & Governance
+
+For deeper details, consult the following resources:
+*   [AI-SDLC Operational Guide (AGENTS.md)](file:///Users/nalin.giri/workspaces/agentic-agri-advisor/AGENTS.md): Coding guidelines, translation constraints, safety parameters, and definitions of done for coding LLMs and assistants.
+*   [AI-SDLC Directory (.ai-sdlc/)](file:///Users/nalin.giri/workspaces/agentic-agri-advisor/.ai-sdlc/): Governance parameters, YAML agent definitions, skills execution, quality scorecards, and release readiness reports.
+*   [Technical Architecture Guide](file:///Users/nalin.giri/workspaces/agentic-agri-advisor/docs/TECHNICAL_ARCHITECTURE.md): Comprehensive system blueprints, agent schemas, and simulation dynamics.
+*   [PWA & Local LLM Integration Plan](file:///Users/nalin.giri/workspaces/agentic-agri-advisor/docs/PWA_LLM_IMPLEMENTATION_PLAN.md): Details the client-side WebGPU local Gemma model deployment, offline TFLite camera classifier, and hybrid agent routing.
+*   [Hybrid Intelligence Strategy](file:///Users/nalin.giri/workspaces/agentic-agri-advisor/docs/HYBRID_INTELLIGENCE_STRATEGY.md): Details the query-triage router (Local Edge vs Cloud Agent Network) and outlines offline/online mobile use cases.
+
+## 🛠️ Verification Gates
+
+Run pre-PR quality, safety, and translation validation checks locally:
+```bash
+make ai-sdlc-check
+```
+Verify staging/production release eligibility and compile quality scorecards:
+```bash
+make release-check
+```

@@ -1,6 +1,7 @@
 from google.adk.agents import Agent
 from google.adk.models import Gemini
 from google.genai import types
+
 from agents.dashboard_agent.tools import get_ui_schema
 
 irrigation_advisor_agent = Agent(

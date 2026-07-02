@@ -4,87 +4,256 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Krishi Sampark - Traditional Agriculture Advisor</title>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#2C6B37">
   <link rel="stylesheet" href="styles.css">
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
-<body>
-  <div class="dashboard-grid hybrid-layout">
-    <!-- Left Pane: Dynamic UI Workspace -->
-    <aside class="workspace-pane">
-      <header class="workspace-header">
-        <div class="logo">🌾 Krishi Sampark</div>
-        <div class="header-selectors" style="display: flex; gap: 0.5rem; align-items: center;">
-          <select id="field-selector" class="field-select-dropdown">
-            <option value="">Loading Fields...</option>
-          </select>
-          <select id="language-selector" class="field-select-dropdown">
-            <option value="English">English</option>
-            <option value="Hindi">Hindi (हिंदी)</option>
-            <option value="Marathi">Marathi (मराठी)</option>
-            <option value="Telugu">Telugu (తెలుగు)</option>
-            <option value="Swahili">Swahili (Kiswahili)</option>
-          </select>
-          <label style="display: flex; align-items: center; gap: 0.25rem; font-size: 0.85rem; color: var(--text-main); cursor: pointer; user-select: none;">
-            <input type="checkbox" id="tts-toggle" style="cursor: pointer;">
-            🔊 Auto-Speak
-          </label>
+<body class="dark-theme">
+  <div class="app-layout">
+    <div id="left-nav-backdrop" class="left-nav-backdrop" style="display: none;"></div>
+    <!-- Responsive Mobile Shell Container -->
+    <div class="mobile-shell">
+      
+      <!-- COLLAPSIBLE LEFT NAVIGATION -->
+      <aside id="left-nav" class="left-nav-container" aria-label="Main Navigation">
+        <div class="left-nav-header">
+          <div class="left-nav-logo">🌾 <span class="logo-text">Krishi Sampark</span></div>
+          <button id="left-nav-toggle-btn" class="nav-toggle-btn" aria-expanded="true" aria-label="Collapse Navigation">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+              <line x1="9" y1="3" x2="9" y2="21"/>
+            </svg>
+          </button>
         </div>
-      </header>
-      
-      <!-- Horizontal Tab Segment Controls -->
-      <nav class="workspace-tabs" id="dashboard-nav">
-        <a href="#" data-schema="crop_dashboard" class="tab-btn active">🌾 Health</a>
-        <a href="#" data-schema="irrigation_planner" class="tab-btn">💧 Irrigation</a>
-        <a href="#" data-schema="pest_alert" class="tab-btn">🐛 Pests</a>
-        <a href="#" data-schema="market_insights" class="tab-btn">📈 Markets</a>
-        <a href="#" data-schema="simulation" class="tab-btn">🎮 Simulator</a>
-        <a href="#" id="nav-profile-link" data-schema="farmer_profile" class="tab-btn">🧬 Profile</a>
-      </nav>
-      
-      <!-- Dynamic A2UI Canvas -->
-      <div class="canvas-container">
-        <div id="agui-canvas"></div>
-      </div>
-      
-      <!-- Floating Action Buttons (FABs) -->
-      <div class="fab-container">
-        <button id="fab-diagnose" class="fab-btn" title="Diagnose Crop Disease">🚨 Diagnose Crop</button>
-        <button id="fab-refresh" class="fab-btn" title="Refresh Live Data">🔄 Refresh Data</button>
-        <button id="fab-run" class="fab-btn" title="Advance Simulation Step">🎮 Run Simulation</button>
-      </div>
-    </aside>
-
-    <!-- Right Pane: Persistent Assistant Chat Panel -->
-    <main class="chat-pane">
-      <header class="chat-header">
-        <h2>Krishi Sastri Chat Portal</h2>
-        <div class="system-status">
-          <span id="agents-status-indicator" class="status-indicator online"></span>
-          <span id="agents-status-text" class="status-text">Agents Online</span>
-        </div>
-      </header>
-
-      <section class="chat-container">
-        <div id="chat-messages" class="chat-box">
-          <div class="message system-msg">
-            <strong>System:</strong> Connected to AAA Coordinator. Interactive dashboard widgets will show on the left workspace panel automatically as we discuss weather, pricing, alerts, or simulator settings.
+        <nav class="left-nav-links" id="left-nav-links-list"></nav>
+        <div class="left-nav-footer">
+          <div class="profile-info">
+            <span class="profile-avatar">👨‍🌾</span>
+            <span class="profile-name" id="left-nav-profile-name">माधव जी</span>
           </div>
         </div>
-        
-        <div class="chat-input-bar">
-          <input type="text" id="user-input-field" placeholder="Ask the advisor a question or trigger a tool...">
-          <button id="mic-btn" class="mic-btn" title="Record Voice Input">🎙️</button>
-          <button id="send-btn" class="send-btn">Send</button>
+      </aside>
+      
+      <!-- GLOBAL HEADER -->
+      <header class="app-header">
+        <div class="header-top">
+          <button id="menu-toggle-btn" class="menu-toggle-btn" aria-label="Open Navigation Menu">☰</button>
+          <div class="logo">🌾 Krishi Sampark</div>
+          <div class="header-right">
+            <select id="user-mode-selector" class="header-dropdown" style="margin-right: 8px; font-weight: bold; background: var(--border);">
+              <option value="farmer">👨‍🌾 Farmer Mode</option>
+              <option value="expert">💻 Expert Console</option>
+            </select>
+            <button id="theme-toggle-btn" class="theme-btn" title="Toggle Light/Dark Theme">🌙</button>
+            <select id="language-selector" class="header-dropdown">
+              <option value="en">English</option>
+              <option value="hi">Hindi (हिंदी)</option>
+              <option value="mr">Marathi (मराठी)</option>
+              <option value="te">Telugu (తెలుగు)</option>
+              <option value="sw">Swahili (Kiswahili)</option>
+            </select>
+          </div>
         </div>
-      </section>
-    </main>
+        <div class="header-profile-bar">
+          <div class="profile-info">
+            <span class="profile-avatar">👨‍🌾</span>
+            <span id="header-farmer-name" class="profile-name">माधव जी</span>
+            <span class="profile-separator">·</span>
+            <select id="field-selector" class="field-select-minimal">
+              <option value="">Loading Fields...</option>
+            </select>
+          </div>
+          <!-- Dynamic Network Sync Status Bar -->
+          <div class="sync-status-bar">
+            <span id="agents-status-indicator" class="status-indicator online"></span>
+            <span id="agents-status-text" class="status-text">Connected</span>
+            <span id="sync-queue-badge" class="sync-queue-badge" style="display: none; margin-left: 8px; padding: 2px 6px; border-radius: 12px; background: rgba(255,255,255,0.15); font-size: 0.8rem; font-weight: bold; align-items: center;">🔄 0 Pending</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- SCREEN WRAPPER / ACTIVE CANVAS -->
+      <main class="screen-container">
+        
+        <!-- SCREEN 1: HOME PANEL -->
+        <section id="screen-home" class="app-screen active">
+          <!-- Dynamically loaded via Home Schema -->
+          <div id="home-canvas"></div>
+        </section>
+
+        <!-- SCREEN 2: MY FARM PANEL -->
+        <section id="screen-farm" class="app-screen">
+          <div id="farm-canvas"></div>
+        </section>
+
+        <!-- SCREEN 3: ASK / CHAT PANEL -->
+        <section id="screen-ask" class="app-screen">
+          <!-- Voice Assistant Main Interface -->
+          <div class="voice-assistant-view">
+            <button id="close-drawer-btn" class="close-drawer-btn" style="display: none; background: none; border: none; font-size: 1.5rem; color: var(--text-main); cursor: pointer; align-self: flex-end; padding: 5px 15px;">✕ Close</button>
+            <div id="assistant-info-pane" style="padding: 10px; margin: 10px; border-radius: 8px; background: var(--bg-dark); border: 1px solid var(--border); font-size: 0.9rem;"></div>
+            <!-- Chat history bubble area -->
+            <div id="chat-messages" class="chat-messages-container">
+              <div class="message system-msg">
+                <strong>System:</strong> Connected to Sastri Advisor. Tap the green microphone to speak in your local language or type below.
+              </div>
+            </div>
+            
+            <!-- Standard Chat inputs -->
+            <div class="voice-controls">
+              <!-- Large Voice Button W/ Soundwave Animation -->
+              <div class="mic-button-wrapper">
+                <button id="main-voice-btn" class="main-voice-btn" title="Speak to Advisor">🎙️</button>
+                <div class="wave-animation" id="mic-wave-container" style="display: none;">
+                  <div class="wave-bar"></div>
+                  <div class="wave-bar"></div>
+                  <div class="wave-bar"></div>
+                  <div class="wave-bar"></div>
+                  <div class="wave-bar"></div>
+                </div>
+                <div class="voice-instruction-text" id="voice-status-label">बोलकर पूछें</div>
+                <div class="voice-sub-text" id="voice-sub-label">मैं आपकी भाषा में सुनूँगा</div>
+              </div>
+              
+              <!-- Keyboard Text Input Bar (Farmer friendly) -->
+              <div class="text-input-bar">
+                <input type="text" id="user-input-field" placeholder="लिखकर पूछें...">
+                <button id="send-btn" class="send-action-btn">➔</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SCREEN 4: MARKET PANEL -->
+        <section id="screen-market" class="app-screen">
+          <div id="market-canvas"></div>
+        </section>
+
+        <!-- SCREEN 5: MORE PANEL -->
+        <section id="screen-more" class="app-screen">
+          <div id="more-canvas"></div>
+        </section>
+
+        <!-- SCREEN 6: EXPERT CONSOLE -->
+        <section id="screen-console" class="app-screen">
+          <div id="console-canvas"></div>
+        </section>
+
+        <!-- SCREEN 7: CONSULTATIONS -->
+        <section id="screen-consultations" class="app-screen">
+          <div id="consultations-canvas"></div>
+        </section>
+
+        <!-- SCREEN 8: REGIONAL INTEL -->
+        <section id="screen-outbreak" class="app-screen">
+          <div id="outbreak-canvas"></div>
+        </section>
+
+        <!-- SCREEN 9: GOVERNANCE -->
+        <section id="screen-governance" class="app-screen">
+          <div id="governance-canvas"></div>
+        </section>
+
+        <!-- SCREEN 10: EVALUATION -->
+        <section id="screen-evaluation" class="app-screen">
+          <div id="evaluation-canvas"></div>
+        </section>
+
+        <!-- SCREEN 11: AUDIT -->
+        <section id="screen-audit" class="app-screen">
+          <div id="audit-canvas"></div>
+        </section>
+
+        <!-- SCREEN 12: SETTINGS -->
+        <section id="screen-settings" class="app-screen">
+          <div id="settings-canvas"></div>
+        </section>
+
+      </main>
+
+      <!-- GLOBAL BOTTOM NAVIGATION BAR -->
+      <nav class="bottom-nav-bar">
+        <a href="#" data-tab="home" class="nav-tab active">
+          <span class="nav-icon">🏠</span>
+          <span class="nav-label" data-tr="nav_home">Home</span>
+        </a>
+        <a href="#" data-tab="farm" class="nav-tab">
+          <span class="nav-icon">🌱</span>
+          <span class="nav-label" data-tr="nav_farm">My Farm</span>
+        </a>
+        <a href="#" data-tab="ask" class="nav-tab nav-tab-center">
+          <div class="nav-mic-bubble">
+            <span class="nav-icon mic-icon">🎙️</span>
+          </div>
+          <span class="nav-label" data-tr="nav_ask">Ask</span>
+        </a>
+        <a href="#" data-tab="market" class="nav-tab">
+          <span class="nav-icon">📈</span>
+          <span class="nav-label" data-tr="nav_market">Market</span>
+        </a>
+        <a href="#" data-tab="more" class="nav-tab">
+          <span class="nav-icon">📋</span>
+          <span class="nav-label" data-tr="nav_more">More</span>
+        </a>
+      </nav>
+
+    </div>
   </div>
+
+  <!-- Camera Viewfinder Modal -->
+  <div id="camera-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+      <header class="modal-header">
+        <h3>Diagnose Photo</h3>
+        <button id="camera-close-btn" class="close-btn">&times;</button>
+      </header>
+      <div class="viewfinder-container">
+        <video id="camera-viewfinder" autoplay playsinline></video>
+        <canvas id="camera-canvas" style="display: none;"></canvas>
+        <div id="camera-fallback-container" style="display: none; text-align: center; padding: 2rem; width: 100%;">
+          <p style="margin-bottom: 1rem; color: var(--text-main);">Camera stream is unavailable. Please upload a photo:</p>
+          <input type="file" id="camera-file-input" accept="image/*" capture="environment" style="display: none;">
+          <button id="camera-upload-trigger-btn" class="a2ui-btn" style="max-width: 200px; margin: 0 auto;">Choose File</button>
+          <div id="camera-file-name" style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-sub);"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="camera-capture-btn" class="a2ui-btn" style="margin: 0; flex: 1;">📸 Take Photo</button>
+        <button id="camera-analyze-btn" class="a2ui-btn success" style="display: none; margin: 0; flex: 1;">🔬 Analyze Photo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden elements to satisfy existing scripts if required -->
+  <button id="download-model-btn" style="display: none;"></button>
+  <button id="fab-diagnose" style="display: none;"></button>
+  <button id="fab-refresh" style="display: none;"></button>
+  <button id="fab-run" style="display: none;"></button>
+  <button id="camera-btn" style="display: none;"></button>
+  <button id="mic-btn" style="display: none;"></button>
+  <label style="display: none;"><input type="checkbox" id="tts-toggle" checked></label>
 
   <!-- Toast Notification Container -->
   <div id="toast-container" class="toast-container"></div>
 
   <script src="../a2ui/app.js"></script>
   <script src="panel_router.js"></script>
+  <script src="translations.js"></script>
+  <script src="voice.js"></script>
+  <script src="expert_dashboards.js"></script>
+  <script src="camera.js"></script>
+  <script src="local_db.js"></script>
+  <script src="local_models.js"></script>
   <script src="dashboard.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(reg => console.log('[PWA] ServiceWorker registered:', reg.scope))
+          .catch(err => console.error('[PWA] ServiceWorker registration failed:', err));
+      });
+    }
+  </script>
 </body>
 </html>
