@@ -2,6 +2,38 @@ import json
 import os
 import subprocess
 
+from pathlib import Path
+from xml.etree import ElementTree as ET
+
+
+def parse_junit(junit_path: str) -> dict:
+    """Parse a JUnit XML file and return structured test evidence.
+
+    Args:
+        junit_path: Path to the JUnit XML file.
+
+    Returns:
+        Dict with total_tests, failed_tests, passed_tests, suites.
+
+    Raises:
+        ValueError: If the XML is malformed or invalid JUnit format.
+    """
+    try:
+        ET.parse(junit_path)
+    except ET.ParseError as exc:
+        raise ValueError(f"Malformed JUnit XML: {exc}")
+
+    root = ET.parse(junit_path).getroot()
+    total = int(root.attrib.get("tests", 0))
+    failures = int(root.attrib.get("failures", 0))
+    errors = int(root.attrib.get("errors", 0))
+
+    return {
+        "total_tests": total,
+        "failed_tests": failures + errors,
+        "passed_tests": total - (failures + errors),
+    }
+
 
 def collect_evidence():
     evidence = {

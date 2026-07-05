@@ -16,19 +16,40 @@ EVIDENCE_DIR = (
 )
 
 
-def unavailable(tool_name: str) -> dict:
-    """Return a NOT_EXECUTED evidence record for a missing tool."""
-    return {
-        "artifactId": f"security-{tool_name}",
-        "artifactType": f"security-{tool_name}",
-        "path": str(EVIDENCE_DIR / f"{tool_name}.json"),
+def unavailable(
+    tool_name: str,
+    artifact_id: str,
+    artifact_type: str,
+    output_path: Path,
+) -> int:
+    """Write a NOT_EXECUTED evidence record for a missing security tool.
+
+    Args:
+        tool_name: Name of the security scanner tool.
+        artifact_id: Unique identifier for this evidence record.
+        artifact_type: Category of the scanner (e.g., 'security-secrets').
+        output_path: Where to write the NOT_EXECUTED evidence JSON.
+
+    Returns:
+        Exit code 2 (NOT_EXECUTED).
+    """
+    record = {
+        "artifactId": artifact_id,
+        "artifactType": artifact_type,
+        "path": str(output_path),
         "status": "NOT_EXECUTED",
         "generatedAt": datetime.now(UTC).isoformat(),
         "command": tool_name,
-        "exitCode": 127,
+        "exitCode": 2,
         "sourceTool": tool_name,
         "metadata": {"findingCount": 0},
     }
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(output_path, "w", encoding="utf-8") as f:
+        json.dump(record, f, indent=2)
+
+    return 2
 
 
 def run_scanner(tool_name: str, command: list[str], evidence_file: str = None) -> dict:
@@ -54,7 +75,7 @@ def run_scanner(tool_name: str, command: list[str], evidence_file: str = None) -
             "timestamp": datetime.now(UTC).isoformat(),
         }
     except FileNotFoundError:
-        evidence = unavailable(tool_name)
+        evidence = unavailable(tool_name, f"security-{tool_name}", f"security-{tool_name}", EVIDENCE_DIR / f"{tool_name}.json")
         evidence["command"] = " ".join(command)
     except subprocess.TimeoutExpired:
         evidence = {

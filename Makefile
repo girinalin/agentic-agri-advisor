@@ -13,7 +13,7 @@ typecheck:
 	$(UV) run ty check
 
 test:
-	$(UV) run pytest tests/ --ignore=scratch/
+	$(UV) run pytest tests/ --ignore=tests/integration/ --ignore=scratch/
 
 test-integration:
 	$(UV) run pytest tests/integration/ --ignore=scratch/

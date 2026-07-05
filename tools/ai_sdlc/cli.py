@@ -91,6 +91,7 @@ def run_test_evidence():
         "pytest",
         "tests/",
         "--ignore=scratch/",
+        "--ignore=tests/integration/",
         f"--junitxml={junit_path}",
     ]
     print(f"Running: {' '.join(cmd)}")

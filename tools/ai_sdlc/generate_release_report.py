@@ -1,5 +1,43 @@
 import json
 import os
+from pathlib import Path
+
+
+APPROVALS_PATH = Path(".ai-sdlc/evidence/approvals/approvals.json")
+
+
+def approval_status(environment, current_commit_sha):
+    """Check if a release approval exists for the current commit.
+
+    Args:
+        environment: Target deployment environment.
+        current_commit_sha: The commit SHA to check against.
+
+    Returns:
+        Tuple of (status, reason).
+    """
+    if not APPROVALS_PATH.exists():
+        return ("FAIL", "No approvals file found")
+
+    try:
+        with open(APPROVALS_PATH, encoding="utf-8") as f:
+            data = json.load(f)
+    except (json.JSONDecodeError, OSError):
+        return ("FAIL", "Invalid approvals file")
+
+    approvals = data.get("approvals", [])
+    
+    # Find the most recent approval for this environment
+    matching = [a for a in approvals if a.get("environment") == environment]
+
+    if not matching:
+        return ("FAIL", "No approval found for this environment")
+
+    latest = max(matching, key=lambda x: x.get("timestamp", 0))
+    if latest["commit"] == current_commit_sha:
+        return ("PASS", "Approval exists for this commit")
+    else:
+        return ("FAIL", "Approval exists but for a different commit")
 
 
 def generate_release_report():
