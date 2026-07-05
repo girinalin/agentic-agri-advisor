@@ -18,6 +18,7 @@ import argparse
 import os
 import subprocess
 import sys
+from datetime import UTC
 from pathlib import Path
 
 import yaml
@@ -29,7 +30,7 @@ MANIFEST_PATH = REPO_ROOT / ".ai-sdlc" / "manifest.yaml"
 
 def load_manifest():
     """Load the AI-SDLC manifest to get toolRegistry."""
-    with open(MANIFEST_PATH, "r") as f:
+    with open(MANIFEST_PATH) as f:
         # Strip cache control artifacts from manifest
         content = f.read()
         # Find the end of valid YAML (stop at any non-YAML artifact)
@@ -70,7 +71,7 @@ def load_agent(agent_name):
         print(f"   Available: {list(name_map.keys())}")
         return None
 
-    with open(agent_file, "r") as f:
+    with open(agent_file) as f:
         return yaml.safe_load(f)
 
 
@@ -111,12 +112,12 @@ def run_agent(agent_name, tool_registry):
     permitted_tools = agent.get("permittedTools", [])
     evidence_produced = agent.get("evidenceProduced", "none")
 
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print(f"🤖 Lifecycle Agent: {agent_display}")
     print(f"   Purpose: {agent.get('purpose', 'N/A')}")
     print(f"   Permitted tools: {permitted_tools}")
     print(f"   Evidence: {evidence_produced}")
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
 
     if not permitted_tools:
         print("  ⚠️  No permitted tools defined — skipping execution.")
@@ -162,10 +163,14 @@ def run_agent(agent_name, tool_registry):
             "toolsRun": list(results.keys()),
             "toolsPassed": passed,
             "toolsTotal": total,
-            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
         }
         # Write to the first evidence file name
-        evidence_file = evidence_produced[0] if isinstance(evidence_produced, list) else evidence_produced
+        evidence_file = (
+            evidence_produced[0]
+            if isinstance(evidence_produced, list)
+            else evidence_produced
+        )
         evidence_path = evidence_dir / evidence_file
         with open(evidence_path, "w") as f:
             json.dump(evidence_data, f, indent=2)
@@ -192,12 +197,12 @@ def run_all_agents(tool_registry):
             all_passed = False
             print(f"\n⚠️  Agent '{agent_name}' failed — continuing to next agent")
 
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     if all_passed:
         print("✅ All lifecycle agents passed.")
     else:
         print("❌ Some lifecycle agents failed.")
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
     return all_passed
 
 

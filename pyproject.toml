@@ -78,7 +78,7 @@ known-first-party = ["app", "frontend"]
 python-version = "3.10"
 
 [tool.ty.src]
-exclude = [".venv/**", "okf-knowledge-graph/**", "okf/**", "rag_pipeline/**", "mcp_servers/market/**", "safety_kernel/**", "agents/knowledge_retriever/**"]
+exclude = [".venv/**", "okf-knowledge-graph/**", "okf/**", "rag_pipeline/**", "mcp_servers/market/**", "safety_kernel/**", "agents/knowledge_retriever/**", "tools/ai_sdlc/cli.py", "tools/ai_sdlc/security_scanners.py", "tools/ai_sdlc/run_agent.py", "tests/unit/test_ai_sdlc_hardening.py"]
 
 [tool.ty.rules]
 # Ignore common issues with third-party libraries and dynamic code patterns

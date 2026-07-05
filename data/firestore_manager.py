@@ -61,6 +61,7 @@ def _get_firestore():
         if emulator_host:
             # Local Firestore Emulator — no credentials needed
             from google.auth.credentials import AnonymousCredentials
+
             _firestore_client = firestore.Client(
                 project=project_id or "emulator-project",
                 credentials=AnonymousCredentials(),

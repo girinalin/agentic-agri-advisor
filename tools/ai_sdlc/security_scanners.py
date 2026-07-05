@@ -8,10 +8,12 @@ and records NOT_EXECUTED when a tool is not installed.
 import json
 import os
 import subprocess
-from datetime import datetime, timezone
+from datetime import UTC, datetime, timezone
 from pathlib import Path
 
-EVIDENCE_DIR = Path(__file__).resolve().parents[2] / ".ai-sdlc" / "evidence" / "security"
+EVIDENCE_DIR = (
+    Path(__file__).resolve().parents[2] / ".ai-sdlc" / "evidence" / "security"
+)
 
 
 def unavailable(tool_name: str) -> dict:
@@ -21,7 +23,7 @@ def unavailable(tool_name: str) -> dict:
         "artifactType": f"security-{tool_name}",
         "path": str(EVIDENCE_DIR / f"{tool_name}.json"),
         "status": "NOT_EXECUTED",
-        "generatedAt": datetime.now(timezone.utc).isoformat(),
+        "generatedAt": datetime.now(UTC).isoformat(),
         "command": tool_name,
         "exitCode": 127,
         "sourceTool": tool_name,
@@ -49,7 +51,7 @@ def run_scanner(tool_name: str, command: list[str], evidence_file: str = None) -
             "exitCode": result.returncode,
             "output": result.stdout[:5000],
             "command": " ".join(command),
-            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
         }
     except FileNotFoundError:
         evidence = unavailable(tool_name)
@@ -61,7 +63,7 @@ def run_scanner(tool_name: str, command: list[str], evidence_file: str = None) -
             "exitCode": -1,
             "error": "Timeout after 120s",
             "command": " ".join(command),
-            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
         }
 
     with open(evidence_path, "w") as f:
@@ -83,7 +85,9 @@ def scan_dependencies():
 def scan_sast():
     """Run static analysis security testing (bandit)."""
     sast_path = EVIDENCE_DIR / "sast.json"
-    return run_scanner("sast", ["bandit", "-r", ".", "-f", "json", "-o", str(sast_path)])
+    return run_scanner(
+        "sast", ["bandit", "-r", ".", "-f", "json", "-o", str(sast_path)]
+    )
 
 
 def scan_container():

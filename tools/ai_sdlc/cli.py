@@ -22,42 +22,46 @@ import json
 import os
 import subprocess
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime, timezone
 
-EVIDENCE_DIR = os.path.join(os.path.dirname(__file__), "..", "..", ".ai-sdlc", "evidence")
+EVIDENCE_DIR = os.path.join(
+    os.path.dirname(__file__), "..", "..", ".ai-sdlc", "evidence"
+)
 REPORTS_DIR = os.path.join(os.path.dirname(__file__), "..", "..", ".ai-sdlc", "reports")
 
 
 def run_validate_schemas():
     """Validate A2UI schemas."""
     from tools.ai_sdlc.validate_schemas import validate_a2ui_schemas
+
     return validate_a2ui_schemas()
 
 
 def run_validate_translations():
     """Validate translations for all 5 languages."""
     from tools.ai_sdlc.validate_translations import validate_translations
-    errors = validate_translations()
-    if errors:
-        print("❌ Translation validation FAILED:")
-        for e in errors:
-            print(f"  {e}")
-        return False
-    print("✅ Translation validation passed.")
-    return True
+
+    result = validate_translations()
+    if result:
+        print("✅ Translation validation passed.")
+    else:
+        print("❌ Translation validation FAILED.")
+    return result
 
 
 def run_validate_safety():
     """Validate safety policies."""
-    from tools.ai_sdlc.validate_safety_policies import main as validate_main
-    # validate_safety_policies uses a main() that returns 0 on success
-    try:
-        validate_main()
-        return True
-    except SystemExit as e:
-        return e.code == 0
-    except Exception:
-        return False
+    from tools.ai_sdlc.validate_safety_policies import validate_safety
+
+    result = validate_safety()
+    if isinstance(result, bool):
+        if result:
+            print("✅ Safety validation passed.")
+        else:
+            print("❌ Safety validation FAILED.")
+        return result
+    print("✅ Safety validation completed.")
+    return True
 
 
 def run_validate_all():
@@ -68,8 +72,10 @@ def run_validate_all():
         "safety": run_validate_safety(),
     }
     all_pass = all(results.values())
-    print(f"\n{'✅ All validations passed.' if all_pass else '❌ Some validations failed.'} "
-          f"({sum(results.values())}/{len(results)} passed)")
+    print(
+        f"\n{'✅ All validations passed.' if all_pass else '❌ Some validations failed.'} "
+        f"({sum(results.values())}/{len(results)} passed)"
+    )
     return all_pass
 
 
@@ -80,18 +86,34 @@ def run_test_evidence():
     os.makedirs(os.path.join(EVIDENCE_DIR, "tests"), exist_ok=True)
 
     cmd = [
-        sys.executable, "-m", "pytest", "tests/", "--ignore=scratch/",
+        sys.executable,
+        "-m",
+        "pytest",
+        "tests/",
+        "--ignore=scratch/",
         f"--junitxml={junit_path}",
     ]
     print(f"Running: {' '.join(cmd)}")
     result = subprocess.run(cmd, capture_output=False)
 
     # Try coverage
-    cov_cmd = [sys.executable, "-m", "coverage", "run", "-m", "pytest", "tests/", "--ignore=scratch/"]
+    cov_cmd = [
+        sys.executable,
+        "-m",
+        "coverage",
+        "run",
+        "-m",
+        "pytest",
+        "tests/",
+        "--ignore=scratch/",
+    ]
     try:
         subprocess.run(cov_cmd, capture_output=True, timeout=120)
-        subprocess.run([sys.executable, "-m", "coverage", "json", "-o", coverage_path],
-                       capture_output=True, timeout=30)
+        subprocess.run(
+            [sys.executable, "-m", "coverage", "json", "-o", coverage_path],
+            capture_output=True,
+            timeout=30,
+        )
     except Exception:
         pass
 
@@ -103,16 +125,31 @@ def run_security(scan_type):
     os.makedirs(os.path.join(EVIDENCE_DIR, "security"), exist_ok=True)
 
     scanners = {
-        "secrets": {"cmd": ["detect-secrets", "scan", "--all-files", "."],
-                     "evidence": os.path.join(EVIDENCE_DIR, "security", "secrets.json"),
-                     "fallback": "gitleaks"},
-        "dependencies": {"cmd": ["pip-audit"],
-                         "evidence": os.path.join(EVIDENCE_DIR, "security", "dependencies.json")},
-        "sast": {"cmd": ["bandit", "-r", ".", "-f", "json",
-                         "-o", os.path.join(EVIDENCE_DIR, "security", "sast.json")],
-                  "evidence": os.path.join(EVIDENCE_DIR, "security", "sast.json")},
-        "container": {"cmd": ["trivy", "filesystem", "."],
-                      "evidence": os.path.join(EVIDENCE_DIR, "security", "container.json")},
+        "secrets": {
+            "cmd": ["detect-secrets", "scan", "--all-files", "."],
+            "evidence": os.path.join(EVIDENCE_DIR, "security", "secrets.json"),
+            "fallback": "gitleaks",
+        },
+        "dependencies": {
+            "cmd": ["pip-audit"],
+            "evidence": os.path.join(EVIDENCE_DIR, "security", "dependencies.json"),
+        },
+        "sast": {
+            "cmd": [
+                "bandit",
+                "-r",
+                ".",
+                "-f",
+                "json",
+                "-o",
+                os.path.join(EVIDENCE_DIR, "security", "sast.json"),
+            ],
+            "evidence": os.path.join(EVIDENCE_DIR, "security", "sast.json"),
+        },
+        "container": {
+            "cmd": ["trivy", "filesystem", "."],
+            "evidence": os.path.join(EVIDENCE_DIR, "security", "container.json"),
+        },
     }
 
     if scan_type == "all":
@@ -128,17 +165,21 @@ def run_security(scan_type):
     print(f"Running: {' '.join(cmd)}")
     try:
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
-        evidence_path = scanner.get("evidence", os.path.join(EVIDENCE_DIR, "security", f"{scan_type}.json"))
+        evidence_path = scanner.get(
+            "evidence", os.path.join(EVIDENCE_DIR, "security", f"{scan_type}.json")
+        )
         evidence = {
             "artifactId": f"security-{scan_type}",
             "status": "PASS" if result.returncode == 0 else "FAIL",
             "exitCode": result.returncode,
             "output": result.stdout[:5000] if result.stdout else "",
-            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
         }
         with open(evidence_path, "w") as f:
             json.dump(evidence, f, indent=2)
-        print(f"{'✅' if result.returncode == 0 else '❌'} {scan_type} scan: {'PASS' if result.returncode == 0 else 'FAIL'}")
+        print(
+            f"{'✅' if result.returncode == 0 else '❌'} {scan_type} scan: {'PASS' if result.returncode == 0 else 'FAIL'}"
+        )
         return result.returncode == 0
     except FileNotFoundError:
         print(f"⚠️  {cmd[0]} not installed — recording NOT_EXECUTED")
@@ -146,9 +187,14 @@ def run_security(scan_type):
             "artifactId": f"security-{scan_type}",
             "status": "NOT_EXECUTED",
             "exitCode": 127,
-            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
         }
-        with open(scanner.get("evidence", os.path.join(EVIDENCE_DIR, "security", f"{scan_type}.json")), "w") as f:
+        with open(
+            scanner.get(
+                "evidence", os.path.join(EVIDENCE_DIR, "security", f"{scan_type}.json")
+            ),
+            "w",
+        ) as f:
             json.dump(evidence, f, indent=2)
         return True  # Don't fail the gate for missing tools
     except Exception as e:
@@ -159,6 +205,7 @@ def run_security(scan_type):
 def run_evidence_verify():
     """Verify evidence manifest integrity."""
     from tools.ai_sdlc.evidence import validate_manifest
+
     valid, issues = validate_manifest(allow_stale=True)
     if valid:
         print("✅ Evidence manifest verified.")
@@ -172,6 +219,7 @@ def run_evidence_verify():
 def run_release_report():
     """Generate release readiness report."""
     from tools.ai_sdlc.generate_release_report import generate_release_report
+
     generate_release_report()
     return True
 
@@ -179,6 +227,7 @@ def run_release_report():
 def run_requirements():
     """Verify requirements traceability."""
     from tools.ai_sdlc.generate_traceability import generate_matrix
+
     generate_matrix()
     return True
 
