@@ -1,5 +1,5 @@
 # Tools for pest & disease detection
-from google.adk.tools import ToolContext
+
 
 def prescribe_treatment(pest_name: str, crop: str) -> dict:
     """Prescribe biological or chemical treatment for a detected pest/disease.
@@ -11,4 +11,8 @@ def prescribe_treatment(pest_name: str, crop: str) -> dict:
     Returns:
         dict: Treatment prescription details.
     """
-    return {"status": "success", "treatment": "Apply organic neem oil spray.", "urgency": "high"}
+    return {
+        "status": "success",
+        "treatment": "Apply organic neem oil spray.",
+        "urgency": "high",
+    }

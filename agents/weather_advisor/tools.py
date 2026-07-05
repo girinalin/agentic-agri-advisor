@@ -1,5 +1,5 @@
 # Placeholder tools for weather advisor
-from google.adk.tools import ToolContext
+
 
 def predict_frost_risk(temperature: float, humidity: float) -> dict:
     """Predict risk of crop frost damage based on current temperature and humidity.

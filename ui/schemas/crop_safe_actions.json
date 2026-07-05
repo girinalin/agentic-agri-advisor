@@ -1,0 +1,42 @@
+{
+  "type": "card",
+  "titleKey": "photo.safe.title",
+  "theme": "success",
+  "components": [
+    {
+      "type": "list",
+      "items": [
+        {
+          "titleKey": "photo.safe.safety_kernel",
+          "descKey": "photo.safe.step1",
+          "status": "normal"
+        },
+        {
+          "titleKey": "photo.safe.safety_kernel",
+          "descKey": "photo.safe.step2",
+          "status": "normal"
+        },
+        {
+          "titleKey": "photo.safe.safety_kernel",
+          "descKey": "photo.safe.step3",
+          "status": "normal"
+        },
+        {
+          "titleKey": "photo.safe.safety_kernel",
+          "descKey": "photo.safe.step4",
+          "status": "normal"
+        },
+        {
+          "titleKey": "photo.safe.safety_kernel",
+          "descKey": "photo.safe.step5",
+          "status": "normal"
+        }
+      ]
+    },
+    {
+      "type": "button",
+      "labelKey": "photo.safe.back",
+      "action": "START_CROP_DIAGNOSIS"
+    }
+  ]
+}

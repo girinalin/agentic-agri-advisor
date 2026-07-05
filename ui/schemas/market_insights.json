@@ -1,11 +1,40 @@
 {
   "type": "card",
-  "title": "Commodity Market Pricing",
+  "titleKey": "market.title",
   "theme": "market",
   "components": [
     {
-      "type": "text",
-      "value": "Live Chicago Board of Trade (CBOT) futures rates and export volume trends."
+      "type": "header",
+      "titleKey": "market.title",
+      "subtitleKey": "market.subtitle"
+    },
+    {
+      "type": "form",
+      "fields": [
+        {
+          "type": "select",
+          "name": "mandi_selector",
+          "labelKey": "market.mandi.label",
+          "options": [
+            {
+              "value": "Nagpur District",
+              "label": "Nagpur Mandi"
+            },
+            {
+              "value": "Pune District",
+              "label": "Pune Mandi"
+            },
+            {
+              "value": "Indore District",
+              "label": "Indore Mandi"
+            },
+            {
+              "value": "Rift Valley Region",
+              "label": "Eldoret Mandi (Kenya)"
+            }
+          ]
+        }
+      ]
     },
     {
       "type": "grid",
@@ -13,28 +42,50 @@
       "items": [
         {
           "type": "metric",
-          "label": "CBOT Corn / bu",
-          "value": "$4.19",
+          "labelKey": "market.local.wheat",
+          "value": "\u20b92,450/quintal",
+          "valueKey": "market.local.wheat.val",
           "status": "optimal"
         },
         {
           "type": "metric",
-          "label": "CBOT Wheat / bu",
-          "value": "$5.91",
+          "labelKey": "market.local.corn",
+          "value": "\u20b91,980/quintal",
+          "valueKey": "market.local.corn.val",
+          "status": "optimal"
+        },
+        {
+          "type": "metric",
+          "labelKey": "market.local.soy",
+          "value": "\u20b94,200/quintal",
+          "valueKey": "market.local.soy.val",
           "status": "warning"
-        },
-        {
-          "type": "metric",
-          "label": "CBOT Soy / bu",
-          "value": "$11.53",
-          "status": "optimal"
         }
       ]
     },
     {
-      "type": "button",
-      "label": "\ud83d\udcca Export Market Analysis",
-      "action": "export_market"
+      "type": "grid",
+      "columns": 3,
+      "items": [
+        {
+          "type": "metric",
+          "labelKey": "market.cbot.corn",
+          "value": "$4.43",
+          "status": "optimal"
+        },
+        {
+          "type": "metric",
+          "labelKey": "market.cbot.wheat",
+          "value": "$6.00",
+          "status": "warning"
+        },
+        {
+          "type": "metric",
+          "labelKey": "market.cbot.soy",
+          "value": "$11.54",
+          "status": "optimal"
+        }
+      ]
     }
   ]
 }

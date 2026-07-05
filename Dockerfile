@@ -21,6 +21,17 @@ WORKDIR /code
 COPY ./pyproject.toml ./README.md ./uv.lock* ./
 
 COPY ./app ./app
+COPY ./agents ./agents
+COPY ./mcp_servers ./mcp_servers
+COPY ./ui ./ui
+COPY ./okf-knowledge-graph ./okf-knowledge-graph
+COPY ./okf ./okf
+COPY ./rag_pipeline ./rag_pipeline
+COPY ./safety_kernel ./safety_kernel
+COPY ./simulation ./simulation
+COPY ./data ./data
+COPY ./config ./config
+COPY ./tools ./tools
 
 RUN uv sync --frozen
 
@@ -32,4 +43,4 @@ ENV AGENT_VERSION=${AGENT_VERSION}
 
 EXPOSE 8080
 
-CMD ["uv", "run", "uvicorn", "app.fast_api_app:app", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["uv", "run", "uvicorn", "app.fast_api_app:app", "--host", "0.0.0.0", "--port", "8080", "--workers", "1"]

@@ -1,0 +1,26 @@
+{
+  "type": "card",
+  "titleKey": "outbreak.map.title",
+  "theme": "warning",
+  "components": [
+    {
+      "type": "header",
+      "titleKey": "outbreak.map.title",
+      "subtitleKey": "outbreak.map.subtitle"
+    },
+    {
+      "type": "grid",
+      "items": [
+        {
+          "labelKey": "outbreak.map.nagpur.label",
+          "value": "out_2",
+          "valueKey": "outbreak.map.nagpur.desc",
+          "status": "danger",
+          "actions": [
+            { "labelKey": "outbreak.action.details", "action": "OPEN_OUTBREAK_DETAILS", "params": { "outbreak_id": "out_2" } }
+          ]
+        }
+      ]
+    }
+  ]
+}

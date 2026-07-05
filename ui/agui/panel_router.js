@@ -35,7 +35,7 @@
     routeIntent: function(text) {
       if (!text) return null;
       const lowerText = text.toLowerCase();
-      
+
       for (const entry of intentMap) {
         for (const word of entry.keywords) {
           const regex = new RegExp(`\\b${word}\\b`, 'i');

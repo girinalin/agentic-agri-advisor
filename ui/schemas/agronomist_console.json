@@ -1,0 +1,39 @@
+{
+  "type": "card",
+  "titleKey": "console.title",
+  "theme": "primary",
+  "components": [
+    {
+      "type": "header",
+      "titleKey": "console.title",
+      "subtitleKey": "console.subtitle"
+    },
+    {
+      "type": "grid",
+      "items": [
+        {
+          "labelKey": "console.case1.label",
+          "value": "esc_1",
+          "valueKey": "console.case1.desc",
+          "status": "danger",
+          "actions": [
+            { "labelKey": "console.action.assign", "action": "ASSIGN_CASE", "params": { "escalation_id": "esc_1" } },
+            { "labelKey": "console.action.resolve", "action": "MARK_RESOLVED", "params": { "escalation_id": "esc_1" } },
+            { "labelKey": "console.action.close", "action": "CLOSE_CASE", "params": { "escalation_id": "esc_1" } }
+          ]
+        },
+        {
+          "labelKey": "console.case2.label",
+          "value": "esc_2",
+          "valueKey": "console.case2.desc",
+          "status": "warning",
+          "actions": [
+            { "labelKey": "console.action.assign", "action": "ASSIGN_CASE", "params": { "escalation_id": "esc_2" } },
+            { "labelKey": "console.action.resolve", "action": "MARK_RESOLVED", "params": { "escalation_id": "esc_2" } },
+            { "labelKey": "console.action.close", "action": "CLOSE_CASE", "params": { "escalation_id": "esc_2" } }
+          ]
+        }
+      ]
+    }
+  ]
+}

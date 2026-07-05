@@ -1,0 +1,178 @@
+project:
+  name: Krishi Sampark
+  domain: Agricultural Intelligence
+  version: "1.0.0"
+  architecture:
+    - PWA
+    - FastAPI
+    - Google ADK
+    - A2UI
+    - IndexedDB
+    - SQLite
+    - local AI
+    - cloud agents
+
+environments:
+  - name: local
+    purpose: Developer workstation testing and local verification
+  - name: development
+    purpose: Automated branch integration and continuous testing
+  - name: staging
+    purpose: Release candidate verification and expert user reviews
+  - name: production
+    purpose: Live agricultural assistance deployment (manual gate required)
+
+components:
+  - name: backend-server
+    path: app/
+    tech: FastAPI
+  - name: web-shell
+    path: ui/agui/
+    tech: PWA, JS, HTML, CSS
+  - name: a2ui-framework
+    path: ui/a2ui/
+    tech: Canvas Rendering Engine
+  - name: agent-orchestrator
+    path: agents/
+    tech: Google ADK
+
+agentRegistry:
+  - name: Product Agent
+    id: AGENT-REQ-01
+  - name: Architecture Agent
+    id: AGENT-ARCH-01
+  - name: UX Agent
+    id: AGENT-UX-01
+  - name: Developer Agent
+    id: AGENT-DEV-01
+  - name: Test Agent
+    id: AGENT-TEST-01
+  - name: Security Agent
+    id: AGENT-SEC-01
+  - name: Safety Agent
+    id: AGENT-SAFE-01
+  - name: DevOps Agent
+    id: AGENT-DEVOPS-01
+  - name: Release Agent
+    id: AGENT-REL-01
+  - name: Documentation Agent
+    id: AGENT-DOC-01
+  - name: Observability Agent
+    id: AGENT-OBS-01
+
+skillRegistry:
+  - name: localization-validation
+    id: SKILL-LOC-01
+  - name: a2ui-schema-validation
+    id: SKILL-A2UI-01
+  - name: agricultural-safety-review
+    id: SKILL-SAFE-01
+  - name: codebase-understanding
+    id: SKILL-CODE-01
+  - name: threat-modeling
+    id: SKILL-SEC-01
+
+toolRegistry:
+  - name: validate-schemas
+    command: python -m tools.ai_sdlc.cli validate --schemas
+  - name: validate-translations
+    command: python -m tools.ai_sdlc.cli validate --translations
+  - name: validate-safety
+    command: python -m tools.ai_sdlc.cli validate --safety
+  - name: validate-all
+    command: python -m tools.ai_sdlc.cli validate --all
+  - name: test-execution
+    command: python -m pytest tests/ --ignore=scratch/ -v
+  - name: test-generation
+    command: python -m tools.ai_sdlc.cli test --evidence
+  - name: static-analysis
+    command: python -m tools.ai_sdlc.cli security --sast
+  - name: secret-scanning
+    command: python -m tools.ai_sdlc.cli security --secrets
+  - name: dependency-vulnerability-review
+    command: python -m tools.ai_sdlc.cli security --dependencies
+  - name: threat-modeling
+    command: "echo Threat model at docs/06-devsecops/threat-model.md"
+  - name: codebase-understanding
+    command: "echo Codebase scan: use agents-cli lint"
+  - name: release-readiness
+    command: python -m tools.ai_sdlc.cli release --report
+  - name: generate-readiness
+    command: python -m tools.ai_sdlc.cli release --report
+  - name: evidence-pack-generation
+    command: python -m tools.ai_sdlc.cli evidence --verify
+  - name: agricultural-safety-review
+    command: python -m tools.ai_sdlc.cli validate --safety
+  - name: container-build-validation
+    command: "echo Docker build validation: use make build"
+  - name: infrastructure-validation
+    command: "echo Terraform validation: use terraform validate"
+  - name: deployment-plan-generation
+    command: "echo Deployment plan: see deployment/terraform/single-project/"
+  - name: rollback-plan-generation
+    command: "echo Rollback plan: see .ai-sdlc/workflows/release.yaml"
+  - name: release-note-generation
+    command: "echo Release notes: see docs/08-roadmap/current-status-and-roadmap.md"
+  - name: localization-validation
+    command: python -m tools.ai_sdlc.cli validate --translations
+  - name: mixed-script-detection
+    command: python -m tools.ai_sdlc.detect_mixed_scripts
+  - name: code-review
+    command: uv run ruff check .
+  - name: requirement-analysis
+    command: python -m tools.ai_sdlc.generate_traceability
+  - name: adr-generation
+    command: "echo ADRs at docs/02-architecture/adr/"
+  - name: architecture-impact-analysis
+    command: "echo Architecture impact: review docs/02-architecture/"
+
+workflowRegistry:
+  - name: Feature Delivery
+    file: .ai-sdlc/workflows/feature-delivery.yaml
+  - name: Bug Fix
+    file: .ai-sdlc/workflows/bug-fix.yaml
+
+governance:
+  humanApprovalRequiredFor:
+    - production deployment
+    - infrastructure changes
+    - database migrations
+    - security policy changes
+    - agricultural safety policy changes
+    - model replacement
+    - knowledge publication
+    - data deletion behavior
+
+qualityGates:
+  - lint
+  - type_check
+  - unit_tests
+  - integration_tests
+  - schema_validation
+  - localization_validation
+  - accessibility_validation
+  - release_readiness
+
+securityGates:
+  - secret_scan
+  - static_code_analysis
+  - dependency_vulnerability_scan
+
+evidence:
+  location: .ai-sdlc/evidence/
+  requiredArtifacts:
+    - requirements.json
+    - traceability.json
+    - tests.json
+    - coverage.json
+    - security.json
+    - safety.json
+    - build.json
+    - approvals.json
+
+releaseCriteria:
+  qualityGatesPassed: true
+  securityGatesPassed: true
+  openCriticalBugs: 0
+  safetyKernelVerification: PASSED
+  humanApprovalObtained: true

@@ -1,0 +1,43 @@
+{
+  "type": "card",
+  "titleKey": "reminder.title",
+  "theme": "primary",
+  "components": [
+    {
+      "type": "header",
+      "titleKey": "reminder.title",
+      "subtitleKey": "reminder.subtitle"
+    },
+    {
+      "type": "grid",
+      "items": [
+        {
+          "labelKey": "reminder.item1.title",
+          "value": "rem_1",
+          "valueKey": "reminder.item1.desc",
+          "status": "warning",
+          "actions": [
+            { "labelKey": "reminder.action.complete", "action": "COMPLETE_REMINDER", "params": { "reminder_id": "rem_1" } },
+            { "labelKey": "reminder.action.snooze", "action": "SNOOZE_REMINDER", "params": { "reminder_id": "rem_1" } },
+            { "labelKey": "reminder.action.reschedule", "action": "RESCHEDULE_REMINDER", "params": { "reminder_id": "rem_1" } },
+            { "labelKey": "reminder.action.cancel", "action": "CANCEL_REMINDER", "params": { "reminder_id": "rem_1" } },
+            { "labelKey": "reminder.action.hear", "action": "HEAR_REMINDER", "params": { "reminder_id": "rem_1" } }
+          ]
+        },
+        {
+          "labelKey": "reminder.item2.title",
+          "value": "rem_2",
+          "valueKey": "reminder.item2.desc",
+          "status": "warning",
+          "actions": [
+            { "labelKey": "reminder.action.complete", "action": "COMPLETE_REMINDER", "params": { "reminder_id": "rem_2" } },
+            { "labelKey": "reminder.action.snooze", "action": "SNOOZE_REMINDER", "params": { "reminder_id": "rem_2" } },
+            { "labelKey": "reminder.action.reschedule", "action": "RESCHEDULE_REMINDER", "params": { "reminder_id": "rem_2" } },
+            { "labelKey": "reminder.action.cancel", "action": "CANCEL_REMINDER", "params": { "reminder_id": "rem_2" } },
+            { "labelKey": "reminder.action.hear", "action": "HEAR_REMINDER", "params": { "reminder_id": "rem_2" } }
+          ]
+        }
+      ]
+    }
+  ]
+}

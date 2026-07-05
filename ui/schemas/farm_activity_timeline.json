@@ -1,0 +1,47 @@
+{
+  "type": "card",
+  "titleKey": "timeline.title",
+  "theme": "primary",
+  "components": [
+    {
+      "type": "header",
+      "titleKey": "timeline.title",
+      "subtitleKey": "timeline.subtitle"
+    },
+    {
+      "type": "grid",
+      "items": [
+        {
+          "labelKey": "timeline.group.today",
+          "value": "act_07060aae",
+          "valueKey": "timeline.item.today.desc",
+          "status": "optimal",
+          "actions": [
+            { "labelKey": "timeline.action.undo", "action": "UNDO_ACTIVITY", "params": { "activity_id": "act_07060aae" } },
+            { "labelKey": "timeline.action.correct", "action": "CORRECT_ACTIVITY", "params": { "activity_id": "act_07060aae" } }
+          ]
+        },
+        {
+          "labelKey": "timeline.group.yesterday",
+          "value": "act_2",
+          "valueKey": "timeline.item.yesterday.desc",
+          "status": "optimal",
+          "actions": [
+            { "labelKey": "timeline.action.undo", "action": "UNDO_ACTIVITY", "params": { "activity_id": "act_2" } },
+            { "labelKey": "timeline.action.correct", "action": "CORRECT_ACTIVITY", "params": { "activity_id": "act_2" } }
+          ]
+        },
+        {
+          "labelKey": "timeline.group.earlier",
+          "value": "act_1",
+          "valueKey": "timeline.item.earlier.desc",
+          "status": "optimal",
+          "actions": [
+            { "labelKey": "timeline.action.undo", "action": "UNDO_ACTIVITY", "params": { "activity_id": "act_1" } },
+            { "labelKey": "timeline.action.correct", "action": "CORRECT_ACTIVITY", "params": { "activity_id": "act_1" } }
+          ]
+        }
+      ]
+    }
+  ]
+}

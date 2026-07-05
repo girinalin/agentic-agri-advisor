@@ -1,0 +1,12 @@
+{
+  "agent": "Agricultural Safety Review Agent",
+  "agentId": "safety",
+  "status": "FAIL",
+  "toolsRun": [
+    "agricultural-safety-review",
+    "codebase-understanding"
+  ],
+  "toolsPassed": 1,
+  "toolsTotal": 2,
+  "timestamp": "2026-07-04T23:46:12.291603+00:00"
+}

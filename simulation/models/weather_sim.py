@@ -1,6 +1,7 @@
 # Placeholder for weather forecast and condition simulators
 import random
 
+
 class WeatherSimulator:
     def __init__(self, rain_probability: float = 0.15):
         self.rain_probability = rain_probability
@@ -11,5 +12,5 @@ class WeatherSimulator:
         return {
             "temp_c": random.uniform(15.0, 32.0),
             "precip_mm": random.uniform(5.0, 25.0) if is_raining else 0.0,
-            "condition": "rainy" if is_raining else "sunny"
+            "condition": "rainy" if is_raining else "sunny",
         }

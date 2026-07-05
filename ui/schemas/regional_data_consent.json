@@ -1,0 +1,19 @@
+{
+  "type": "card",
+  "titleKey": "privacy.consent.title",
+  "theme": "primary",
+  "components": [
+    {
+      "type": "header",
+      "titleKey": "privacy.consent.title",
+      "subtitleKey": "privacy.consent.subtitle"
+    },
+    {
+      "type": "actions",
+      "items": [
+        { "labelKey": "privacy.consent.action.grant", "action": "GRANT_REGIONAL_CONSENT", "theme": "primary" },
+        { "labelKey": "privacy.action.cancel", "action": "CANCEL_PRIVACY_ACTION", "theme": "secondary" }
+      ]
+    }
+  ]
+}

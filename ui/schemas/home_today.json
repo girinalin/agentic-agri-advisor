@@ -1,0 +1,57 @@
+{
+  "type": "card",
+  "titleKey": "home.title",
+  "theme": "success",
+  "components": [
+    {
+      "type": "greeting",
+      "titleKey": "home.greeting.title",
+      "subtitleKey": "home.greeting.subtitle"
+    },
+    {
+      "type": "metric_card",
+      "icon": "☀️",
+      "titleKey": "home.weather.title",
+      "value": "31°C",
+      "descriptionKey": "home.weather.desc"
+    },
+    {
+      "type": "alert_card",
+      "severity": "warning",
+      "titleKey": "home.alert.title",
+      "descriptionKey": "home.alert.desc"
+    },
+    {
+      "type": "action_card",
+      "titleKey": "home.action.title",
+      "action": {
+        "commandId": "CREATE_IRRIGATION_REMINDER",
+        "labelKey": "home.action.label"
+      }
+    },
+    {
+      "type": "option_grid",
+      "titleKey": "home.quickActions.title",
+      "items": [
+        {
+          "labelKey": "home.quickActions.voice.label",
+          "icon": "🎙️",
+          "descriptionKey": "home.quickActions.voice.desc",
+          "commandId": "NAVIGATE_ASK"
+        },
+        {
+          "labelKey": "home.quickActions.market.label",
+          "icon": "🏪",
+          "descriptionKey": "home.quickActions.market.desc",
+          "commandId": "NAVIGATE_MARKET"
+        },
+        {
+          "labelKey": "home.quickActions.log.label",
+          "icon": "📋",
+          "descriptionKey": "home.quickActions.log.desc",
+          "commandId": "LOG_FARM_WORK"
+        }
+      ]
+    }
+  ]
+}

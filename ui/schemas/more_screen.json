@@ -1,0 +1,60 @@
+{
+  "type": "card",
+  "titleKey": "more.title",
+  "theme": "default",
+  "components": [
+    {
+      "type": "header",
+      "titleKey": "more.title",
+      "subtitleKey": "more.subtitle"
+    },
+    {
+      "type": "option_grid",
+      "titleKey": "more.settings.title",
+      "items": [
+        {
+          "labelKey": "more.items.profile.label",
+          "icon": "👤",
+          "descriptionKey": "more.items.profile.desc",
+          "commandId": "NAVIGATE_PROFILE"
+        },
+        {
+          "labelKey": "more.items.history.label",
+          "icon": "📜",
+          "descriptionKey": "more.items.history.desc",
+          "commandId": "FARM_HISTORY"
+        },
+        {
+          "labelKey": "more.items.offline.label",
+          "icon": "📥",
+          "descriptionKey": "more.items.offline.desc",
+          "commandId": "OFFLINE_DOWNLOADS"
+        },
+        {
+          "labelKey": "more.items.sync.label",
+          "icon": "🔄",
+          "descriptionKey": "more.items.sync.desc",
+          "commandId": "SYNC_STATUS"
+        },
+        {
+          "labelKey": "more.items.voice.label",
+          "icon": "🗣️",
+          "descriptionKey": "more.items.voice.desc",
+          "commandId": "LANGUAGE_VOICE_SETTINGS"
+        },
+        {
+          "labelKey": "more.items.whatif.label",
+          "icon": "🔮",
+          "descriptionKey": "more.items.whatif.desc",
+          "commandId": "NAVIGATE_SIMULATOR"
+        },
+        {
+          "labelKey": "more.items.help.label",
+          "icon": "ℹ️",
+          "descriptionKey": "more.items.help.desc",
+          "commandId": "APP_HELP"
+        }
+      ]
+    }
+  ]
+}

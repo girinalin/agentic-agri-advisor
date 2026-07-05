@@ -1,0 +1,56 @@
+{
+  "type": "card",
+  "titleKey": "activity_confirm.title",
+  "theme": "primary",
+  "components": [
+    {
+      "type": "header",
+      "titleKey": "activity_confirm.title",
+      "subtitleKey": "activity_confirm.subtitle"
+    },
+    {
+      "type": "grid",
+      "items": [
+        {
+          "labelKey": "activity_confirm.grid.type.label",
+          "value": "",
+          "valueKey": "activity_confirm.state.type",
+          "status": "optimal"
+        },
+        {
+          "labelKey": "activity_confirm.grid.quantity.label",
+          "value": "",
+          "valueKey": "activity_confirm.state.quantity",
+          "status": "optimal"
+        },
+        {
+          "labelKey": "activity_confirm.grid.field.label",
+          "value": "",
+          "valueKey": "activity_confirm.state.field",
+          "status": "optimal"
+        },
+        {
+          "labelKey": "activity_confirm.grid.details.label",
+          "value": "",
+          "valueKey": "activity_confirm.state.details",
+          "status": "optimal"
+        }
+      ]
+    },
+    {
+      "type": "buttons",
+      "items": [
+        {
+          "labelKey": "activity_confirm.action.confirm",
+          "commandId": "CONFIRM_LOG_ACTION",
+          "variant": "primary"
+        },
+        {
+          "labelKey": "activity_confirm.action.cancel",
+          "commandId": "CANCEL_LOG_ACTION",
+          "variant": "secondary"
+        }
+      ]
+    }
+  ]
+}

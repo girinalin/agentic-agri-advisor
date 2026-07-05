@@ -1,6 +1,7 @@
 # Placeholder for crop commodity market price simulators (random walk)
 import random
 
+
 class CommodityMarketSimulator:
     def __init__(self, volatility: float = 0.02):
         self.volatility = volatility

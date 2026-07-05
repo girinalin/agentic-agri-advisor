@@ -1,0 +1,84 @@
+{
+  "type": "card",
+  "titleKey": "onboarding.title",
+  "theme": "primary",
+  "components": [
+    {
+      "type": "header",
+      "titleKey": "onboarding.title",
+      "subtitleKey": "onboarding.subtitle"
+    },
+    {
+      "type": "form",
+      "fields": [
+        {
+          "type": "text",
+          "name": "farmer_name",
+          "labelKey": "onboarding.fields.name.label",
+          "placeholderKey": "onboarding.fields.name.placeholder",
+          "value": ""
+        },
+        {
+          "type": "select",
+          "name": "preferred_language",
+          "labelKey": "onboarding.fields.language.label",
+          "options": [
+            {"value": "English", "label": "English"},
+            {"value": "Hindi", "label": "हिन्दी (Hindi)"},
+            {"value": "Marathi", "label": "मराठी (Marathi)"},
+            {"value": "Telugu", "label": "తెలుగు (Telugu)"},
+            {"value": "Swahili", "label": "Kiswahili (Swahili)"}
+          ]
+        },
+        {
+          "type": "select",
+          "name": "region",
+          "labelKey": "onboarding.fields.region.label",
+          "options": [
+            {"value": "Nagpur District", "label": "Nagpur District (Maharashtra)"},
+            {"value": "Pune District", "label": "Pune District (Maharashtra)"},
+            {"value": "Indore District", "label": "Indore District (Madhya Pradesh)"},
+            {"value": "Rift Valley Region", "label": "Rift Valley Region (Kenya)"}
+          ]
+        },
+        {
+          "type": "number",
+          "name": "acres",
+          "labelKey": "onboarding.fields.acres.label",
+          "value": 5.0
+        },
+        {
+          "type": "select",
+          "name": "soil_type",
+          "labelKey": "onboarding.fields.soil.label",
+          "options": [
+            {"value": "Black Clay (Cotton Soil)", "label": "Black Clay (Cotton Soil)"},
+            {"value": "Red Sandy Loam", "label": "Red Sandy Loam"},
+            {"value": "Alluvial", "label": "Alluvial"}
+          ]
+        },
+        {
+          "type": "select",
+          "name": "primary_crop",
+          "labelKey": "onboarding.fields.crop.label",
+          "options": [
+            {"value": "Corn", "label": "Maize / Corn"},
+            {"value": "Wheat", "label": "Wheat"},
+            {"value": "Soybeans", "label": "Soybeans"},
+            {"value": "Rice", "label": "Rice"}
+          ]
+        }
+      ]
+    },
+    {
+      "type": "buttons",
+      "items": [
+        {
+          "labelKey": "onboarding.action.save",
+          "commandId": "SAVE_ONBOARDING_PROFILE",
+          "variant": "primary"
+        }
+      ]
+    }
+  ]
+}

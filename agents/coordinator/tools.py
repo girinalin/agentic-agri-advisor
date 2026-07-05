@@ -1,6 +1,7 @@
 # Placeholder for coordinator-specific tools
 from google.adk.tools import ToolContext
 
+
 def routing_helper(query: str, tool_context: ToolContext) -> dict:
     """Helper tool to assist in routing decision logs.
 

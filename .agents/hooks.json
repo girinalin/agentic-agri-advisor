@@ -1,0 +1,35 @@
+{
+  "okf-write-guard": {
+    "enabled": true,
+    "description": "Blocks write_okf_concept tool — OKF is read-only at runtime",
+    "PreToolUse": [{
+      "matcher": "write_okf_concept",
+      "hooks": [{
+        "command": "python3 .agents/scripts/validate_tool_call.py",
+        "timeout": 5
+      }]
+    }]
+  },
+  "path-traversal-guard": {
+    "enabled": true,
+    "description": "Validates file paths in tool arguments to prevent directory traversal",
+    "PreToolUse": [{
+      "matcher": "analyze_crop_image|text_to_speech|speech_to_text|read_okf_concept",
+      "hooks": [{
+        "command": "python3 .agents/scripts/validate_tool_call.py",
+        "timeout": 5
+      }]
+    }]
+  },
+  "prompt-injection-guard": {
+    "enabled": true,
+    "description": "Flags possible prompt injection in safety-critical tool arguments",
+    "PreToolUse": [{
+      "matcher": "get_treatment_safety|query_knowledge_graph|get_safety_rules",
+      "hooks": [{
+        "command": "python3 .agents/scripts/validate_tool_call.py",
+        "timeout": 5
+      }]
+    }]
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "artifactId": "security-dependencies",
+  "status": "PASS",
+  "exitCode": 0,
+  "output": "Name                 Skip Reason\n-------------------- -----------------------------------------------------------------------------------\nagentic-agri-advisor Dependency not found on PyPI and could not be audited: agentic-agri-advisor (0.1.0)\n",
+  "timestamp": "2026-07-04T23:46:25.439016+00:00"
+}

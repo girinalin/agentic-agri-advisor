@@ -1,0 +1,74 @@
+{
+  "type": "card",
+  "titleKey": "profile.title",
+  "theme": "info",
+  "components": [
+    {
+      "type": "text",
+      "valueKey": "profile.desc"
+    },
+    {
+      "type": "form",
+      "fields": [
+        {
+          "type": "input",
+          "name": "farmer_name",
+          "labelKey": "profile.name.label",
+          "placeholder": "profile.name.placeholder"
+        },
+        {
+          "type": "select",
+          "name": "region",
+          "labelKey": "profile.region.label",
+          "options": [
+            "profile.region.mh",
+            "profile.region.pb",
+            "profile.region.ke",
+            "profile.region.gh"
+          ]
+        },
+        {
+          "type": "input",
+          "name": "acres",
+          "labelKey": "profile.acres.label",
+          "placeholder": "profile.acres.placeholder"
+        },
+        {
+          "type": "select",
+          "name": "soil_type",
+          "labelKey": "profile.soil.label",
+          "options": [
+            "profile.soil.blackClay",
+            "profile.soil.redSandy",
+            "profile.soil.alluvial",
+            "profile.soil.clayLoam"
+          ]
+        },
+        {
+          "type": "select",
+          "name": "primary_crop",
+          "labelKey": "profile.crop.label",
+          "options": [
+            "profile.crop.corn",
+            "profile.crop.wheat",
+            "profile.crop.soybeans"
+          ]
+        },
+        {
+          "type": "select",
+          "name": "has_drip",
+          "labelKey": "profile.drip.label",
+          "options": [
+            "profile.drip.yes",
+            "profile.drip.no"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "button",
+      "labelKey": "profile.saveAction",
+      "action": "save_farmer_profile"
+    }
+  ]
+}

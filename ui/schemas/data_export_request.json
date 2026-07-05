@@ -1,0 +1,19 @@
+{
+  "type": "card",
+  "titleKey": "privacy.export.title",
+  "theme": "primary",
+  "components": [
+    {
+      "type": "header",
+      "titleKey": "privacy.export.title",
+      "subtitleKey": "privacy.export.subtitle"
+    },
+    {
+      "type": "actions",
+      "items": [
+        { "labelKey": "privacy.export.action.trigger", "action": "TRIGGER_DATA_EXPORT", "theme": "primary" },
+        { "labelKey": "privacy.action.cancel", "action": "CANCEL_PRIVACY_ACTION", "theme": "secondary" }
+      ]
+    }
+  ]
+}

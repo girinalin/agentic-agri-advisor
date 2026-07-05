@@ -6,11 +6,11 @@ document.addEventListener('DOMContentLoaded', () => {
   window.renderA2UIPayload = function(payload, targetCanvas) {
     const destCanvas = targetCanvas || canvas;
     destCanvas.innerHTML = '';
-    
+
     if (payload.type === 'card') {
       const card = document.createElement('div');
       card.className = `a2ui-card ${payload.theme || 'default'}`;
-      
+
       const title = document.createElement('h3');
       title.className = 'a2ui-card-title';
       title.textContent = payload.title || 'Notification';
@@ -28,7 +28,145 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function renderComponent(comp, container) {
-    if (comp.type === 'text') {
+    if (comp.type === 'greeting') {
+      const div = document.createElement('div');
+      div.className = 'a2ui-greeting';
+      div.style.marginBottom = '1.25rem';
+      div.innerHTML = `<h2 style="margin:0;font-size:1.6rem;color:var(--accent);">${comp.title}</h2>
+                       <p style="margin:4px 0 0 0;font-size:0.95rem;color:var(--text-sub);">${comp.subtitle}</p>`;
+      container.appendChild(div);
+    } else if (comp.type === 'header') {
+      const div = document.createElement('div');
+      div.className = 'a2ui-header-comp';
+      div.style.marginBottom = '1.25rem';
+      div.innerHTML = `<h2 style="margin:0;font-size:1.4rem;color:var(--text-main);">${comp.title}</h2>
+                       <p style="margin:2px 0 0 0;font-size:0.85rem;color:var(--text-sub);">${comp.subtitle}</p>`;
+      container.appendChild(div);
+    } else if (comp.type === 'alert_card') {
+      const div = document.createElement('div');
+      div.className = `a2ui-card alert-${comp.severity || 'info'}`;
+      div.style.padding = '1rem';
+      div.style.marginBottom = '1rem';
+      div.style.borderRadius = '12px';
+      div.style.borderLeft = `5px solid ${comp.severity === 'warning' ? 'var(--warning)' : comp.severity === 'critical' ? 'var(--danger)' : 'var(--info)'}`;
+      div.style.backgroundColor = 'var(--panel-bg)';
+      div.innerHTML = `
+        <div style="font-weight:bold;color:var(--text-main);margin-bottom:0.25rem;">⚠️ ${comp.title}</div>
+        <div style="font-size:0.9rem;color:var(--text-sub);">${comp.description}</div>
+      `;
+      container.appendChild(div);
+    } else if (comp.type === 'action_card') {
+      const div = document.createElement('div');
+      div.className = 'a2ui-card';
+      div.style.padding = '1.25rem';
+      div.style.marginBottom = '1rem';
+      div.style.borderRadius = '12px';
+      div.style.backgroundColor = 'var(--panel-bg)';
+      div.style.border = '1.5px solid var(--accent)';
+
+      const textNode = document.createElement('div');
+      textNode.style.fontWeight = '600';
+      textNode.style.fontSize = '1.05rem';
+      textNode.style.color = 'var(--text-main)';
+      textNode.style.marginBottom = '0.5rem';
+      textNode.textContent = comp.title;
+      div.appendChild(textNode);
+
+      if (comp.description) {
+        const descNode = document.createElement('div');
+        descNode.style.fontSize = '0.85rem';
+        descNode.style.color = 'var(--text-sub)';
+        descNode.style.marginBottom = '0.75rem';
+        descNode.textContent = comp.description;
+        div.appendChild(descNode);
+      }
+
+      if (comp.action) {
+        const btn = document.createElement('button');
+        btn.className = 'a2ui-btn';
+        btn.style.width = '100%';
+        btn.style.padding = '0.75rem';
+        btn.style.borderRadius = '24px';
+        btn.style.backgroundColor = 'var(--accent)';
+        btn.style.color = 'white';
+        btn.style.border = 'none';
+        btn.style.fontWeight = 'bold';
+        btn.style.cursor = 'pointer';
+        btn.textContent = comp.action.label;
+        btn.addEventListener('click', () => {
+          const event = new CustomEvent('a2ui-action', {
+            detail: { action: comp.action.commandId, button: btn }
+          });
+          document.dispatchEvent(event);
+        });
+        div.appendChild(btn);
+      }
+      container.appendChild(div);
+    } else if (comp.type === 'metric_card') {
+      const div = document.createElement('div');
+      div.className = 'a2ui-card';
+      div.style.padding = '1rem';
+      div.style.marginBottom = '1rem';
+      div.style.borderRadius = '12px';
+      div.style.backgroundColor = 'var(--panel-bg)';
+      div.style.border = '1px solid var(--border)';
+      div.innerHTML = `
+        <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.25rem;">
+          <span style="font-size:1.2rem;">${comp.icon || ''}</span>
+          <strong style="font-size:0.95rem;color:var(--text-sub);">${comp.title}</strong>
+        </div>
+        <div style="font-size:1.6rem;font-weight:bold;color:var(--text-main);margin-bottom:0.25rem;">${comp.value}</div>
+        <div style="font-size:0.85rem;color:var(--text-sub);">${comp.description || ''}</div>
+      `;
+      container.appendChild(div);
+    } else if (comp.type === 'option_grid') {
+      const wrapper = document.createElement('div');
+      wrapper.style.marginBottom = '1.25rem';
+
+      if (comp.title) {
+        const title = document.createElement('h3');
+        title.style.fontSize = '1.05rem';
+        title.style.marginBottom = '0.75rem';
+        title.style.color = 'var(--text-main)';
+        title.textContent = comp.title;
+        wrapper.appendChild(title);
+      }
+
+      const grid = document.createElement('div');
+      grid.style.display = 'grid';
+      grid.style.gridTemplateColumns = 'repeat(2, 1fr)';
+      grid.style.gap = '0.75rem';
+
+      comp.items.forEach(item => {
+        const box = document.createElement('div');
+        box.className = 'a2ui-card';
+        box.style.padding = '0.75rem';
+        box.style.borderRadius = '12px';
+        box.style.backgroundColor = 'var(--panel-bg)';
+        box.style.border = '1px solid var(--border)';
+        box.style.cursor = 'pointer';
+        box.style.display = 'flex';
+        box.style.flexDirection = 'column';
+        box.style.gap = '0.25rem';
+        box.style.transition = 'all 0.2s ease';
+
+        box.addEventListener('click', () => {
+          const event = new CustomEvent('a2ui-action', {
+            detail: { action: item.commandId, button: box }
+          });
+          document.dispatchEvent(event);
+        });
+
+        box.innerHTML = `
+          <div style="font-size:1.3rem;">${item.icon || ''}</div>
+          <strong style="font-size:0.9rem;color:var(--text-main);">${item.label}</strong>
+          <span style="font-size:0.75rem;color:var(--text-sub);">${item.description || ''}</span>
+        `;
+        grid.appendChild(box);
+      });
+      wrapper.appendChild(grid);
+      container.appendChild(wrapper);
+    } else if (comp.type === 'text') {
       const p = document.createElement('p');
       p.className = 'a2ui-text';
       p.textContent = comp.value;
@@ -57,7 +195,7 @@ document.addEventListener('DOMContentLoaded', () => {
       grid.style.gridTemplateColumns = `repeat(${comp.columns || 2}, 1fr)`;
       grid.style.gap = '1rem';
       grid.style.marginBottom = '1.25rem';
-      
+
       comp.items.forEach(item => {
         const itemContainer = document.createElement('div');
         renderComponent(item, itemContainer);
@@ -69,23 +207,23 @@ document.addEventListener('DOMContentLoaded', () => {
       chartBox.className = 'a2ui-chart';
       chartBox.style.marginBottom = '1.25rem';
       chartBox.innerHTML = `<div class="chart-label" style="font-size:0.9rem;color:var(--text-sub);">${comp.label}</div>`;
-      
+
       const barsContainer = document.createElement('div');
       barsContainer.className = 'chart-bars';
       barsContainer.style.display = 'flex';
       barsContainer.style.gap = '1.5rem';
       barsContainer.style.marginTop = '0.75rem';
-      
+
       for (const [key, val] of Object.entries(comp.data)) {
         const barCol = document.createElement('div');
         barCol.style.display = 'flex';
         barCol.style.flexDirection = 'column';
         barCol.style.alignItems = 'center';
         barCol.style.flexGrow = '1';
-        
+
         const barVal = Number(val);
         const barHeight = Math.min(100, Math.max(20, barVal / 2));
-        
+
         barCol.innerHTML = `
           <span style="font-size:0.8rem;color:var(--text-sub);">${val}</span>
           <div style="width:100%;height:${barHeight}px;background-color:var(--accent);border-radius:4px 4px 0 0;margin:0.25rem 0;"></div>
@@ -100,20 +238,20 @@ document.addEventListener('DOMContentLoaded', () => {
       form.className = 'a2ui-form';
       form.style.marginBottom = '1.25rem';
       form.addEventListener('submit', (e) => e.preventDefault());
-      
+
       comp.fields.forEach(field => {
         const fRow = document.createElement('div');
         fRow.className = 'form-row';
         fRow.style.display = 'flex';
         fRow.style.flexDirection = 'column';
         fRow.style.marginBottom = '1rem';
-        
+
         const label = document.createElement('label');
         label.textContent = field.label;
         label.style.fontSize = '0.9rem';
         label.style.marginBottom = '0.25rem';
         fRow.appendChild(label);
-        
+
         if (field.type === 'select') {
           const select = document.createElement('select');
           select.name = field.name;
@@ -122,13 +260,18 @@ document.addEventListener('DOMContentLoaded', () => {
           select.style.color = 'var(--text-main)';
           select.style.border = '1px solid var(--border)';
           select.style.borderRadius = '4px';
-          
+
           field.options.forEach(opt => {
             const o = document.createElement('option');
-            o.value = opt.toLowerCase();
-            o.textContent = opt;
+            const optionValue = typeof opt === 'object' ? opt.value : opt;
+            const optionLabel = typeof opt === 'object' ? (opt.label || opt.value) : opt;
+            o.value = String(optionValue).toLowerCase();
+            o.textContent = optionLabel;
             select.appendChild(o);
           });
+          if (field.value !== undefined) {
+            select.value = field.value.toLowerCase();
+          }
           fRow.appendChild(select);
         } else if (field.type === 'input') {
           const input = document.createElement('input');
@@ -140,6 +283,9 @@ document.addEventListener('DOMContentLoaded', () => {
           input.style.color = 'var(--text-main)';
           input.style.border = '1px solid var(--border)';
           input.style.borderRadius = '4px';
+          if (field.value !== undefined) {
+            input.value = field.value;
+          }
           fRow.appendChild(input);
         }
         form.appendChild(fRow);
@@ -152,18 +298,18 @@ document.addEventListener('DOMContentLoaded', () => {
       list.style.flexDirection = 'column';
       list.style.gap = '0.75rem';
       list.style.marginBottom = '1.25rem';
-      
+
       comp.items.forEach(item => {
         const itemBox = document.createElement('div');
         itemBox.className = `list-item ${item.status || 'default'}`;
         itemBox.style.padding = '0.75rem';
         itemBox.style.borderRadius = '6px';
         itemBox.style.backgroundColor = 'var(--bg-dark)';
-        
+
         let borderLeftColor = 'var(--border)';
         if (item.status === 'critical') borderLeftColor = 'var(--danger)';
         if (item.status === 'warning') borderLeftColor = 'var(--warning)';
-        
+
         itemBox.style.borderLeft = `4px solid ${borderLeftColor}`;
         itemBox.innerHTML = `
           <strong style="display:block;margin-bottom:0.25rem;font-size:0.95rem;">${item.title}</strong>

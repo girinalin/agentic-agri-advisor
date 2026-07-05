@@ -1,0 +1,28 @@
+# Pre-commit hooks for Agentic Agriculture Advisor
+# Based on secure-agent-lab security practices
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: check-yaml
+      - id: check-json
+      - id: check-merge-conflict
+      - id: detect-private-key
+        
+  - repo: local
+    hooks:
+      - id: semgrep
+        name: Semgrep Security Scan
+        entry: uv run semgrep --config .semgrep/rules.yaml --error
+        language: system
+        types: [python]
+        pass_filenames: false
+        
+      - id: ruff-lint
+        name: Ruff Lint Check
+        entry: uv run python -m ruff check agents/ app/ mcp_servers/ safety_kernel/ tests/
+        language: system
+        pass_filenames: false
+        always_run: true

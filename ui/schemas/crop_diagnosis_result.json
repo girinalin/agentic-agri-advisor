@@ -1,0 +1,55 @@
+{
+  "type": "card",
+  "titleKey": "photo.result.title",
+  "theme": "warning",
+  "components": [
+    {
+      "type": "metric",
+      "labelKey": "photo.result.problem",
+      "value": "Late Blight (झुलसा रोग)",
+      "status": "warning"
+    },
+    {
+      "type": "metric",
+      "labelKey": "photo.result.confidence",
+      "valueKey": "photo.result.confidence.val",
+      "status": "normal"
+    },
+    {
+      "type": "list",
+      "items": [
+        {
+          "titleKey": "photo.result.alternatives",
+          "descKey": "photo.result.alt1",
+          "status": "normal"
+        },
+        {
+          "titleKey": "photo.result.alternatives",
+          "descKey": "photo.result.alt2",
+          "status": "normal"
+        }
+      ]
+    },
+    {
+      "type": "grid",
+      "columns": 2,
+      "items": [
+        {
+          "type": "button",
+          "labelKey": "photo.result.retake",
+          "action": "START_CROP_DIAGNOSIS"
+        },
+        {
+          "type": "button",
+          "labelKey": "photo.result.safeSteps",
+          "action": "SHOW_SAFE_FIRST_STEPS"
+        },
+        {
+          "type": "button",
+          "labelKey": "photo.result.hear",
+          "action": "PLAY_DIAGNOSIS_RESULT"
+        }
+      ]
+    }
+  ]
+}

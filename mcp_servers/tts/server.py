@@ -1,9 +1,11 @@
 import os
-from mcp.server.fastmcp import FastMCP
+
 from google import genai
 from google.genai import types
+from mcp.server.fastmcp import FastMCP
 
 mcp = FastMCP("TTS-Voice-Server")
+
 
 @mcp.tool()
 async def text_to_speech(text: str, output_path: str) -> str:
@@ -28,32 +30,35 @@ async def text_to_speech(text: str, output_path: str) -> str:
             response = client.models.generate_content(
                 model="gemini-2.0-flash",
                 contents=f"Read this text out loud verbatim: {text}",
-                config=types.GenerateContentConfig(
-                    response_modalities=["AUDIO"]
-                )
+                config=types.GenerateContentConfig(response_modalities=["AUDIO"]),
             )
-            
+
             audio_bytes = None
             for part in response.candidates[0].content.parts:
                 if part.inline_data and part.inline_data.mime_type.startswith("audio/"):
                     audio_bytes = part.inline_data.data
                     break
-                    
+
             if audio_bytes:
-                os.makedirs(os.path.dirname(os.path.abspath(output_path)), exist_ok=True)
+                os.makedirs(
+                    os.path.dirname(os.path.abspath(output_path)), exist_ok=True
+                )
                 with open(output_path, "wb") as f:
                     f.write(audio_bytes)
-                return f"Successfully generated Gemini Speech audio file at: {output_path}"
+                return (
+                    f"Successfully generated Gemini Speech audio file at: {output_path}"
+                )
         except Exception as e:
             print(f"Gemini Audio Generation failed: {e}. Falling back to gTTS.")
 
     try:
         from gtts import gTTS
-        tts = gTTS(text=text, lang='en')
+
+        tts = gTTS(text=text, lang="en")
         os.makedirs(os.path.dirname(os.path.abspath(output_path)), exist_ok=True)
         tts.save(output_path)
         return f"Generated speech audio file via gTTS at: {output_path}"
-    except Exception as e:
+    except Exception:
         txt_path = output_path + ".txt"
         os.makedirs(os.path.dirname(os.path.abspath(txt_path)), exist_ok=True)
         with open(txt_path, "w", encoding="utf-8") as f:

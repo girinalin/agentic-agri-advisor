@@ -1,0 +1,29 @@
+{
+  "type": "card",
+  "titleKey": "photo.quality.title",
+  "theme": "danger",
+  "components": [
+    {
+      "type": "alert_card",
+      "severity": "warning",
+      "titleKey": "photo.quality.title",
+      "descriptionKey": "photo.quality.message.poor"
+    },
+    {
+      "type": "grid",
+      "columns": 2,
+      "items": [
+        {
+          "type": "button",
+          "labelKey": "photo.quality.retake",
+          "action": "RETAKE_IMAGE"
+        },
+        {
+          "type": "button",
+          "labelKey": "photo.quality.useAnyway",
+          "action": "ACCEPT_IMAGE"
+        }
+      ]
+    }
+  ]
+}

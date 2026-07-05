@@ -1,11 +1,11 @@
 {
   "type": "card",
-  "title": "Pest & Disease Warnings",
+  "titleKey": "pest.title",
   "theme": "danger",
   "components": [
     {
       "type": "text",
-      "value": "Active high-urgency crop protection alerts for your region."
+      "valueKey": "pest.desc"
     },
     {
       "type": "grid",
@@ -13,14 +13,14 @@
       "items": [
         {
           "type": "metric",
-          "label": "Critical Alerts",
-          "value": "1 Active",
+          "labelKey": "pest.criticalAlerts",
+          "valueKey": "pest.criticalAlerts.val",
           "status": "critical"
         },
         {
           "type": "metric",
-          "label": "Moderate Risks",
-          "value": "1 Reported",
+          "labelKey": "pest.moderateRisks",
+          "valueKey": "pest.moderateRisks.val",
           "status": "medium"
         }
       ]
@@ -29,13 +29,13 @@
       "type": "list",
       "items": [
         {
-          "title": "Late Blight Warning",
-          "desc": "Weather conditions favor spore growth in North Fields. Action: Apply copper-based spray.",
+          "titleKey": "pest.lateBlight",
+          "descKey": "pest.lateBlight.desc",
           "status": "critical"
         },
         {
-          "title": "Aphid infestation",
-          "desc": "Minor reports on soy crops. Action: Monitor leaves daily.",
+          "titleKey": "pest.aphids",
+          "descKey": "pest.aphids.desc",
           "status": "medium"
         }
       ]
