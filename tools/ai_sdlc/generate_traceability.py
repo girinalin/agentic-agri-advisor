@@ -93,5 +93,24 @@ def generate_matrix():
     return True
 
 
+def validate_duplicate_ids(entries):
+    """Detect duplicate requirement IDs in a list of traceability entries.
+
+    Args:
+        entries: List of dicts, each containing an ``"id"`` key.
+
+    Returns:
+        A list of IDs that appear more than once (sorted, deduplicated).
+    """
+    seen = {}
+    for entry in entries:
+        req_id = entry.get("id")
+        if req_id is None:
+            continue
+        seen[req_id] = seen.get(req_id, 0) + 1
+
+    return sorted({rid for rid, count in seen.items() if count > 1})
+
+
 if __name__ == "__main__":
     generate_matrix()
