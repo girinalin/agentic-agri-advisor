@@ -34,7 +34,7 @@ import asyncio
 import edge_tts
 import google.auth
 from fastapi import Body, FastAPI, HTTPException, Request, Response
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, RedirectResponse
 from google.adk.cli.fast_api import get_fast_api_app
 from google.auth.transport.requests import Request as GoogleAuthRequest
 from google.cloud import logging as google_cloud_logging
@@ -231,7 +231,7 @@ class GoogleLoginBody(BaseModel):
 
 
 class GuestLoginBody(BaseModel):
-    email: str = Field(..., min_length=5)
+    email: str = ""
     name: str = "Guest"
 
 
@@ -293,8 +293,10 @@ def login_with_google(payload: GoogleLoginBody, response: Response) -> dict:
 @app.post("/api/auth/guest")
 def login_as_guest(payload: GuestLoginBody, response: Response) -> dict:
     email = payload.email.strip().lower()
-    if not _is_valid_email(email):
+    if email and not _is_valid_email(email):
         raise HTTPException(status_code=400, detail="Valid email is required")
+    if not email:
+        email = f"guest_{int(time.time())}@local.krishi"
 
     guest_payload = {
         "sub": "",
@@ -366,6 +368,45 @@ def auth_me(request: Request) -> dict:
 def auth_logout(response: Response) -> dict:
     response.delete_cookie(key=SESSION_COOKIE_NAME, path="/")
     return {"status": "success"}
+
+
+@app.middleware("http")
+async def protect_app_routes(request: Request, call_next):
+    if request.method == "GET" and request.url.path in {"/", "/index.html"}:
+        return FileResponse(os.path.join(AGENT_DIR, "ui", "index.html"))
+
+    protected_paths = {
+        "/app/home",
+        "/app/home/",
+        "/onboarding",
+        "/onboarding/",
+        "/agui/index.html",
+    }
+    if request.url.path in protected_paths:
+        if not _current_user_from_request(request):
+            return RedirectResponse(url="/", status_code=307)
+    return await call_next(request)
+
+
+@app.get("/")
+def public_landing() -> FileResponse:
+    return FileResponse(os.path.join(AGENT_DIR, "ui", "index.html"))
+
+
+@app.get("/app/home")
+@app.get("/app/home/")
+def app_home(request: Request):
+    if not _current_user_from_request(request):
+        return RedirectResponse(url="/", status_code=307)
+    return FileResponse(os.path.join(AGENT_DIR, "ui", "agui", "index.html"))
+
+
+@app.get("/onboarding")
+@app.get("/onboarding/")
+def onboarding_home(request: Request):
+    if not _current_user_from_request(request):
+        return RedirectResponse(url="/", status_code=307)
+    return FileResponse(os.path.join(AGENT_DIR, "ui", "agui", "index.html"))
 
 
 @app.get("/api/run_diagnostic_tests")

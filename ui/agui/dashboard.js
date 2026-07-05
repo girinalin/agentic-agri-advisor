@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
           logoutBtn.addEventListener('click', async () => {
             try {
               await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
-              window.location.reload();
+              window.location.href = '/';
             } catch (err) {
               console.warn('Logout failed:', err);
             }
@@ -1861,9 +1861,21 @@ ${text}`;
   (async () => {
     const canStartApp = await ensureGoogleAuthIfRequired();
     if (!canStartApp) return;
+
+    const currentPath = window.location.pathname || '';
+    const params = new URLSearchParams(window.location.search || '');
+    const forceOnboarding = currentPath.startsWith('/onboarding') || params.get('onboarding') === '1';
+
     window.switchTab('home', false, false);
     fetchFieldsAndProfile();
     initCropDiagnosisState();
+
+    if (forceOnboarding) {
+      setTimeout(() => {
+        window.switchTab('more');
+        loadSchema('farmer_onboarding', 'more-canvas');
+      }, 250);
+    }
   })();
 
   // Clean up any stale local AI mode flags in localStorage
