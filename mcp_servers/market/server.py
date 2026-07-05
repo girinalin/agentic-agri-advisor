@@ -22,37 +22,37 @@ CROP_META = {
     "corn": {
         "ticker": "ZC=F",
         "raw_unit": "cents/bushel",
-        "bushel_weight_kg": 25.401,   # 1 bushel corn = 25.4 kg
-        "contract_size": 5000,         # 5000 bushels per contract
+        "bushel_weight_kg": 25.401,  # 1 bushel corn = 25.4 kg
+        "contract_size": 5000,  # 5000 bushels per contract
         "display_name": "Corn (Maize)",
     },
     "wheat": {
         "ticker": "ZW=F",
         "raw_unit": "cents/bushel",
-        "bushel_weight_kg": 27.215,   # 1 bushel wheat = 27.2 kg
+        "bushel_weight_kg": 27.215,  # 1 bushel wheat = 27.2 kg
         "contract_size": 5000,
         "display_name": "Wheat",
     },
     "soybeans": {
         "ticker": "ZS=F",
         "raw_unit": "cents/bushel",
-        "bushel_weight_kg": 27.215,   # 1 bushel soybeans = 27.2 kg
+        "bushel_weight_kg": 27.215,  # 1 bushel soybeans = 27.2 kg
         "contract_size": 5000,
         "display_name": "Soybeans",
     },
     "cotton": {
         "ticker": "CT=F",
         "raw_unit": "cents/pound",
-        "bushel_weight_kg": None,     # Cotton is priced per pound, not bushel
+        "bushel_weight_kg": None,  # Cotton is priced per pound, not bushel
         "pound_to_kg": 0.4536,
-        "contract_size": 50000,       # 50,000 pounds per contract
+        "contract_size": 50000,  # 50,000 pounds per contract
         "display_name": "Cotton",
     },
     "rice": {
         "ticker": "ZR=F",
-        "raw_unit": "USD/cwt",        # Hundredweight = 100 lbs = 45.36 kg
+        "raw_unit": "USD/cwt",  # Hundredweight = 100 lbs = 45.36 kg
         "cwt_weight_kg": 45.36,
-        "contract_size": 2000,        # 2000 cwt per contract
+        "contract_size": 2000,  # 2000 cwt per contract
         "display_name": "Rough Rice",
     },
     "sugarcane": {
@@ -60,7 +60,7 @@ CROP_META = {
         "raw_unit": "cents/pound",
         "bushel_weight_kg": None,
         "pound_to_kg": 0.4536,
-        "contract_size": 112000,      # 112,000 pounds (50 long tons)
+        "contract_size": 112000,  # 112,000 pounds (50 long tons)
         "display_name": "Raw Sugar (Sugarcane proxy)",
     },
 }
@@ -120,30 +120,41 @@ async def fetch_commodity_price(commodity: str) -> dict:
     name = commodity.lower().strip()
 
     # Handle common aliases
-    aliases = {"maize": "corn", "soy": "soybeans", "soya": "soybeans",
-               "sugar": "sugarcane", "cane": "sugarcane"}
+    aliases = {
+        "maize": "corn",
+        "soy": "soybeans",
+        "soya": "soybeans",
+        "sugar": "sugarcane",
+        "cane": "sugarcane",
+    }
     name = aliases.get(name, name)
 
     if name not in CROP_META:
         supported = ", ".join(CROP_META.keys())
-        return {"status": "error",
-                "message": f"Unsupported commodity '{commodity}'. Supported: {supported}"}
+        return {
+            "status": "error",
+            "message": f"Unsupported commodity '{commodity}'. Supported: {supported}",
+        }
 
     meta = CROP_META[name]
     ticker = meta["ticker"]
 
     try:
         url = f"https://query1.finance.yahoo.com/v8/finance/chart/{ticker}"
-        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
         res = urllib.request.urlopen(req, timeout=5)
         data = json.loads(res.read().decode())
 
-        chart_meta = data['chart']['result'][0]['meta']
-        raw_price = chart_meta['regularMarketPrice']
-        currency = chart_meta.get('currency', 'USX')
+        chart_meta = data["chart"]["result"][0]["meta"]
+        raw_price = chart_meta["regularMarketPrice"]
+        currency = chart_meta.get("currency", "USX")
 
-        prev_close = chart_meta.get('chartPreviousClose', raw_price)
-        change_pct = round(((raw_price - prev_close) / prev_close) * 100, 2) if prev_close else 0.0
+        prev_close = chart_meta.get("chartPreviousClose", raw_price)
+        change_pct = (
+            round(((raw_price - prev_close) / prev_close) * 100, 2)
+            if prev_close
+            else 0.0
+        )
         trend = "up" if change_pct >= 0 else "down"
 
         # Convert to USD per quintal (100 kg) — the unit Indian/African farmers use
@@ -174,8 +185,12 @@ async def fetch_commodity_price(commodity: str) -> dict:
     except Exception as e:
         # Fallback rates (approximate USD per quintal)
         fallback_usd = {
-            "corn": 17.36, "wheat": 22.04, "soybeans": 42.15,
-            "cotton": 171.05, "rice": 29.35, "sugarcane": 32.72,
+            "corn": 17.36,
+            "wheat": 22.04,
+            "soybeans": 42.15,
+            "cotton": 171.05,
+            "rice": 29.35,
+            "sugarcane": 32.72,
         }
         usd_q = fallback_usd.get(name, 20.0)
         return {
@@ -207,15 +222,29 @@ async def fetch_mandi_prices(region: str, commodity: str = "") -> dict:
     import os
 
     region_str = (region or "").strip()
-    is_africa = any(a in region_str.lower() for a in
-                    ["eldoret", "nakuru", "kenya", "nairobi", "tanzania", "uganda", "nigeria", "ghana"])
+    is_africa = any(
+        a in region_str.lower()
+        for a in [
+            "eldoret",
+            "nakuru",
+            "kenya",
+            "nairobi",
+            "tanzania",
+            "uganda",
+            "nigeria",
+            "ghana",
+        ]
+    )
 
     # --- Attempt 1: data.gov.in API for Indian mandi prices ---
     api_key = os.environ.get("DATA_GOV_IN_API_KEY", "")
     if api_key and not is_africa:
         try:
             import urllib.parse as url_parse
-            base_url = "https://api.data.gov.in/resource/9ef8423d-2997-4601-abef-1a8b0dca3b8c"
+
+            base_url = (
+                "https://api.data.gov.in/resource/9ef8423d-2997-4601-abef-1a8b0dca3b8c"
+            )
             params = {
                 "api-key": api_key,
                 "format": "json",
@@ -224,17 +253,25 @@ async def fetch_mandi_prices(region: str, commodity: str = "") -> dict:
             if commodity:
                 # Map commodity names to data.gov.in format
                 crop_map = {
-                    "corn": "Maize", "wheat": "Wheat", "soybeans": "Soyabean",
-                    "cotton": "Cotton", "rice": "Rice", "sugarcane": "Sugarcane",
+                    "corn": "Maize",
+                    "wheat": "Wheat",
+                    "soybeans": "Soyabean",
+                    "cotton": "Cotton",
+                    "rice": "Rice",
+                    "sugarcane": "Sugarcane",
                 }
                 crop_name = crop_map.get(commodity.lower().strip(), commodity.title())
                 params["filters[commodity]"] = crop_name
             if region_str:
                 params["filters[state]"] = region_str.title()
 
-            query = "&".join(f"{k}={url_parse.quote(str(v))}" for k, v in params.items())
+            query = "&".join(
+                f"{k}={url_parse.quote(str(v))}" for k, v in params.items()
+            )
             mandi_url = f"{base_url}?{query}"
-            req = urllib.request.Request(mandi_url, headers={'User-Agent': 'Mozilla/5.0'})
+            req = urllib.request.Request(
+                mandi_url, headers={"User-Agent": "Mozilla/5.0"}
+            )
             res = urllib.request.urlopen(req, timeout=8)
             mandi_data = json.loads(res.read().decode())
 
@@ -243,7 +280,6 @@ async def fetch_mandi_prices(region: str, commodity: str = "") -> dict:
                 for entry in mandi_data[:10]:
                     crop = entry.get("commodity", "").lower().strip()
                     price_str = entry.get("modal_price", "0")
-                    market = entry.get("market", "")
                     try:
                         price_val = int(float(price_str))
                         if crop and price_val > 0:
@@ -260,7 +296,9 @@ async def fetch_mandi_prices(region: str, commodity: str = "") -> dict:
                         "total_results": len(mandi_data),
                     }
         except Exception as e:
-            print(f"Warning: data.gov.in API failed ({e}). Using Yahoo Finance conversion.")
+            print(
+                f"Warning: data.gov.in API failed ({e}). Using Yahoo Finance conversion."
+            )
 
     # --- Attempt 2: Yahoo Finance futures → local currency conversion ---
     currency = "KES" if is_africa else "INR"
@@ -269,9 +307,16 @@ async def fetch_mandi_prices(region: str, commodity: str = "") -> dict:
     unit = "bag" if is_africa else "quintal"
 
     prices = {}
-    crops_to_fetch = [commodity.lower().strip()] if commodity else list(CROP_META.keys())
-    aliases = {"maize": "corn", "soy": "soybeans", "soya": "soybeans",
-               "sugar": "sugarcane", "cane": "sugarcane"}
+    crops_to_fetch = (
+        [commodity.lower().strip()] if commodity else list(CROP_META.keys())
+    )
+    aliases = {
+        "maize": "corn",
+        "soy": "soybeans",
+        "soya": "soybeans",
+        "sugar": "sugarcane",
+        "cane": "sugarcane",
+    }
     crops_to_fetch = [aliases.get(c, c) for c in crops_to_fetch if c]
 
     for crop in crops_to_fetch:
@@ -280,25 +325,35 @@ async def fetch_mandi_prices(region: str, commodity: str = "") -> dict:
         try:
             ticker = CROP_META[crop]["ticker"]
             url = f"https://query1.finance.yahoo.com/v8/finance/chart/{ticker}"
-            req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+            req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
             res = urllib.request.urlopen(req, timeout=5)
             data = json.loads(res.read().decode())
-            raw_price = data['chart']['result'][0]['meta']['regularMarketPrice']
+            raw_price = data["chart"]["result"][0]["meta"]["regularMarketPrice"]
             usd_q = _convert_to_usd_per_quintal(crop, raw_price)
             local_price = round(usd_q * fx_rate, 0)
             prices[crop] = f"{symbol}{int(local_price):,}/{unit}"
         except Exception:
-            fallback = {"corn": 1450, "wheat": 1842, "soybeans": 3521,
-                        "cotton": 14273, "rice": 2449, "sugarcane": 2731}
+            fallback = {
+                "corn": 1450,
+                "wheat": 1842,
+                "soybeans": 3521,
+                "cotton": 14273,
+                "rice": 2449,
+                "sugarcane": 2731,
+            }
             if not is_africa:
                 prices[crop] = f"{symbol}{fallback.get(crop, 2000):,}/{unit}"
             else:
-                prices[crop] = f"{symbol}{round(fallback.get(crop, 2000) * KES_PER_USD / INR_PER_USD):,}/{unit}"
+                prices[crop] = (
+                    f"{symbol}{round(fallback.get(crop, 2000) * KES_PER_USD / INR_PER_USD):,}/{unit}"
+                )
 
     return {
         "region": region_str,
         "source": "Yahoo Finance Futures + Currency Conversion",
         "currency": currency,
         "prices": prices,
-        "note": "Set DATA_GOV_IN_API_KEY for real Indian mandi prices." if not is_africa else "",
+        "note": "Set DATA_GOV_IN_API_KEY for real Indian mandi prices."
+        if not is_africa
+        else "",
     }

@@ -4,5 +4,5 @@ WEATHER_ADVISOR_SETTINGS = {
     "alert_thresholds": {
         "frost_temp_c": 2.0,
         "drought_rain_mm": 5.0,
-    }
+    },
 }

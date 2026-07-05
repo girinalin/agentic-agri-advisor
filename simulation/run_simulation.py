@@ -13,5 +13,6 @@ def run():
     print("After Step state:", next_state)
     print("Simulation execution skeleton verified.")
 
+
 if __name__ == "__main__":
     run()

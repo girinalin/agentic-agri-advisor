@@ -29,6 +29,13 @@ variable "region" {
   default     = "us-east1"
 }
 
+variable "gemini_api_key" {
+  type        = string
+  description = "Gemini API key for agent LLM access"
+  sensitive   = true
+  default     = ""
+}
+
 variable "telemetry_logs_filter" {
   type        = string
   description = "Log Sink filter for capturing telemetry data. Captures logs with the `traceloop.association.properties.log_type` attribute set to `tracing`."
@@ -50,6 +57,8 @@ variable "app_sa_roles" {
     "roles/logging.logWriter",
     "roles/cloudtrace.agent",
     "roles/storage.admin",
+    "roles/datastore.user",
+    "roles/firestore.user",
     "roles/serviceusage.serviceUsageConsumer",
   ]
 }

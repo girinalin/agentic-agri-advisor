@@ -1,5 +1,6 @@
 # Tools for voice transcription and synthesis
 
+
 def translate_query(text: str, target_lang: str) -> dict:
     """Translate query to or from local farmer dialect.
 
@@ -14,11 +15,7 @@ def translate_query(text: str, target_lang: str) -> dict:
 
 
 def record_farm_activity_details(
-    activity_type: str,
-    quantity: float,
-    unit: str,
-    target_field: str,
-    details: str
+    activity_type: str, quantity: float, unit: str, target_field: str, details: str
 ) -> dict:
     """Record the parsed details of a farm activity to be confirmed by the farmer.
 
@@ -38,5 +35,5 @@ def record_farm_activity_details(
         "quantity": quantity,
         "unit": unit,
         "target_field": target_field,
-        "details": details
+        "details": details,
     }

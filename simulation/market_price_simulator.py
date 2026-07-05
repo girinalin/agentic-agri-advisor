@@ -28,6 +28,4 @@ class MarketPriceSimulator:
 
         fluctuation = random.uniform(-0.05, 0.05)
         self.current_price = round(self.base_price + scarcity_premium + fluctuation, 2)
-        return {
-            "price_usd": self.current_price
-        }
+        return {"price_usd": self.current_price}

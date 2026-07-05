@@ -1,3 +1,8 @@
+> **⚠️ SUPERSEDED** — This document is kept for historical reference.
+> The authoritative version is now [docs/04-engineering/pwa-offline-implementation.md](04-engineering/pwa-offline-implementation.md).
+
+---
+
 # PWA Offline AI Stack — Implementation Plan
 
 > Date: 2026-07-03

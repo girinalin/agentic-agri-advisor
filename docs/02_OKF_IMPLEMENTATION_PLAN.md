@@ -1,3 +1,8 @@
+> **⚠️ SUPERSEDED** — This document is kept for historical reference.
+> The authoritative version is now [docs/02-architecture/data-and-farm-twin-architecture.md](02-architecture/data-and-farm-twin-architecture.md).
+
+---
+
 # OKF (Open Knowledge Graph) Implementation Plan
 
 > Date: 2026-07-02

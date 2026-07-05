@@ -1,3 +1,8 @@
+> **⚠️ SUPERSEDED** — This document is kept for historical reference.
+> The authoritative version is now [docs/02-architecture/hybrid-intelligence-strategy.md](02-architecture/hybrid-intelligence-strategy.md).
+
+---
+
 # 🌾 Hybrid Intelligence Strategy: Optimizing Local, Offline, and Agent Networks
 
 This document details the strategy for combining local edge models (Gemma-2B, in-browser classifiers) and the cloud-based multi-agent network (Krishi Sastri coordinator and specialists) to best serve smallholder farmer communities.
@@ -79,7 +84,7 @@ We classify user intents to route queries dynamically:
 
 ## 🛠️ Implementing Simple/Complex Routing in `dashboard.js`
 
-To implement this smart routing in the client script, we update the triage function to check for keywords representing **Dynamic/Complex** intents (e.g., "price", "mandi", "weather", "rain", "forecast", "predict"). 
+To implement this smart routing in the client script, we update the triage function to check for keywords representing **Dynamic/Complex** intents (e.g., "price", "mandi", "weather", "rain", "forecast", "predict").
 
 If none of these keywords are present, the query bypasses the backend network entirely and runs locally, reducing server load and API expenses.
 
@@ -94,7 +99,7 @@ async function handleSend() {
 
   const preferredLang = document.getElementById('language-selector')?.value || 'English';
   const lowercaseText = text.toLowerCase();
-  
+
   // Keywords requiring live APIs, RAG, or heavy backend computations
   const complexKeywords = ['price', 'mandi', 'weather', 'rain', 'forecast', 'predict', 'trend', 'market', 'manual', 'sensor'];
   const isComplex = complexKeywords.some(kw => lowercaseText.includes(kw));
@@ -158,4 +163,3 @@ Instead of static thresholds, the local **Gemma model acts as an Intelligent Cli
     *   *Gemma Logic:* Gemma parses the query type locally (e.g., classifying if the intent is a simple instruction, a diagnostic explanation, or a dynamic pricing query). It sets routing flags directly in the browser runtime:
         *   `Route: Local` ➔ Fast local response, bypasses network.
         *   `Route: Backend` ➔ Transmits payload to cloud agent pipelines.
-

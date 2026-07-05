@@ -2,16 +2,20 @@ import json
 from pathlib import Path
 
 import pytest
+from tools.ai_sdlc.security_scanners import unavailable
 
 from tools.ai_sdlc import collect_test_evidence, evidence, generate_release_report
 from tools.ai_sdlc.generate_traceability import validate_duplicate_ids
-from tools.ai_sdlc.security_scanners import unavailable
 
 
 def configure_evidence_root(monkeypatch, tmp_path: Path) -> None:
     monkeypatch.setattr(evidence, "REPO_ROOT", tmp_path)
     monkeypatch.setattr(evidence, "EVIDENCE_DIR", tmp_path / ".ai-sdlc" / "evidence")
-    monkeypatch.setattr(evidence, "MANIFEST_PATH", tmp_path / ".ai-sdlc" / "evidence" / "evidence-manifest.json")
+    monkeypatch.setattr(
+        evidence,
+        "MANIFEST_PATH",
+        tmp_path / ".ai-sdlc" / "evidence" / "evidence-manifest.json",
+    )
     monkeypatch.setattr(evidence, "get_commit_sha", lambda: "abc123")
 
 
@@ -32,7 +36,9 @@ def test_register_artifact_rejects_pass_without_success(monkeypatch, tmp_path):
         )
 
 
-def test_register_artifact_records_sha_and_prevents_duplicate_records(monkeypatch, tmp_path):
+def test_register_artifact_records_sha_and_prevents_duplicate_records(
+    monkeypatch, tmp_path
+):
     configure_evidence_root(monkeypatch, tmp_path)
     artifact = tmp_path / "artifact.json"
     artifact.write_text('{"status":"PASS"}', encoding="utf-8")
@@ -41,7 +47,9 @@ def test_register_artifact_records_sha_and_prevents_duplicate_records(monkeypatc
     evidence.register_artifact("same-id", "test", artifact, "PASS", "true", 0, "unit")
 
     manifest = json.loads(evidence.MANIFEST_PATH.read_text(encoding="utf-8"))
-    records = [item for item in manifest["artifacts"] if item["artifactId"] == "same-id"]
+    records = [
+        item for item in manifest["artifacts"] if item["artifactId"] == "same-id"
+    ]
     assert len(records) == 1
     assert records[0]["sha256"]
 
@@ -98,7 +106,9 @@ def test_unavailable_scanner_registers_not_executed(monkeypatch, tmp_path):
     security_dir = tmp_path / ".ai-sdlc" / "evidence" / "security"
     output = security_dir / "secrets.json"
 
-    code = unavailable("missing-scanner", "security-secrets", "security-secrets", output)
+    code = unavailable(
+        "missing-scanner", "security-secrets", "security-secrets", output
+    )
 
     data = json.loads(output.read_text(encoding="utf-8"))
     assert code == 2

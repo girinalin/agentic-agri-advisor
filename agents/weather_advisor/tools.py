@@ -1,5 +1,6 @@
 # Placeholder tools for weather advisor
 
+
 def predict_frost_risk(temperature: float, humidity: float) -> dict:
     """Predict risk of crop frost damage based on current temperature and humidity.
 

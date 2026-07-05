@@ -15,7 +15,7 @@ for fname in os.listdir(schema_dir):
             data = json.load(f)
         except Exception as e:
             continue
-        
+
         def find_keys(obj):
             if isinstance(obj, dict):
                 for k, v in obj.items():
@@ -26,7 +26,7 @@ for fname in os.listdir(schema_dir):
             elif isinstance(obj, list):
                 for item in obj:
                     find_keys(item)
-                    
+
         find_keys(data)
 
 with open(translations_path, 'r', encoding='utf-8') as f:

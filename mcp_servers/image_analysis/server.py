@@ -6,6 +6,7 @@ from PIL import Image
 
 mcp = FastMCP("Crop-Image-Analysis-Server")
 
+
 @mcp.tool()
 async def analyze_crop_image(image_path: str) -> dict:
     """Analyze crop leaves photo using Gemini Vision API to diagnose disease/pests.
@@ -34,14 +35,9 @@ async def analyze_crop_image(image_path: str) -> dict:
                 "spots, or pests. Provide a disease/pest diagnosis and recommended organic treatments."
             )
             response = client.models.generate_content(
-                model="gemini-2.5-flash",
-                contents=[img, prompt]
+                model="gemini-2.5-flash", contents=[img, prompt]
             )
-            return {
-                "status": "success",
-                "image": image_path,
-                "analysis": response.text
-            }
+            return {"status": "success", "image": image_path, "analysis": response.text}
         except Exception as e:
             return {"status": "error", "message": f"Gemini Vision call failed: {e}"}
 
@@ -51,5 +47,5 @@ async def analyze_crop_image(image_path: str) -> dict:
         "disease_detected": "Late Blight",
         "confidence": 0.88,
         "diagnosis": "White fuzzy growth under tomato leaves matching Late Blight (Phytophthora infestans).",
-        "treatment": "Apply copper-based organic fungicides and improve plant ventilation."
+        "treatment": "Apply copper-based organic fungicides and improve plant ventilation.",
     }

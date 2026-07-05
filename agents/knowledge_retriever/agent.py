@@ -4,11 +4,11 @@ from google.genai import types
 
 # Import knowledge retriever tools from the tools module
 from agents.knowledge_retriever.tools import (
-    query_knowledge_graph,
     get_safety_rules,
     get_treatment_safety,
     query_crop_profile,
     query_disease_to_crops,
+    query_knowledge_graph,
     query_pest_to_crops,
 )
 

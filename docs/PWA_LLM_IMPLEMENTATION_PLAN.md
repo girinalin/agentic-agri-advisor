@@ -1,3 +1,8 @@
+> **⚠️ SUPERSEDED** — This document is kept for historical reference.
+> The authoritative version is now [docs/04-engineering/local-llm-and-device-capabilities.md](04-engineering/local-llm-and-device-capabilities.md).
+
+---
+
 # 🌾 Progressive Web App (PWA) & Local LLM Integration Plan
 
 This plan details the implementation strategy for converting the **Krishi Sampark** dashboard into an installable, offline-first Progressive Web App (PWA) running browser-native local LLMs and local vision diagnostics.
@@ -9,11 +14,11 @@ This plan details the implementation strategy for converting the **Krishi Sampar
 ```mermaid
 flowchart TD
     UserQuery[User Query / Camera Capture] --> NetworkCheck{Online?}
-    
+
     NetworkCheck -->|Yes| OnlineRoute[Route to FastAPI /run_sse Backend]
     OnlineRoute --> Coordinator[Krishi Sastri Root Agent]
     Coordinator --> CloudVLM[Cloud Gemini Multimodal Image Analyst]
-    
+
     NetworkCheck -->|No| OfflineRoute[Local Hybrid Client-side Routing]
     OfflineRoute --> LocalLLM[MediaPipe GenAI Gemma 2B in WebGPU]
     OfflineRoute --> LocalClassifier[MediaPipe Tasks-Vision TFLite Classifier]

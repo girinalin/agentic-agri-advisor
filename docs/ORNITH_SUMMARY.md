@@ -1,8 +1,14 @@
+> **⚠️ SUPERSEDED** — This document is kept for historical reference.
+> The authoritative version is now [docs/01-product/product-vision.md](01-product/product-vision.md)
+> and [docs/02-architecture/architecture-overview.md](02-architecture/architecture-overview.md).
+
+---
+
 # Agentic Agriculture Advisor (Krishi Sampark) — Project Summary
 
-> **Created:** 2026-07-03  
-> **Purpose:** Master reference document for AI-assisted development. Read this before making any code changes to the project.  
-> **Architecture Framework:** Google ADK (Agent Development Kit) & Antigravity SDK conventions  
+> **Created:** 2026-07-03
+> **Purpose:** Master reference document for AI-assisted development. Read this before making any code changes to the project.
+> **Architecture Framework:** Google ADK (Agent Development Kit) & Antigravity SDK conventions
 
 ---
 
@@ -13,7 +19,7 @@
 ### The Problem
 - 500M+ smallholders face volatile climates, crop diseases, and fluctuating market prices
 - High literacy barriers → need voice-first, visual interfaces
-- Poor internet connectivity in rural areas → need offline-first design  
+- Poor internet connectivity in rural areas → need offline-first design
 - Prohibitive cloud API costs → need zero-cost voice and hybrid edge-cloud routing
 - Generic AI advice doesn't work → need hyper-personalized farm-specific recommendations
 
@@ -257,7 +263,7 @@ make release-check          # Release readiness from evidence & approvals
 
 ### Keywords for Complex Intent Detection
 ```javascript
-const complexKeywords = ['price', 'mandi', 'weather', 'rain', 'forecast', 
+const complexKeywords = ['price', 'mandi', 'weather', 'rain', 'forecast',
                          'predict', 'trend', 'market', 'manual', 'sensor'];
 // If ANY keyword matches → route to cloud agents (if online)
 // Otherwise → run locally on Gemma-2B (saves cost + latency)
@@ -492,7 +498,7 @@ This is the most dangerous gap: an AI could confidently recommend **wrong pestic
 ```bash
 # BLOCKER 1 — Make simulation work TODAY (fix the crash)
 → Create `simulation/pest_outbreak_simulator.py` with humidity + treatment-based pest risk model
-→ Create `simulation/market_price_simulator.py` with crop yield vs price oscillation model  
+→ Create `simulation/market_price_simulator.py` with crop yield vs price oscillation model
 → Create `simulation/historical_parameters.json` with real NPK/yield targets for Indian crops (wheat, rice, cotton, maize, soybean)
 → Then `FarmSimulationEnv` will no longer crash on import
 

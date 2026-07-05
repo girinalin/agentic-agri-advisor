@@ -1,6 +1,6 @@
 # Agentic Agriculture Advisor (AAA)
 
-Agentic Agriculture Advisor (AAA) is a multi-agent agriculture intelligence project built using the Google ADK and Antigravity SDK conventions. 
+Agentic Agriculture Advisor (AAA) is a multi-agent agriculture intelligence project built using the Google ADK and Antigravity SDK conventions.
 
 It coordinates multiple specialized agents, MCP servers, a knowledge graph (OKF), a RAG document search pipeline, and a simulation environment, and exposes both standard agent interfaces and web-based UI tools.
 

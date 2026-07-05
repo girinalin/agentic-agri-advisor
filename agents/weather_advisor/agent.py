@@ -20,4 +20,5 @@ weather_advisor_agent = Agent(
         "If no location is in context, ask the farmer for their nearest town. "
         "Always base your response on the actual tool output, not on assumed weather data."
     ),
-    tools=[fetch_weather_forecast],)
+    tools=[fetch_weather_forecast],
+)

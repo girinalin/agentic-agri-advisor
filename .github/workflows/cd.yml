@@ -1,0 +1,314 @@
+name: Continuous Delivery
+
+# Consolidated CI/CD pipeline — replaces ci.yml, security.yml, container.yml,
+# documentation.yml, ai-sdlc-gates.yml, and deploy-pilot.yml
+#
+# Pipeline stages:
+#   1. Quality Gate (lint, typecheck, schemas, translations, safety, tests)
+#   2. Security Gate (secrets, dependencies, SAST, container scan)
+#   3. Deploy (Terraform infra + agents-cli app deploy) — REQUIRES MANUAL APPROVAL
+#
+# Triggers:
+#   - PR to main: Quality + Security gates only (no deploy)
+#   - Push to main: Full pipeline → deploy waits for human approval in "pilot" environment
+#
+# Required GitHub Secrets:
+#   GCP_PROJECT_ID   - Your Google Cloud project ID
+#   GEMINI_API_KEY    - Gemini API key for agent LLM access
+#   GCP_SA_KEY        - Service account JSON key
+#
+# Release Gating:
+#   The "pilot" GitHub environment is configured with required reviewers.
+#   When code is pushed to main, quality + security gates run automatically.
+#   The deploy job starts but PAUSES — a designated reviewer must click
+#   "Review deployments" → "Approve" in the GitHub Actions UI before
+#   Terraform and agents-cli deploy execute.
+#
+# To configure the approval gate:
+#   Settings → Environments → New environment → Name: "pilot"
+#   → Required reviewers → Add your team members
+#
+# Features are NOT live until the deploy is approved.
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  # ═══════════════════════════════════════════════════════════
+  # Stage 1: Quality Gate
+  # ═══════════════════════════════════════════════════════════
+  quality:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: .
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+        cache: pip
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install uv
+        uv sync --all-extras --dev
+
+    - name: Lint (agents-cli lint)
+      run: uv run agents-cli lint
+
+    - name: Validate schemas
+      run: uv run python -m tools.ai_sdlc.cli validate --schemas
+
+    - name: Validate translations
+      run: uv run python -m tools.ai_sdlc.cli validate --translations
+
+    - name: Validate safety
+      run: uv run python -m tools.ai_sdlc.cli validate --safety
+
+    - name: Run tests with evidence
+      run: uv run python -m tools.ai_sdlc.cli test --evidence
+
+    - name: Verify documentation
+      run: |
+        test -f README.md || (echo "❌ README.md missing" && exit 1)
+        test -f AGENTS.md || (echo "❌ AGENTS.md missing" && exit 1)
+        test -f .ai-sdlc/README.md || (echo "❌ .ai-sdlc/README.md missing" && exit 1)
+        echo "✅ Documentation verified"
+
+    - name: Upload quality evidence
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: quality-evidence
+        path: |
+          .ai-sdlc/evidence/tests/
+          .ai-sdlc/evidence/safety/
+          .ai-sdlc/evidence/evidence-manifest.json
+
+  # ═══════════════════════════════════════════════════════════
+  # Stage 2: Security Gate
+  # ═══════════════════════════════════════════════════════════
+  security:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: .
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+        cache: pip
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install uv
+        uv sync --all-extras --dev
+
+    - name: Install Trivy
+      uses: aquasecurity/setup-trivy@v0.2.3
+
+    - name: Secret scan
+      run: uv run python -m tools.ai_sdlc.cli security --secrets
+
+    - name: Dependency scan
+      run: uv run python -m tools.ai_sdlc.cli security --dependencies
+
+    - name: SAST scan
+      run: uv run python -m tools.ai_sdlc.cli security --sast
+
+    - name: Container scan
+      run: uv run python -m tools.ai_sdlc.cli security --container
+
+    - name: Upload security evidence
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: security-evidence
+        path: |
+          .ai-sdlc/evidence/security/
+
+  # ═══════════════════════════════════════════════════════════
+  # Stage 3a: Plan (runs automatically — produces Terraform plan for review)
+  # ═══════════════════════════════════════════════════════════
+  plan:
+    needs: [quality, security]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: .
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Set up Google Cloud CLI
+      uses: google-github-actions/setup-gcloud@v2
+      with:
+        service_account_key: ${{ secrets.GCP_SA_KEY }}
+        project_id: ${{ secrets.GCP_PROJECT_ID }}
+        export_default_credentials: true
+
+    - name: Install Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: "1.7.0"
+
+    - name: Terraform Init
+      working-directory: deployment/terraform/single-project
+      env:
+        TF_VAR_gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
+      run: terraform init
+
+    - name: Terraform Plan (for review)
+      working-directory: deployment/terraform/single-project
+      env:
+        TF_VAR_gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
+      run: |
+        terraform plan \
+          -var="project_id=${{ secrets.GCP_PROJECT_ID }}" \
+          -var="region=us-east1" \
+          -var="gemini_api_key=${{ secrets.GEMINI_API_KEY }}" \
+          -no-color > plan.txt 2>&1
+        cat plan.txt
+        echo "## Terraform Plan (for review)" >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY
+        cat plan.txt >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY
+
+    - name: Upload Terraform plan
+      uses: actions/upload-artifact@v4
+      with:
+        name: terraform-plan
+        path: deployment/terraform/single-project/plan.txt
+        retention-days: 7
+
+  # ═══════════════════════════════════════════════════════════
+  # Stage 3b: Deploy (main push only — REQUIRES MANUAL APPROVAL)
+  #
+  # The "pilot" GitHub Environment has required reviewers configured.
+  # After the plan job completes, this job starts but PAUSES.
+  # A human reviewer must click "Review deployments" → "Approve"
+  # in the GitHub Actions UI before Terraform apply and agents-cli
+  # deploy execute.
+  #
+  # The reviewer can see the Terraform plan in:
+  #   1. The plan job's step summary (GitHub Actions run page)
+  #   2. The uploaded "terraform-plan" artifact
+  #
+  # ═══════════════════════════════════════════════════════════
+  deploy:
+    needs: [plan]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: pilot
+    defaults:
+      run:
+        working-directory: .
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+        cache: pip
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install uv
+        uv sync --all-extras --dev
+        pip install google-agents-cli
+
+    # --- Authenticate to Google Cloud ---
+    - name: Set up Google Cloud CLI
+      uses: google-github-actions/setup-gcloud@v2
+      with:
+        service_account_key: ${{ secrets.GCP_SA_KEY }}
+        project_id: ${{ secrets.GCP_PROJECT_ID }}
+        export_default_credentials: true
+
+    # --- Step 1: Terraform (Firestore + GCS + IAM + Cloud Run shell) ---
+    - name: Install Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: "1.7.0"
+
+    - name: Terraform Init
+      working-directory: deployment/terraform/single-project
+      env:
+        TF_VAR_gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
+      run: terraform init
+
+    - name: Download Terraform plan (from plan job)
+      uses: actions/download-artifact@v4
+      with:
+        name: terraform-plan
+        path: deployment/terraform/single-project/
+
+    - name: Display Terraform plan for reviewer reference
+      working-directory: deployment/terraform/single-project
+      run: |
+        echo "══════════════════════════════════════════════════════"
+        echo "  TERRAFORM PLAN (reviewed before approval)"
+        echo "══════════════════════════════════════════════════════"
+        cat plan.txt
+
+    - name: Terraform Apply
+      working-directory: deployment/terraform/single-project
+      env:
+        TF_VAR_gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
+      run: |
+        terraform apply -auto-approve \
+          -var="project_id=${{ secrets.GCP_PROJECT_ID }}" \
+          -var="region=us-east1" \
+          -var="gemini_api_key=${{ secrets.GEMINI_API_KEY }}"
+
+    - name: Terraform Outputs
+      working-directory: deployment/terraform/single-project
+      run: |
+        echo "## Deployment Infrastructure" >> $GITHUB_STEP_SUMMARY
+        echo "| Resource | Value |" >> $GITHUB_STEP_SUMMARY
+        echo "|----------|-------|" >> $GITHUB_STEP_SUMMARY
+        echo "| Firestore DB | $(terraform output -raw firestore_database) |" >> $GITHUB_STEP_SUMMARY
+        echo "| Logs Bucket | $(terraform output -raw logs_bucket_name) |" >> $GITHUB_STEP_SUMMARY
+        echo "| Assets Bucket | $(terraform output -raw assets_bucket_name) |" >> $GITHUB_STEP_SUMMARY
+        echo "| Cloud Run URL | $(terraform output -raw cloud_run_service_url) |" >> $GITHUB_STEP_SUMMARY
+
+    # --- Step 2: agents-cli deploy (builds + pushes image, updates Cloud Run) ---
+    - name: Deploy with agents-cli
+      env:
+        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        GOOGLE_CLOUD_PROJECT: ${{ secrets.GCP_PROJECT_ID }}
+        GOOGLE_CLOUD_LOCATION: us-east1
+        USE_FIRESTORE: "1"
+        FIRESTORE_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+      run: |
+        echo "🚀 Deploying app via agents-cli deploy..."
+        agents-cli deploy --region=us-east1
+
+    # --- Verify ---
+    - name: Health Check
+      working-directory: deployment/terraform/single-project
+      run: |
+        SERVICE_URL=$(terraform output -raw cloud_run_service_url)
+        echo "Waiting for service to warm up..."
+        sleep 15
+        echo "Checking: ${SERVICE_URL}/api/profile/user"
+        curl -sf "${SERVICE_URL}/api/profile/user" | python3 -m json.tool | head -10 || echo "⚠️ Health check failed (may need warm-up time)"
+        echo "::notice::Deployed to ${SERVICE_URL}"

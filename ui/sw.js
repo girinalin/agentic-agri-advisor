@@ -68,7 +68,7 @@ self.addEventListener('sync', event => {
 // ============================================================
 self.addEventListener('push', event => {
   if (!event.data) return;
-  
+
   let notification;
   try {
     notification = event.data.json();

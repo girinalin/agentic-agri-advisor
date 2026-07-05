@@ -135,7 +135,7 @@
     // Use backend TTS (edge-tts neural male voices) as primary — better quality + male voices
     // Browser TTS often lacks male voices for Indian/African languages
     const useBackendTTS = localStorage.getItem('tts_prefer_backend') !== 'false'; // default: true
-    
+
     if (useBackendTTS) {
       backendTTS(cleanText, language);
       return;
@@ -154,7 +154,7 @@
       if (voices.length > 0) {
         // Find voice for the language — prefer male voices
         const langPrefix = language + '-';
-        let voice = voices.find(v => v.lang && v.lang.startsWith(langPrefix) && 
+        let voice = voices.find(v => v.lang && v.lang.startsWith(langPrefix) &&
           (v.name.includes('male') || v.name.includes('Male') || v.name.includes('Rishi') || v.name.includes('Madhur') || v.name.includes('Manohar') || v.name.includes('Mohan') || v.name.includes('Rafiki')));
         if (!voice) {
           voice = voices.find(v => v.lang && v.lang.startsWith(langPrefix));

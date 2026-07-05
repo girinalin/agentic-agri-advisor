@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python3
 
 #!/usr/bin/env python3
@@ -25,16 +24,21 @@ from datetime import datetime
 from typing import Optional
 
 # ADK callback types (must use these — not InvocationContext)
-from google.adk.agents.callback_context import CallbackContext  # type: ignore[attr-defined]
+from google.adk.agents.callback_context import (
+    CallbackContext,  # type: ignore[attr-defined]
+)
 from google.genai import types
-
 
 # ============================================================
 # Data Loader — parse OKF safety files at module load time (once)
 # ============================================================
 
 _OKF_SAFETY_DIR = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)), "..", "okf-knowledge-graph", "data", "safety"
+    os.path.dirname(os.path.abspath(__file__)),
+    "..",
+    "okf-knowledge-graph",
+    "data",
+    "safety",
 )
 
 # pesticide_name -> {max_concentration, max_rate, phi_days, notes}
@@ -84,14 +88,17 @@ def _extract_table_data(content: str) -> list[dict[str, str]]:
 
         if not header_seen and "|" in stripped:
             # First non-separator pipe row is the header — remember column count
-            cols = [c.strip() for c in stripped.split("|") if c.strip()]
+            _cols = [c.strip() for c in stripped.split("|") if c.strip()]
             header_seen = True
             in_table = True
             continue
 
         if in_table:
             row_data = _parse_table_row(stripped)
-            if "pesticide" in row_data and not (re.match(r"^[\-:]+$", row_data.get("pesticide", "")) or re.match(r"^\|?\s*$", stripped)):
+            if "pesticide" in row_data and not (
+                re.match(r"^[\-:]+$", row_data.get("pesticide", ""))
+                or re.match(r"^\|?\s*$", stripped)
+            ):
                 rows.append(row_data)
 
     return rows
@@ -102,12 +109,10 @@ def _load_all_safety_files() -> None:
     if not os.path.isdir(_OKF_SAFETY_DIR):
         return
 
-    pesticide_limits_file = os.path.join(
-        _OKF_SAFETY_DIR, "pesticide_limits.md"
-    )
+    pesticide_limits_file = os.path.join(_OKF_SAFETY_DIR, "pesticide_limits.md")
 
     if os.path.isfile(pesticide_limits_file):
-        with open(pesticide_limits_file, "r", encoding="utf-8") as f:
+        with open(pesticide_limits_file, encoding="utf-8") as f:
             content = f.read()
 
         rows = _extract_table_data(content)
@@ -145,6 +150,7 @@ _load_all_safety_files()
 # ============================================================
 # Utility helpers — used by both callbacks
 # ============================================================
+
 
 def _extract_dosages(text: str) -> list[tuple[float | None, str]]:
     """Extract numeric dosage patterns from text.
@@ -209,7 +215,7 @@ def _detect_chemicals(text: str) -> list[str]:
 
 def _check_dosage_against_okf(
     text: str,
-) -> Optional[dict]:
+) -> dict | None:
     """Check if any dosage in text exceeds OKF maximum for that chemical.
 
     Returns:
@@ -239,9 +245,7 @@ def _check_dosage_against_okf(
                 continue
 
             # Parse OKF max concentration (e.g., "0.5 ml/liter")
-            match = re.search(
-                r"(\d+(?:\.\d+)?)\s*(ml|g|mg)\b", max_conc, re.IGNORECASE
-            )
+            match = re.search(r"(\d+(?:\.\d+)?)\s*(ml|g|mg)\b", max_conc, re.IGNORECASE)
             if not match:
                 continue
 
@@ -303,7 +307,9 @@ def create_escalation(
         "created_at": datetime.now().isoformat(),
     }
     _escalation_queue.append(escalation)
-    print(f"[Safety Kernel] Escalation created: {escalation['escalation_id'][:8]}... reason={reason}")
+    print(
+        f"[Safety Kernel] Escalation created: {escalation['escalation_id'][:8]}... reason={reason}"
+    )
     return escalation
 
 
@@ -336,6 +342,7 @@ def resolve_escalation(escalation_id: str, resolution: str, resolved_by: str) ->
 # ============================================================
 # Standalone Safety Validation — callable from any agent or tool
 # ============================================================
+
 
 def validate_recommendation(text: str, farmer_name: str = "", query: str = "") -> dict:
     """Validate any agricultural recommendation text against safety rules.
@@ -370,29 +377,33 @@ def validate_recommendation(text: str, farmer_name: str = "", query: str = "") -
     for chem in BANNED_CHEMICALS:
         if re.search(r"\b" + re.escape(chem) + r"\b", text_lower):
             banned_found.append(chem)
-            violations.append({
-                "type": "banned_chemical",
-                "chemical": chem,
-                "severity": "critical",
-                "message": f"{chem} is BANNED and must never be recommended. "
-                           f"Suggest safe alternatives like neem oil, Bt, or chlorpyrifphos at OKF dosage.",
-            })
+            violations.append(
+                {
+                    "type": "banned_chemical",
+                    "chemical": chem,
+                    "severity": "critical",
+                    "message": f"{chem} is BANNED and must never be recommended. "
+                    f"Suggest safe alternatives like neem oil, Bt, or chlorpyrifphos at OKF dosage.",
+                }
+            )
 
     # --- Check 2: Dosage violations ---
     dosage_check = _check_dosage_against_okf(text)
     if dosage_check:
         dosage_violations.append(dosage_check)
-        violations.append({
-            "type": "dosage_violation",
-            "chemical": dosage_check["chemical"],
-            "detected_amount": dosage_check["detected_amount"],
-            "okf_max": dosage_check["okf_max"],
-            "unit": dosage_check["unit"],
-            "severity": "high",
-            "message": f"{dosage_check['chemical']} dosage {dosage_check['detected_amount']} "
-                       f"{dosage_check['unit']} exceeds OKF maximum of {dosage_check['okf_max']} "
-                       f"{dosage_check['unit']}. Must reduce to safe dosage.",
-        })
+        violations.append(
+            {
+                "type": "dosage_violation",
+                "chemical": dosage_check["chemical"],
+                "detected_amount": dosage_check["detected_amount"],
+                "okf_max": dosage_check["okf_max"],
+                "unit": dosage_check["unit"],
+                "severity": "high",
+                "message": f"{dosage_check['chemical']} dosage {dosage_check['detected_amount']} "
+                f"{dosage_check['unit']} exceeds OKF maximum of {dosage_check['okf_max']} "
+                f"{dosage_check['unit']}. Must reduce to safe dosage.",
+            }
+        )
 
     # --- Check 3: PHI violations ---
     detected_chemicals = _detect_chemicals(text)
@@ -401,7 +412,11 @@ def validate_recommendation(text: str, farmer_name: str = "", query: str = "") -
         if not entry or not entry.get("phi_days"):
             continue
 
-        phi = int(entry["phi_days"]) if isinstance(entry.get("phi_days"), (int, float)) else 0
+        phi = (
+            int(entry["phi_days"])
+            if isinstance(entry.get("phi_days"), (int, float))
+            else 0
+        )
         if phi <= 0:
             continue
 
@@ -409,20 +424,20 @@ def validate_recommendation(text: str, farmer_name: str = "", query: str = "") -
         harvest_near_pesticide = bool(
             re.search(r"harvest", text_lower) and chem_name in text_lower
         )
-        has_phi_mention = bool(
-            re.search(r"pre.harvest|phi|waiting period", text_lower)
-        )
+        has_phi_mention = bool(re.search(r"pre.harvest|phi|waiting period", text_lower))
 
         if harvest_near_pesticide and not has_phi_mention:
             phi_warnings.append(chem_name)
-            violations.append({
-                "type": "phi_violation",
-                "chemical": chem_name,
-                "phi_days": phi,
-                "severity": "high",
-                "message": f"Pre-Harvest Interval ({phi} days) for {chem_name} "
-                           f"must be observed before harvest.",
-            })
+            violations.append(
+                {
+                    "type": "phi_violation",
+                    "chemical": chem_name,
+                    "phi_days": phi,
+                    "severity": "high",
+                    "message": f"Pre-Harvest Interval ({phi} days) for {chem_name} "
+                    f"must be observed before harvest.",
+                }
+            )
 
     # --- Determine safety and create escalation if needed ---
     is_safe = len(violations) == 0
@@ -461,7 +476,8 @@ def validate_recommendation(text: str, farmer_name: str = "", query: str = "") -
 # ADK Callback Functions
 # ============================================================
 
-def safety_before_agent(callback_context: CallbackContext) -> Optional[types.Content]:
+
+def safety_before_agent(callback_context: CallbackContext) -> types.Content | None:
     """Pre-agent safety callback — runs BEFORE coordinator produces final response.
 
     Inspects the conversation history for any tool outputs that mention
@@ -538,7 +554,7 @@ def safety_before_agent(callback_context: CallbackContext) -> Optional[types.Con
         return None
 
 
-def safety_after_agent(callback_context: CallbackContext) -> Optional[types.Content]:
+def safety_after_agent(callback_context: CallbackContext) -> types.Content | None:
     """Post-agent safety callback — runs AFTER coordinator has composed its response.
 
     Scans the final response for unsafe patterns and appends warnings or
@@ -597,7 +613,8 @@ def safety_after_agent(callback_context: CallbackContext) -> Optional[types.Cont
                         parts=[
                             types.Part(
                                 text=(
-                                    output_text + "\n\n⚠️ Please confirm this with a local "
+                                    output_text
+                                    + "\n\n⚠️ Please confirm this with a local "
                                     "agronomist before applying."
                                 )
                             ),
@@ -628,13 +645,18 @@ def safety_after_agent(callback_context: CallbackContext) -> Optional[types.Cont
                 if not entry or not entry.get("phi_days"):
                     continue
 
-                phi = int(entry["phi_days"]) if isinstance(entry.get("phi_days"), (int, float)) else 0
+                phi = (
+                    int(entry["phi_days"])
+                    if isinstance(entry.get("phi_days"), (int, float))
+                    else 0
+                )
                 if phi <= 0:
                     continue
 
                 # Check if harvest is mentioned near pesticide without PHI reference
                 harvest_near_pesticide = bool(
-                    re.search(r"harvest", output_text.lower()) and chem_name in output_text.lower()
+                    re.search(r"harvest", output_text.lower())
+                    and chem_name in output_text.lower()
                 )
 
                 has_phi_mention = bool(
@@ -647,7 +669,12 @@ def safety_after_agent(callback_context: CallbackContext) -> Optional[types.Cont
                     except (json.JSONDecodeError, ValueError):
                         return types.Content(
                             role="assistant",
-                            parts=[types.Part(text=output_text + "\n\n⚠️ Please confirm this with a local agronomist before applying.")],
+                            parts=[
+                                types.Part(
+                                    text=output_text
+                                    + "\n\n⚠️ Please confirm this with a local agronomist before applying."
+                                )
+                            ],
                         )
 
                     if "recommendation" in response_data:
@@ -658,7 +685,11 @@ def safety_after_agent(callback_context: CallbackContext) -> Optional[types.Cont
 
                     return types.Content(
                         role="assistant",
-                        parts=[types.Part(text=json.dumps(response_data, ensure_ascii=False))],
+                        parts=[
+                            types.Part(
+                                text=json.dumps(response_data, ensure_ascii=False)
+                            )
+                        ],
                     )
 
         # --- Trigger 3: Check for "banned" keyword in text ---
@@ -670,7 +701,8 @@ def safety_after_agent(callback_context: CallbackContext) -> Optional[types.Cont
 
             if "escalate" in response_data:
                 response_data["recommendation"] = (
-                    response_data.get("recommendation", "") + "\n⚠️ Please confirm this with a local agronomist before applying."
+                    response_data.get("recommendation", "")
+                    + "\n⚠️ Please confirm this with a local agronomist before applying."
                 )
 
             return types.Content(
@@ -680,7 +712,6 @@ def safety_after_agent(callback_context: CallbackContext) -> Optional[types.Cont
 
         return None
 
-    except Exception as exc:  # noqa: BLE001 — safety callbacks must never crash the agent
+    except Exception as exc:
         print(f"[Safety Kernel] after_agent_callback error (non-blocking): {exc}")  # type: ignore[reportPrintStmt]
         return None
-

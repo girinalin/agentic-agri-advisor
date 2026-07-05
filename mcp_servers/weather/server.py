@@ -5,6 +5,7 @@ from mcp.server.fastmcp import FastMCP
 
 mcp = FastMCP("Weather-Advisory-Server")
 
+
 @mcp.tool()
 async def fetch_weather_forecast(location: str, days: int = 5) -> dict:
     """Fetch weather forecast and microclimate alerts for farm coordinates or locations.
@@ -21,6 +22,7 @@ async def fetch_weather_forecast(location: str, days: int = 5) -> dict:
             lon = float(parts[1].strip())
         else:
             import urllib.parse
+
             geo_url = f"https://geocoding-api.open-meteo.com/v1/search?name={urllib.parse.quote(location)}&count=1&format=json"
             geo_res = urllib.request.urlopen(geo_url, timeout=5)
             geo_data = json.loads(geo_res.read().decode())
@@ -52,22 +54,24 @@ async def fetch_weather_forecast(location: str, days: int = 5) -> dict:
             elif temp_min < 8.0 and humidity > 85.0:
                 frost_risk = "medium"
 
-            forecast.append({
-                "day": i + 1,
-                "date": daily.get("time", [])[i],
-                "temp_max_c": temp_max,
-                "temp_min_c": temp_min,
-                "humidity": humidity,
-                "rain_mm": rain,
-                "frost_risk": frost_risk
-            })
+            forecast.append(
+                {
+                    "day": i + 1,
+                    "date": daily.get("time", [])[i],
+                    "temp_max_c": temp_max,
+                    "temp_min_c": temp_min,
+                    "humidity": humidity,
+                    "rain_mm": rain,
+                    "frost_risk": frost_risk,
+                }
+            )
 
         return {
             "location": f"{lat},{lon}",
             "current_temp_c": current.get("temperature"),
             "current_windspeed": current.get("windspeed"),
             "forecast": forecast,
-            "source": "Open-Meteo Real-Time Weather API"
+            "source": "Open-Meteo Real-Time Weather API",
         }
     except Exception as e:
         return {
@@ -78,5 +82,5 @@ async def fetch_weather_forecast(location: str, days: int = 5) -> dict:
             "forecast": [
                 {"day": d, "temp_c": 20.0 + d, "humidity": 65.0, "frost_risk": "low"}
                 for d in range(1, days + 1)
-            ]
+            ],
         }

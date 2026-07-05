@@ -1,3 +1,9 @@
+> **⚠️ SUPERSEDED** — This document is kept for historical reference.
+> The authoritative version is now [docs/02-architecture/architecture-overview.md](02-architecture/architecture-overview.md)
+> and [docs/02-architecture/agent-architecture.md](02-architecture/agent-architecture.md).
+
+---
+
 # 🌾 Agentic Agriculture Advisor (AAA): Technical Architecture Guide
 
 This document provides an in-depth technical analysis of the Agentic Agriculture Advisor (AAA) platform, detailing the backend systems, multi-agent coordination architecture, simulation sandbox dynamics, data orchestration pipelines, and declarative user interface protocols.

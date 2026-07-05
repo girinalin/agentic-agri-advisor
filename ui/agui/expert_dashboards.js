@@ -2,7 +2,7 @@
   async function renderExpertConsole() {
     const mainCanvas = document.getElementById('console-canvas');
     if (!mainCanvas) return;
-    
+
     if (typeof window.logObservabilityEvent === 'function' && typeof window.generateCorrelationId === 'function') {
       window.logObservabilityEvent(window.generateCorrelationId(), 'screen_rendered', 'expert_console', '', '', 'local', '', 0);
     }
@@ -18,7 +18,7 @@
             <button class="template-chip filter-btn" data-filter="closed">Closed</button>
           </div>
           <div id="expert-case-list">Loading queue...</div>
-          
+
           <h3 style="margin-top: 20px;">🚨 Regional Outbreak Intel</h3>
           <div id="expert-outbreak-list">Loading outbreaks...</div>
         </div>
@@ -49,7 +49,7 @@
     const list = document.getElementById('expert-case-list');
     if (!list) return;
     list.innerHTML = "";
-    
+
     const filtered = cases.filter(c => {
       if (filter === 'urgent') return c.safety_flags && c.safety_flags !== 'none';
       if (filter === 'open') return c.state !== 'closed';
@@ -122,7 +122,7 @@
           <p>${c.recent_activities || 'No activities logged recently.'}</p>
         </div>
       </div>
-      
+
       <hr style="border: 0; border-top: 1px solid var(--border); margin: 20px 0;">
 
       <h3>✍️ Formulate Expert Prescription</h3>
@@ -186,7 +186,7 @@
     const list = document.getElementById('expert-outbreak-list');
     if (!list) return;
     list.innerHTML = "";
-    
+
     outbreaks.forEach(o => {
       const div = document.createElement('div');
       div.className = "case-card";

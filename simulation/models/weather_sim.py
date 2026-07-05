@@ -12,5 +12,5 @@ class WeatherSimulator:
         return {
             "temp_c": random.uniform(15.0, 32.0),
             "precip_mm": random.uniform(5.0, 25.0) if is_raining else 0.0,
-            "condition": "rainy" if is_raining else "sunny"
+            "condition": "rainy" if is_raining else "sunny",
         }

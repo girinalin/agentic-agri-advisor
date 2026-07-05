@@ -1,3 +1,9 @@
+> **⚠️ SUPERSEDED** — This document is kept for historical reference.
+> The authoritative version is now [docs/08-roadmap/current-status-and-roadmap.md](08-roadmap/current-status-and-roadmap.md)
+> and [docs/06-devsecops/lifecycle-mapping.md](06-devsecops/lifecycle-mapping.md).
+
+---
+
 # ADK Lifecycle Alignment Plan: Agentic Agriculture Advisor (AAA)
 
 > Based on the [Google Codelab: Getting Started with Antigravity Skills](https://codelabs.developers.google.com/getting-started-with-antigravity-skills?hl=en#0) and the agents-cli development workflow.

@@ -20,7 +20,9 @@ class CropGrowthSimulator:
                     params = json.load(f)
                 crop_yields = params.get("crop_yield_ton_ha", {})
                 if self.crop_type in crop_yields:
-                    self.historical_yield_target = crop_yields[self.crop_type].get("historical_yield_ton_ha", 5.0)
+                    self.historical_yield_target = crop_yields[self.crop_type].get(
+                        "historical_yield_ton_ha", 5.0
+                    )
         except Exception:
             pass
 
@@ -65,5 +67,5 @@ class CropGrowthSimulator:
             "stage": self.stage,
             "growth_index": round(self.growth_index, 1),
             "biomass_kg": round(self.biomass, 1),
-            "health": round(self.health, 1)
+            "health": round(self.health, 1),
         }

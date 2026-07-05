@@ -4,7 +4,9 @@ import urllib.request
 
 import yaml
 
-SCHEMAS_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../ui/schemas"))
+SCHEMAS_DIR = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "../../ui/schemas")
+)
 OKF_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../okf"))
 
 
@@ -21,17 +23,19 @@ def refresh_market_schema() -> str:
         return f"Error reading market_insights.json: {e}"
 
     prices = {"corn": 4.50, "wheat": 6.12, "soybeans": 11.20}
-    headers = {'User-Agent': 'Mozilla/5.0'}
+    headers = {"User-Agent": "Mozilla/5.0"}
     for crop, ticker in [("corn", "ZC=F"), ("wheat", "ZW=F"), ("soybeans", "ZS=F")]:
         try:
             url = f"https://query1.finance.yahoo.com/v8/finance/chart/{ticker}"
             req = urllib.request.Request(url, headers=headers)
             res = urllib.request.urlopen(req, timeout=3)
             data = json.loads(res.read().decode())
-            raw_price = data['chart']['result'][0]['meta']['regularMarketPrice']
+            raw_price = data["chart"]["result"][0]["meta"]["regularMarketPrice"]
             prices[crop] = round(raw_price / 100.0, 2)
         except Exception as e:
-            print(f"Warning: Failed to fetch pricing for {crop} ({e}). Using base rate.")
+            print(
+                f"Warning: Failed to fetch pricing for {crop} ({e}). Using base rate."
+            )
 
     for comp in schema.get("components", []):
         if comp.get("type") == "grid":
@@ -73,7 +77,9 @@ def refresh_crop_schema() -> str:
             if "---" in content:
                 parts = content.split("---", 2)
                 meta = yaml.safe_load(parts[1])
-                nitrogen_ppm = str(meta.get("properties", {}).get("optimal_ppm", nitrogen_ppm))
+                nitrogen_ppm = str(
+                    meta.get("properties", {}).get("optimal_ppm", nitrogen_ppm)
+                )
         except Exception as e:
             print(f"Warning: Failed to parse nutrient concept ({e}).")
 
@@ -139,10 +145,11 @@ def get_local_mandi_prices(region: str) -> dict:
         dict: Localized crop prices in the farmer's local currency.
     """
     import asyncio as _asyncio
+
     from mcp_servers.market.server import fetch_mandi_prices
+
     try:
         result = _asyncio.run(fetch_mandi_prices(region))
         return result
     except Exception as e:
         return {"region": region, "source": f"Error: {e}", "prices": {}}
-

@@ -55,11 +55,11 @@ for lang, keys in translations_to_add.items():
     target_pattern = f"'{lang}': {{"
     if target_pattern not in content:
         target_pattern = f'"{lang}": {{'
-    
+
     inject_str = ""
     for k, v in keys.items():
         inject_str += f"\n      '{k}': '{v}',"
-    
+
     content = content.replace(target_pattern, target_pattern + inject_str)
 
 # 2. Inject left navigation data sections and Dynamic Rendering helpers inside DOMContentLoaded
@@ -90,7 +90,7 @@ nav_helpers_js = """
     if (focusableElements.length === 0) return;
     const firstFocusable = focusableElements[0];
     const lastFocusable = focusableElements[focusableElements.length - 1];
-    
+
     element.addEventListener('keydown', function(e) {
       if (e.key === 'Tab') {
         if (e.shiftKey) {
@@ -125,7 +125,7 @@ nav_helpers_js = """
       link.setAttribute('data-tab', item.id);
       link.setAttribute('title', label); // tooltip for collapsed mode
       link.setAttribute('aria-label', label);
-      
+
       const currentActive = localStorage.getItem('nav_route_user') || (mode === 'expert' ? 'console' : 'home');
       if (item.id === currentActive) {
         link.classList.add('active');
@@ -154,7 +154,7 @@ nav_helpers_js = """
   // Collapsible toggle buttons event setup
   const leftNavToggleBtn = document.getElementById('left-nav-toggle-btn');
   const leftNav = document.getElementById('left-nav');
-  
+
   if (leftNavToggleBtn && leftNav) {
     // Restore collapsed preference
     const isCollapsed = localStorage.getItem('nav_collapsed_user') === 'true';
@@ -215,7 +215,7 @@ content = content.replace("  // User Mode selector change listener", nav_helpers
 # 3. Replace applyLanguageTranslation to update left navigation links as well
 apply_translation_orig = """  function applyLanguageTranslation(lang) {
     const dict = TRANSLATIONS[lang] || TRANSLATIONS['English'];
-    
+
     // Translate bottom navigation labels
     const labels = document.querySelectorAll('.bottom-nav-bar [data-tr]');
     labels.forEach(lbl => {
@@ -227,7 +227,7 @@ apply_translation_orig = """  function applyLanguageTranslation(lang) {
 
 apply_translation_new = """  function applyLanguageTranslation(lang) {
     const dict = TRANSLATIONS[lang] || TRANSLATIONS['English'];
-    
+
     // Translate bottom navigation labels
     const labels = document.querySelectorAll('.bottom-nav-bar [data-tr]');
     labels.forEach(lbl => {
@@ -246,23 +246,23 @@ content = content.replace(apply_translation_orig, apply_translation_new)
 # 4. Replace switchTab routing implementation to handle expert routes, state preservation and left-nav highlighting
 switch_tab_orig = """  window.switchTab = function(tabId, skipLoadSchema) {
     console.log(`[Navigation] Switching to screen tab: ${tabId}`);
-    
+
     // Remove active styles from bottom nav links
     const tabs = document.querySelectorAll('.bottom-nav-bar .nav-tab');
     tabs.forEach(t => t.classList.remove('active'));
-    
+
     // Highlight the selected bottom nav tab
     const targetTab = document.querySelector(`.bottom-nav-bar .nav-tab[data-tab="${tabId}"]`);
     if (targetTab) targetTab.classList.add('active');
-    
+
     // Hide all screen contents
     const screens = document.querySelectorAll('.screen-container .app-screen');
     screens.forEach(s => s.classList.remove('active'));
-    
+
     // Show active screen content
     const targetScreen = document.getElementById(`screen-${tabId}`);
     if (targetScreen) targetScreen.classList.add('active');
-    
+
     if (!skipLoadSchema) {
       // Dynamically trigger corresponding schema loads
       if (tabId === 'home') {
@@ -279,7 +279,7 @@ switch_tab_orig = """  window.switchTab = function(tabId, skipLoadSchema) {
 
 switch_tab_new = """  window.switchTab = function(tabId, skipLoadSchema) {
     console.log(`[Navigation] Switching to screen tab: ${tabId}`);
-    
+
     // Save route selection
     localStorage.setItem('nav_route_user', tabId);
 
@@ -296,7 +296,7 @@ switch_tab_new = """  window.switchTab = function(tabId, skipLoadSchema) {
     // Remove active styles from bottom nav links
     const tabs = document.querySelectorAll('.bottom-nav-bar .nav-tab');
     tabs.forEach(t => t.classList.remove('active'));
-    
+
     // Highlight the selected bottom nav tab
     const targetTab = document.querySelector(`.bottom-nav-bar .nav-tab[data-tab="${tabId}"]`);
     if (targetTab) targetTab.classList.add('active');
@@ -306,15 +306,15 @@ switch_tab_new = """  window.switchTab = function(tabId, skipLoadSchema) {
     leftTabs.forEach(t => t.classList.remove('active'));
     const targetLeftTab = document.querySelector(`.left-nav-item[data-tab="${tabId}"]`);
     if (targetLeftTab) targetLeftTab.classList.add('active');
-    
+
     // Hide all screen contents
     const screens = document.querySelectorAll('.screen-container .app-screen');
     screens.forEach(s => s.classList.remove('active'));
-    
+
     // Show active screen content
     const targetScreen = document.getElementById(`screen-${tabId}`);
     if (targetScreen) targetScreen.classList.add('active');
-    
+
     if (!skipLoadSchema) {
       // Dynamically trigger corresponding schema loads
       if (tabId === 'home') {
@@ -366,7 +366,7 @@ mode_selector_new = """  // User Mode selector change listener
     const savedMode = localStorage.getItem('nav_mode_user') || 'farmer';
     modeSelector.value = savedMode;
     renderLeftNavigation(savedMode);
-    
+
     // Switch to last active route
     const savedRoute = localStorage.getItem('nav_route_user') || (savedMode === 'expert' ? 'console' : 'home');
     setTimeout(() => {

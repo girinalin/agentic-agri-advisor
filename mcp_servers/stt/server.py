@@ -16,12 +16,18 @@ try:
         # Load model on Apple GPU, using CPU for audio preprocessing channel
         backend = litert_lm.Backend.GPU()
         audio_backend = litert_lm.Backend.CPU()
-        engine = litert_lm.Engine(model_path, backend=backend, audio_backend=audio_backend)
+        engine = litert_lm.Engine(
+            model_path, backend=backend, audio_backend=audio_backend
+        )
         print("Local Gemma-4-12B ASR Engine successfully loaded on GPU!")
     else:
-        print(f"Warning: Local Gemma-4-12B model not found at {model_path}. Cloud fallback active.")
+        print(
+            f"Warning: Local Gemma-4-12B model not found at {model_path}. Cloud fallback active."
+        )
 except Exception as e:
-    print(f"Warning: Could not initialize local Gemma-4-12B Engine: {e}. Cloud fallback active.")
+    print(
+        f"Warning: Could not initialize local Gemma-4-12B Engine: {e}. Cloud fallback active."
+    )
 
 
 @mcp.tool()
@@ -41,7 +47,7 @@ async def speech_to_text(audio_path: str) -> str:
             with engine.create_conversation() as conv:
                 multimodal_input = litert_lm.Contents.of(
                     litert_lm.Content.AudioFile(absolute_path=audio_path),
-                    "Transcribe the spoken words in this agricultural audio query verbatim. Do not add any introduction or comments."
+                    "Transcribe the spoken words in this agricultural audio query verbatim. Do not add any introduction or comments.",
                 )
                 response = conv.send_message(multimodal_input)
                 transcription = response["content"][0]["text"].strip()
@@ -49,7 +55,9 @@ async def speech_to_text(audio_path: str) -> str:
                     print(f"Local ASR Success: '{transcription}'")
                     return transcription
         except Exception as local_err:
-            print(f"Local Gemma-4-12B transcription failed: {local_err}. Falling back to Cloud Gemini.")
+            print(
+                f"Local Gemma-4-12B transcription failed: {local_err}. Falling back to Cloud Gemini."
+            )
 
     # 2. Cloud Fallback (Gemini API)
     api_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
@@ -67,10 +75,15 @@ async def speech_to_text(audio_path: str) -> str:
             uploaded_file = client.files.upload(file=audio_path)
             response = client.models.generate_content(
                 model="gemini-2.5-flash",
-                contents=[uploaded_file, "Transcribe this agricultural audio query verbatim."]
+                contents=[
+                    uploaded_file,
+                    "Transcribe this agricultural audio query verbatim.",
+                ],
             )
             return response.text
         except Exception as e:
             return f"Error transcribing via Gemini: {e}"
 
-    return "Farmer Query (Mocked): What is the best treatment for late blight on potatoes?"
+    return (
+        "Farmer Query (Mocked): What is the best treatment for late blight on potatoes?"
+    )

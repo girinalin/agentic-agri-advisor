@@ -12,9 +12,8 @@ from agents.knowledge_retriever.agent import knowledge_retriever_agent
 from agents.market_advisor.agent import market_advisor_agent
 from agents.pest_detector.agent import pest_detector_agent
 from agents.simulation_agent.agent import simulation_agent
-from safety_kernel import safety_before_agent, safety_after_agent
-
 from agents.weather_advisor.agent import weather_advisor_agent
+from safety_kernel import safety_after_agent, safety_before_agent
 
 # Coordinator agent that delegates queries to the specialized advisors
 coordinator_agent = Agent(
@@ -70,7 +69,6 @@ coordinator_agent = Agent(
         "6. Do not use markdown symbols such as ** or ### in any text.\n"
         "7. End with one clear action or question in the 'question' field, and provide 2-3 logical action buttons in the 'actions' array.\n"
         "8. For pesticide, chemical, or disease advice, ensure recommendations conform to the Agricultural Safety Kernel limits, and escalate low confidence requests to a human agronomist."
-
     ),
     sub_agents=[
         crop_analyst_agent,
@@ -81,8 +79,7 @@ coordinator_agent = Agent(
         farmer_interaction_agent,
         knowledge_retriever_agent,
         simulation_agent(),
-        dashboard_agent()
+        dashboard_agent(),
     ],
     tools=[get_ui_schema],
 )
-

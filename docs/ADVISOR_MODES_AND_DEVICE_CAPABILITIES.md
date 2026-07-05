@@ -1,3 +1,8 @@
+> **⚠️ SUPERSEDED** — This document is kept for historical reference.
+> The authoritative version is now [docs/02-architecture/edge-cloud-advisor-architecture.md](02-architecture/edge-cloud-advisor-architecture.md).
+
+---
+
 # Advisor Mode & Device Capability Architecture
 
 > Date: 2026-07-03
@@ -197,7 +202,7 @@ Farmer speaks: "गेहूँ में रतुआ का इलाज क�
        │                  ▼
        │              Display + 🔊 Speak in Hindi
        │
-       └── Not found? ──→ "I don't have this offline. 
+       └── Not found? ──→ "I don't have this offline.
                             When online, I can ask the expert."
 ```
 

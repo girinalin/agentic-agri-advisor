@@ -1,11 +1,12 @@
 # Tools for OKF SPARQL and RAG document queries
 # Queries the Open Knowledge Graph (OKF) for static agricultural knowledge
 
+import glob
 import os
 import re
+from typing import Any, Optional
+
 import yaml
-import glob
-from typing import List, Dict, Any, Optional
 
 # OKF base directory
 OKF_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../okf"))
@@ -14,11 +15,10 @@ OKF_DATA_DIR = OKF_DIR  # OKF data lives directly at /okf/
 LEGACY_OKF_DIR = os.path.join(os.path.dirname(OKF_DIR), "okf-knowledge-graph", "data")
 
 
-
-def _load_yaml(path: str) -> Optional[dict]:
+def _load_yaml(path: str) -> dict | None:
     """Safely load a YAML file."""
     try:
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             return yaml.safe_load(f)
     except Exception:
         return None
@@ -39,7 +39,7 @@ def _parse_frontmatter(content: str) -> tuple:
     return meta, parts[2].strip()
 
 
-def _search_directory(query: str, directory: str) -> List[dict]:
+def _search_directory(query: str, directory: str) -> list[dict]:
     """Search all markdown files in a directory for matching content."""
     results = []
     query_lower = query.lower()
@@ -47,7 +47,7 @@ def _search_directory(query: str, directory: str) -> List[dict]:
 
     for filepath in glob.glob(os.path.join(directory, "*.md")):
         try:
-            with open(filepath, "r", encoding="utf-8") as f:
+            with open(filepath, encoding="utf-8") as f:
                 content = f.read()
             meta, body = _parse_frontmatter(content)
             full_text = content.lower()
@@ -58,7 +58,10 @@ def _search_directory(query: str, directory: str) -> List[dict]:
                 title = meta.get("name", os.path.basename(filepath).replace(".md", ""))
                 entity_type = meta.get("type", "unknown")
                 severity = meta.get("severity", "N/A")
-                crops = meta.get("affected_crops", meta.get("properties", {}).get("common_regions", []))
+                crops = meta.get(
+                    "affected_crops",
+                    meta.get("properties", {}).get("common_regions", []),
+                )
                 if isinstance(crops, list):
                     crops = ", ".join(crops[:3])
 
@@ -68,21 +71,39 @@ def _search_directory(query: str, directory: str) -> List[dict]:
                     treatment_section = body.split("## Treatment")[1].split("##")[0]
                     for line in treatment_section.split("\n"):
                         line = line.strip()
-                        if line.startswith("|") and not line.startswith("|---") and not line.startswith("|---"):
+                        if (
+                            line.startswith("|")
+                            and not line.startswith("|---")
+                            and not line.startswith("|---")
+                        ):
                             parts = [p.strip() for p in line.split("|")[1:-1]]
                             if len(parts) >= 2:
-                                treatments.append({"stage": parts[0], "treatment": parts[1], "application": parts[2] if len(parts) > 2 else ""})
+                                treatments.append(
+                                    {
+                                        "stage": parts[0],
+                                        "treatment": parts[1],
+                                        "application": parts[2]
+                                        if len(parts) > 2
+                                        else "",
+                                    }
+                                )
 
-                results.append({
-                    "id": meta.get("id", os.path.basename(filepath).replace(".md", "")),
-                    "type": entity_type,
-                    "name": title,
-                    "severity": severity,
-                    "affected_crops": crops if isinstance(crops, str) else str(crops),
-                    "treatments": treatments[:5],  # Max 5 treatments
-                    "summary": body[:500],
-                    "file": filepath
-                })
+                results.append(
+                    {
+                        "id": meta.get(
+                            "id", os.path.basename(filepath).replace(".md", "")
+                        ),
+                        "type": entity_type,
+                        "name": title,
+                        "severity": severity,
+                        "affected_crops": crops
+                        if isinstance(crops, str)
+                        else str(crops),
+                        "treatments": treatments[:5],  # Max 5 treatments
+                        "summary": body[:500],
+                        "file": filepath,
+                    }
+                )
         except Exception:
             continue
 
@@ -101,12 +122,7 @@ def query_knowledge_graph(query: str) -> dict:
     Returns:
         dict: Search results with entities, treatments, and recommendations
     """
-    results = {
-        "query": query,
-        "results": [],
-        "total_found": 0,
-        "status": "success"
-    }
+    results = {"query": query, "results": [], "total_found": 0, "status": "success"}
 
     # Search across all OKF entity types (both okf/ and okf-knowledge-graph/data/)
     search_dirs = [OKF_DATA_DIR, LEGACY_OKF_DIR]
@@ -124,21 +140,30 @@ def query_knowledge_graph(query: str) -> dict:
         if relations:
             for entity_id, entity_data in relations.items():
                 if isinstance(entity_data, dict):
-                    for category, items in entity_data.items():
+                    for _category, items in entity_data.items():
                         if isinstance(items, dict):
                             for item_id, item_data in items.items():
                                 item_text = str(item_data).lower()
-                                if any(kw in item_text for kw in query.lower().split()[:3]):
-                                    results["results"].append({
-                                        "id": item_id,
-                                        "type": f"relation:{entity_id}",
-                                        "name": item_id.replace("_", " ").title(),
-                                        "severity": "N/A",
-                                        "affected_crops": str(item_data.get("affects", item_data.get("suitable_crops", []))),
-                                        "treatments": [],
-                                        "summary": f"Relation: {entity_id} → {item_id}",
-                                        "file": relations_path
-                                    })
+                                if any(
+                                    kw in item_text for kw in query.lower().split()[:3]
+                                ):
+                                    results["results"].append(
+                                        {
+                                            "id": item_id,
+                                            "type": f"relation:{entity_id}",
+                                            "name": item_id.replace("_", " ").title(),
+                                            "severity": "N/A",
+                                            "affected_crops": str(
+                                                item_data.get(
+                                                    "affects",
+                                                    item_data.get("suitable_crops", []),
+                                                )
+                                            ),
+                                            "treatments": [],
+                                            "summary": f"Relation: {entity_id} → {item_id}",
+                                            "file": relations_path,
+                                        }
+                                    )
 
     results["total_found"] = len(results["results"])
     results["status"] = "found" if results["total_found"] > 0 else "not_found"
@@ -157,11 +182,7 @@ def get_safety_rules(query: str = "") -> dict:
     Returns:
         dict: Safety rules matching the query
     """
-    results = {
-        "query": query,
-        "results": [],
-        "status": "success"
-    }
+    results = {"query": query, "results": [], "status": "success"}
 
     safety_dir = os.path.join(OKF_DATA_DIR, "safety")
     if os.path.exists(safety_dir):
@@ -185,7 +206,11 @@ def get_treatment_safety(treatment_name: str) -> dict:
     relations = _load_yaml(relations_path)
 
     if not relations or "treatment_safety" not in relations:
-        return {"treatment": treatment_name, "safety": "unknown", "note": "Treatment not found in safety database"}
+        return {
+            "treatment": treatment_name,
+            "safety": "unknown",
+            "note": "Treatment not found in safety database",
+        }
 
     treatment_data = relations["treatment_safety"].get(treatment_name.lower(), {})
 
@@ -194,7 +219,7 @@ def get_treatment_safety(treatment_name: str) -> dict:
             "treatment": treatment_name,
             "safety": "unknown",
             "note": f"No safety data for '{treatment_name}'. User should consult expert.",
-            "escalation": True
+            "escalation": True,
         }
 
     return {
@@ -204,7 +229,7 @@ def get_treatment_safety(treatment_name: str) -> dict:
         "max_rate": treatment_data.get("max_rate", "N/A"),
         "phi_days": treatment_data.get("phi_days", "N/A"),
         "organic_allowed": treatment_data.get("organic_allowed", False),
-        "escalation_threshold": treatment_data.get("escalation_threshold", None)
+        "escalation_threshold": treatment_data.get("escalation_threshold", None),
     }
 
 
@@ -217,18 +242,14 @@ def get_soil_recommendations(soil_type: str) -> dict:
     Returns:
         dict: Crop recommendations, irrigation advice, amendments
     """
-    results = {
-        "soil_type": soil_type,
-        "recommendations": {},
-        "status": "success"
-    }
+    results = {"soil_type": soil_type, "recommendations": {}, "status": "success"}
 
     # Search for soil type entity
     soil_dir = os.path.join(OKF_DATA_DIR, "soil")
     if os.path.exists(soil_dir):
         for filepath in glob.glob(os.path.join(soil_dir, "*.md")):
             try:
-                with open(filepath, "r", encoding="utf-8") as f:
+                with open(filepath, encoding="utf-8") as f:
                     content = f.read()
                 meta, body = _parse_frontmatter(content)
                 name = meta.get("name", "").lower()
@@ -240,8 +261,18 @@ def get_soil_recommendations(soil_type: str) -> dict:
                     challenging = []
                     if "## Crop Suitability" in body:
                         section = body.split("## Crop Suitability")[1].split("##")[0]
-                        suitable = re.findall(r"- (.+?)(?=\n-|$)", section.split("Good for:")[1] if "Good for:" in section else section)
-                        challenging = re.findall(r"- (.+?)(?=\n-|$)", section.split("Challenging for:")[1] if "Challenging for:" in section else "")
+                        suitable = re.findall(
+                            r"- (.+?)(?=\n-|$)",
+                            section.split("Good for:")[1]
+                            if "Good for:" in section
+                            else section,
+                        )
+                        challenging = re.findall(
+                            r"- (.+?)(?=\n-|$)",
+                            section.split("Challenging for:")[1]
+                            if "Challenging for:" in section
+                            else "",
+                        )
 
                     # Extract irrigation
                     irrigation = ""
@@ -254,10 +285,12 @@ def get_soil_recommendations(soil_type: str) -> dict:
 
                     results["recommendations"] = {
                         "name": meta.get("name", soil_type.title()),
-                        "suitable_crops": suitable if suitable else "See detailed profile",
+                        "suitable_crops": suitable
+                        if suitable
+                        else "See detailed profile",
                         "challenging_crops": challenging if challenging else [],
                         "irrigation": irrigation,
-                        "properties": meta.get("properties", {})
+                        "properties": meta.get("properties", {}),
                     }
                     results["status"] = "found"
                     break
@@ -284,11 +317,15 @@ def search_local_indices(query: str) -> dict:
         return {
             "status": "success",
             "results": okf_results["results"],
-            "source": "OKF Knowledge Graph"
+            "source": "OKF Knowledge Graph",
         }
 
     # Fallback to basic local search
-    return {"status": "success", "results": [{"doc": "factsheet.pdf", "text": "Soil pH should be 6.0-6.8."}], "source": "local_fallback"}
+    return {
+        "status": "success",
+        "results": [{"doc": "factsheet.pdf", "text": "Soil pH should be 6.0-6.8."}],
+        "source": "local_fallback",
+    }
 
 
 def query_crop_profile(crop_name: str) -> dict | None:
@@ -300,11 +337,13 @@ def query_crop_profile(crop_name: str) -> dict | None:
     crop_lower = crop_name.lower()
     for filepath in glob.glob(os.path.join(crops_dir, "*.md")):
         try:
-            with open(filepath, "r", encoding="utf-8") as f:
+            with open(filepath, encoding="utf-8") as f:
                 raw = f.read()
             meta, body = _parse_frontmatter(raw)
-            if (meta.get("id", "").lower() == crop_lower or
-                any(crop_lower in n.lower() for n in [meta.get("name", ""), meta.get("id", "")])):
+            if meta.get("id", "").lower() == crop_lower or any(
+                crop_lower in n.lower()
+                for n in [meta.get("name", ""), meta.get("id", "")]
+            ):
                 return {
                     "status": "success",
                     "type": meta.get("type"),
@@ -324,8 +363,10 @@ def query_crop_profile(crop_name: str) -> dict | None:
 def query_disease_to_crops(disease_name: str) -> dict | None:
     """Find diseases by name AND return which crops they affect (from relations.yaml)."""
     crop_disease_map = {
-        "wheat_rust": ["wheat"], "wheat_powdery_mildew": ["wheat"],
-        "rice_blast": ["rice"], "rice_bacterial_leaf_blight": ["rice"],
+        "wheat_rust": ["wheat"],
+        "wheat_powdery_mildew": ["wheat"],
+        "rice_blast": ["rice"],
+        "rice_bacterial_leaf_blight": ["rice"],
         "cotton_grey_mold": ["cotton"],
     }
     affected = crop_disease_map.get(disease_name.lower(), [])
@@ -333,8 +374,6 @@ def query_disease_to_crops(disease_name: str) -> dict | None:
     diseases_dirs = [OKF_DIR, LEGACY_OKF_DIR]
     diseases_dir = None
     for d in diseases_dirs:
-        candidate = os.path.join(d, "diseases") if os.path.isdir(os.path.join(os.path.dirname(d), "data")) else d
-        # For legacy path, the data dir IS the diseases dir
         if os.path.isdir(os.path.join(d, "data", "diseases")):
             diseases_dir = os.path.join(d, "data", "diseases")
             break
@@ -344,12 +383,17 @@ def query_disease_to_crops(disease_name: str) -> dict | None:
 
     for filepath in glob.glob(os.path.join(diseases_dir, "*.md")):
         try:
-            with open(filepath, "r", encoding="utf-8") as f:
+            with open(filepath, encoding="utf-8") as f:
                 raw = f.read()
             meta, body = _parse_frontmatter(raw)
-            if (meta.get("id", "").lower() == disease_name.lower()):
-                return {**{"affected_crops": affected}, "status": "success", "body": body,
-                        "type": meta.get("type"), "name": meta.get("name", disease_name)}
+            if meta.get("id", "").lower() == disease_name.lower():
+                return {
+                    **{"affected_crops": affected},
+                    "status": "success",
+                    "body": body,
+                    "type": meta.get("type"),
+                    "name": meta.get("name", disease_name),
+                }
         except Exception:
             continue
 
@@ -360,8 +404,10 @@ def query_disease_to_crops(disease_name: str) -> dict | None:
 def query_pest_to_crops(pest_name: str) -> dict | None:
     """Find pests by name AND return which crops they affect (from relations.yaml)."""
     crop_pest_map = {
-        "corn_stalk_borer": ["corn"], "cotton_bollworm": ["cotton"],
-        "rice_stem_borer": ["rice"], "wheat_leaf_eater": ["wheat", "corn"],
+        "corn_stalk_borer": ["corn"],
+        "cotton_bollworm": ["cotton"],
+        "rice_stem_borer": ["rice"],
+        "wheat_leaf_eater": ["wheat", "corn"],
     }
     affected = crop_pest_map.get(pest_name.lower(), [])
 
@@ -377,12 +423,17 @@ def query_pest_to_crops(pest_name: str) -> dict | None:
 
     for filepath in glob.glob(os.path.join(pests_dir, "*.md")):
         try:
-            with open(filepath, "r", encoding="utf-8") as f:
+            with open(filepath, encoding="utf-8") as f:
                 raw = f.read()
             meta, body = _parse_frontmatter(raw)
-            if (meta.get("id", "").lower() == pest_name.lower()):
-                return {**{"affected_crops": affected}, "status": "success", "body": body,
-                        "type": meta.get("type"), "name": meta.get("name", pest_name)}
+            if meta.get("id", "").lower() == pest_name.lower():
+                return {
+                    **{"affected_crops": affected},
+                    "status": "success",
+                    "body": body,
+                    "type": meta.get("type"),
+                    "name": meta.get("name", pest_name),
+                }
         except Exception:
             continue
 
@@ -400,16 +451,22 @@ def get_soil_crop_suitability(soil_name: str) -> dict | None:
     suitable = soil_crop_map.get(soil_name.lower(), [])
 
     # Try to find soil profile from old location too
-    old_soil_dir = os.path.join(os.path.dirname(OKF_DIR), "okf-knowledge-graph/data/soil")
+    old_soil_dir = os.path.join(
+        os.path.dirname(OKF_DIR), "okf-knowledge-graph/data/soil"
+    )
     if os.path.isdir(old_soil_dir):
         for filepath in glob.glob(os.path.join(old_soil_dir, "*.md")):
             try:
-                with open(filepath, "r", encoding="utf-8") as f:
+                with open(filepath, encoding="utf-8") as f:
                     raw = f.read()
                 meta, body = _parse_frontmatter(raw)
                 if soil_name.lower() in (meta.get("id", "") or "").lower():
-                    return {"status": "success", "name": meta.get("name"), "suitable_crops": suitable,
-                            "properties": meta.get("properties", {})}
+                    return {
+                        "status": "success",
+                        "name": meta.get("name"),
+                        "suitable_crops": suitable,
+                        "properties": meta.get("properties", {}),
+                    }
             except Exception:
                 continue
 
@@ -427,7 +484,7 @@ def get_crop_npk(crop_name: str) -> dict | None:
     crop_lower = crop_name.lower()
     for filepath in glob.glob(os.path.join(crops_dir, "*.md")):
         try:
-            with open(filepath, "r", encoding="utf-8") as f:
+            with open(filepath, encoding="utf-8") as f:
                 raw = f.read()
             meta, body = _parse_frontmatter(raw)
             if crop_lower in (meta.get("id", "") or "").lower():
@@ -439,9 +496,19 @@ def get_crop_npk(crop_name: str) -> dict | None:
                         if line.startswith("|") and "| Growth" not in line:
                             cells = [c.strip() for c in line.split("|")[1:-1]]
                             if len(cells) >= 3:
-                                rows.append({"stage": cells[0], "nitrogen_kg_ha": cells[1], "phosphorus_kg_ha": cells[2]})
+                                rows.append(
+                                    {
+                                        "stage": cells[0],
+                                        "nitrogen_kg_ha": cells[1],
+                                        "phosphorus_kg_ha": cells[2],
+                                    }
+                                )
                     if rows:
-                        return {"status": "success", "crop": meta.get("name"), "npk_targets": rows}
+                        return {
+                            "status": "success",
+                            "crop": meta.get("name"),
+                            "npk_targets": rows,
+                        }
         except Exception:
             continue
     return None
@@ -475,7 +542,9 @@ def get_all_related_to(entity_type, entity_name):
                 related["affected_crops"] = rel.get("affected_crops", [])
         for rel in relations.get("disease_treatment_relations", []):
             if (rel.get("disease") or "").lower() == name_lower:
-                related["treatments"] = rel.get("treatments", []) + rel.get("organic_alternatives", [])
+                related["treatments"] = rel.get("treatments", []) + rel.get(
+                    "organic_alternatives", []
+                )
                 related["safety_rules"] = rel.get("safety_rule", "")
 
     elif entity_type == "pest":
@@ -484,7 +553,9 @@ def get_all_related_to(entity_type, entity_name):
                 related["affected_crops"] = rel.get("affected_crops", [])
         for rel in relations.get("pest_treatment_relations", []):
             if (rel.get("pest") or "").lower() == name_lower:
-                related["treatments"] = rel.get("treatments", []) + rel.get("organic_alternatives", [])
+                related["treatments"] = rel.get("treatments", []) + rel.get(
+                    "organic_alternatives", []
+                )
                 related["safety_rules"] = rel.get("safety_rule", "")
 
     elif entity_type == "soil":

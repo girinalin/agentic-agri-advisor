@@ -2,19 +2,19 @@ from google.adk.agents import Agent
 from google.adk.models import Gemini
 from google.genai import types
 
+from agents.dashboard_agent.tools import get_ui_schema
+
 # Import OKF knowledge tools from the knowledge retriever module
 from agents.knowledge_retriever.tools import (
-    query_knowledge_graph,
     get_safety_rules,
     get_treatment_safety,
     query_disease_to_crops,
+    query_knowledge_graph,
     query_pest_to_crops,
 )
 
 # Import image analysis from MCP server directly (not subprocess)
 from mcp_servers.image_analysis.server import analyze_crop_image
-
-from agents.dashboard_agent.tools import get_ui_schema
 
 pest_detector_agent = Agent(
     name="pest_detector_agent",

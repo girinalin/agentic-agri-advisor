@@ -12,30 +12,32 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import os
-import tempfile
 import re
+import tempfile
 from datetime import datetime
 
 # Load .env file early so GEMINI_API_KEY and other secrets are available
 try:
     from dotenv import find_dotenv, load_dotenv
+
     load_dotenv(find_dotenv(usecwd=True), override=False)
 except ImportError:
     pass  # dotenv not installed; rely on environment variables being set externally
 
+import asyncio
+
 import edge_tts
 import google.auth
 from fastapi import Body, FastAPI, Response
-from pydantic import BaseModel, Field
 from fastapi.responses import FileResponse
 from google.adk.cli.fast_api import get_fast_api_app
 from google.cloud import logging as google_cloud_logging
-from pydantic import BaseModel
-import asyncio
+from pydantic import BaseModel, Field
 
 from app.app_utils.telemetry import setup_telemetry
 from app.app_utils.typing import Feedback
 from data import db_manager
+from data.db_manager import get_latest_soil_report, get_soil_reports, save_soil_report
 
 setup_telemetry()
 
@@ -43,11 +45,13 @@ setup_telemetry()
 logger = None
 try:
     import google.auth
+
     _, project_id = google.auth.default()
     logging_client = google_cloud_logging.Client()
     logger = logging_client.logger(__name__)
 except Exception as e:
     import logging
+
     logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger(__name__)
     # Polyfill log_struct for local logging compatibility
@@ -71,10 +75,13 @@ artifact_service_uri = f"gs://{logs_bucket_name}" if logs_bucket_name else None
 otel_to_cloud = True
 try:
     import google.auth
+
     google.auth.default()
 except Exception:
     otel_to_cloud = False
-    print("Warning: Google Cloud default credentials not found. Local offline execution active.")
+    print(
+        "Warning: Google Cloud default credentials not found. Local offline execution active."
+    )
 
 app: FastAPI = get_fast_api_app(
     agents_dir=AGENT_DIR,
@@ -96,15 +103,24 @@ def run_diagnostic_tests():
         test_script_separation_and_leak_prevention,
         test_translation_keys_defined,
     )
+
     try:
         test_translation_keys_defined()
         test_script_separation_and_leak_prevention()
         test_english_translation_cleanliness()
         test_preservation_of_farmer_names()
-        return {"status": "success", "message": "All diagnostic localization tests passed successfully!"}
+        return {
+            "status": "success",
+            "message": "All diagnostic localization tests passed successfully!",
+        }
     except Exception as e:
         import traceback
-        return {"status": "failed", "message": str(e), "traceback": traceback.format_exc()}
+
+        return {
+            "status": "failed",
+            "message": str(e),
+            "traceback": traceback.format_exc(),
+        }
 
 
 @app.get("/v1/models")
@@ -134,7 +150,7 @@ def save_profile(farmer_id: str, payload: dict = Body(...)):
         soil_type=soil_type,
         acres=float(acres),
         irrigation_type=irrigation_type,
-        crop_type=crop_type
+        crop_type=crop_type,
     )
     return {"status": "success", "field": res}
 
@@ -145,7 +161,9 @@ def save_language(farmer_id: str, payload: dict = Body(...)):
     conn = db_manager.get_connection()
     cursor = conn.cursor()
     try:
-        cursor.execute("UPDATE farmers SET language = ? WHERE farmer_id = ?", (language, farmer_id))
+        cursor.execute(
+            "UPDATE farmers SET language = ? WHERE farmer_id = ?", (language, farmer_id)
+        )
         conn.commit()
     finally:
         conn.close()
@@ -179,7 +197,7 @@ def log_activity(payload: dict = Body(...)):
         quantity=float(quantity),
         unit=unit,
         details=details,
-        timestamp=timestamp
+        timestamp=timestamp,
     )
     return res
 
@@ -204,7 +222,10 @@ def collect_feedback(feedback: Feedback) -> dict[str, str]:
         logger.log_struct(feedback.model_dump(), severity="INFO")
     except Exception as e:
         import logging
-        logging.getLogger(__name__).info(f"Local fallback logging: {feedback.model_dump()} (Cloud logging err: {e})")
+
+        logging.getLogger(__name__).info(
+            f"Local fallback logging: {feedback.model_dump()} (Cloud logging err: {e})"
+        )
     return {"status": "success"}
 
 
@@ -213,14 +234,15 @@ def collect_feedback(feedback: Feedback) -> dict[str, str]:
 # ============================================================
 
 from safety_kernel import (
-    validate_recommendation,
     get_pending_escalations,
     resolve_escalation,
+    validate_recommendation,
 )
 
 
 class EscalationResolve(BaseModel):
     """Agronomist resolution for an escalation case."""
+
     escalation_id: str
     resolution: str
     resolved_by: str
@@ -270,6 +292,7 @@ def resolve_escalation_endpoint(resolve: EscalationResolve) -> dict:
 # OKF Knowledge Sync Endpoint (for PWA offline caching)
 # ============================================================
 
+
 @app.get("/api/okf/sync")
 def sync_okf_knowledge() -> dict:
     """Return all OKF knowledge entities as JSON for PWA offline caching.
@@ -279,10 +302,17 @@ def sync_okf_knowledge() -> dict:
     IndexedDB for offline querying.
     """
     import glob
+
     import yaml
 
-    okf_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "okf")
-    legacy_okf = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "okf-knowledge-graph", "data")
+    okf_dir = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "okf"
+    )
+    legacy_okf = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+        "okf-knowledge-graph",
+        "data",
+    )
 
     def load_entities(base_dir, entity_type):
         entities = []
@@ -298,38 +328,167 @@ def sync_okf_knowledge() -> dict:
                     if len(parts) >= 3:
                         meta = yaml.safe_load(parts[1]) or {}
                         body = parts[2].strip()
-                        entities.append({
-                            "id": meta.get("id", os.path.basename(filepath).replace(".md", "")),
-                            "type": meta.get("type", entity_type),
-                            "metadata": meta,
-                            "body": body,
-                            "filename": os.path.basename(filepath),
-                        })
+                        entities.append(
+                            {
+                                "id": meta.get(
+                                    "id", os.path.basename(filepath).replace(".md", "")
+                                ),
+                                "type": meta.get("type", entity_type),
+                                "metadata": meta,
+                                "body": body,
+                                "filename": os.path.basename(filepath),
+                            }
+                        )
                         continue
-                entities.append({
-                    "id": os.path.basename(filepath).replace(".md", ""),
-                    "type": entity_type,
-                    "body": content,
-                    "filename": os.path.basename(filepath),
-                })
+                entities.append(
+                    {
+                        "id": os.path.basename(filepath).replace(".md", ""),
+                        "type": entity_type,
+                        "body": content,
+                        "filename": os.path.basename(filepath),
+                    }
+                )
             except Exception:
                 continue
         return entities
 
     result = {
         "status": "success",
-        "synced_at": datetime.now().isoformat() if 'datetime' in dir() else "",
+        "synced_at": datetime.now().isoformat() if "datetime" in dir() else "",
         "crops": load_entities(okf_dir, "crops"),
-        "diseases": load_entities(okf_dir, "diseases") + load_entities(legacy_okf, "diseases"),
+        "diseases": load_entities(okf_dir, "diseases")
+        + load_entities(legacy_okf, "diseases"),
         "pests": load_entities(okf_dir, "pests") + load_entities(legacy_okf, "pests"),
         "soil": load_entities(okf_dir, "soil") + load_entities(legacy_okf, "soil"),
         "safety": load_entities(legacy_okf, "safety"),
     }
 
-    total = sum(len(result[k]) for k in ["crops", "diseases", "pests", "soil", "safety"])
+    total = sum(
+        len(result[k]) for k in ["crops", "diseases", "pests", "soil", "safety"]
+    )
     result["total_entities"] = total
     return result
 
+
+# ============================================================
+# Soil Test Report Endpoints
+# ============================================================
+
+
+class SoilReportSave(BaseModel):
+    """Soil report confirmation from farmer."""
+
+    farmer_id: str = "user"
+    field_id: str = ""
+    source: str = "manual"
+    file_name: str = ""
+    sample_date: str = ""
+    lab_name: str = ""
+    extraction_confidence: float = 0.0
+    confirmed_by_farmer: bool = True
+    values: list = []
+
+
+@app.post("/api/soil/save")
+def save_soil_report_endpoint(report: SoilReportSave) -> dict:
+    """Save a confirmed soil test report linked to a field."""
+    result = save_soil_report(report.model_dump())
+    return result
+
+
+@app.get("/api/soil/reports/{field_id}")
+def get_soil_reports_endpoint(field_id: str) -> dict:
+    """Get all soil reports for a field."""
+    reports = get_soil_reports(field_id)
+    return {"status": "success", "count": len(reports), "reports": reports}
+
+
+@app.get("/api/soil/latest/{field_id}")
+def get_latest_soil_endpoint(field_id: str) -> dict:
+    """Get the latest confirmed soil report for a field."""
+    report = get_latest_soil_report(field_id)
+    if report:
+        return {"status": "success", "report": report}
+    return {"status": "not_found", "message": "No soil report found"}
+
+
+@app.post("/api/soil/extract")
+async def extract_soil_report(file: bytes = Body(...)) -> dict:
+    """Extract values from an uploaded soil report using Gemini Vision."""
+    import json as json_mod
+    import os
+    import tempfile
+
+    from google import genai
+    from PIL import Image
+
+    api_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
+    if not api_key:
+        return {"status": "error", "message": "No API key", "values": []}
+
+    tmp_path = None
+    try:
+        client = genai.Client(api_key=api_key)
+        with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as tmp:
+            tmp.write(file)
+            tmp_path = tmp.name
+
+        try:
+            img = Image.open(tmp_path)
+            contents = [img]
+        except Exception:
+            with open(tmp_path, "rb") as f:
+                contents = [f.read()]
+
+        prompt = """Extract soil test values from this report. Return JSON:
+{"sample_date": null, "lab_name": null, "pH": null, "EC": null,
+ "organic_carbon": null, "nitrogen": null, "phosphorus": null,
+ "potassium": null, "sulfur": null, "zinc": null, "boron": null,
+ "iron": null, "soil_type": null}
+Return ONLY JSON."""
+
+        response = client.models.generate_content(
+            model="gemini-2.5-flash", contents=[*contents, prompt]
+        )
+
+        if tmp_path and os.path.exists(tmp_path):
+            os.unlink(tmp_path)
+
+        raw = response.text.strip()
+        if raw.startswith("```"):
+            raw = raw.split("\n", 1)[1] if "\n" in raw else raw
+            if raw.endswith("```"):
+                raw = raw.rsplit("```", 1)[0]
+        raw = raw.strip()
+
+        if raw.startswith("{"):
+            values = json_mod.loads(raw)
+            value_list = []
+            for key, val in values.items():
+                if val is not None and val != "null":
+                    if key not in ("sample_date", "lab_name", "soil_type"):
+                        value_list.append(
+                            {
+                                "parameter_name": key,
+                                "value": str(val),
+                                "unit": "",
+                                "category": "",
+                                "confidence": 0.8,
+                            }
+                        )
+            return {
+                "status": "success",
+                "sample_date": values.get("sample_date"),
+                "lab_name": values.get("lab_name"),
+                "soil_type": values.get("soil_type"),
+                "values": value_list,
+                "extraction_confidence": 0.8,
+            }
+        return {"status": "error", "message": "Could not parse", "values": []}
+    except Exception as e:
+        if tmp_path and os.path.exists(tmp_path):
+            os.unlink(tmp_path)
+        return {"status": "error", "message": str(e), "values": []}
 
 
 # Edge Neural Text-To-Speech Endpoint
@@ -352,18 +511,21 @@ VOICE_MAP = {
     "sw-KE": "sw-KE-RafikiNeural",
 }
 
+
 class TTSRequest(BaseModel):
     text: str
     lang: str = "English"
 
+
 # To prevent overlapping audio from simultaneous requests
 tts_lock = asyncio.Lock()
+
 
 @app.post("/api/tts")
 async def text_to_speech_endpoint(req: TTSRequest):
     voice = VOICE_MAP.get(req.lang, "en-US-GuyNeural")
     # Improved cleaning: Remove markdown-like syntax and excessive whitespace
-    clean_text = re.sub(r'[#*_~`]', '', req.text).strip()
+    clean_text = re.sub(r"[#*_~`]", "", req.text).strip()
 
     # Save synthesized speech to a temp file
     temp_dir = tempfile.gettempdir()
@@ -378,13 +540,17 @@ async def text_to_speech_endpoint(req: TTSRequest):
             print(f"Edge TTS Synthesis Failed: {e}")
             return {"error": str(e)}
 
+
 @app.get("/favicon.ico", include_in_schema=False)
 def favicon():
     return Response(status_code=204)
+
+
 @app.get("/api/plans/{planting_id}")
 def get_plans(planting_id: str):
     res = db_manager.get_daily_plans(planting_id)
     return {"status": "success", "plans": res}
+
 
 @app.post("/api/plans/complete")
 def complete_plan_task(payload: dict = Body(...)):
@@ -395,10 +561,12 @@ def complete_plan_task(payload: dict = Body(...)):
     db_manager.update_plan_state(plan_id, state)
     return {"status": "success"}
 
+
 @app.get("/api/reminders/{planting_id}")
 def get_reminders(planting_id: str):
     res = db_manager.get_reminders(planting_id)
     return {"status": "success", "reminders": res}
+
 
 @app.post("/api/reminders/action")
 def reminder_action(payload: dict = Body(...)):
@@ -409,27 +577,33 @@ def reminder_action(payload: dict = Body(...)):
     db_manager.update_reminder_state(reminder_id, state)
     return {"status": "success"}
 
+
 @app.post("/api/escalations")
 def create_escalation(payload: dict = Body(...)):
     res = db_manager.save_escalation_request(payload)
     return res
+
 
 @app.get("/api/escalations/{planting_id}")
 def get_escalations(planting_id: str):
     res = db_manager.get_escalations(planting_id)
     return {"status": "success", "escalations": res}
 
+
 @app.post("/api/feedback")
 def save_feedback(payload: dict = Body(...)):
     res = db_manager.log_outcome_feedback(payload)
     return res
 
+
 # Phase 5 Endpoints
+
 
 @app.get("/api/expert/queue")
 def get_expert_queue():
     res = db_manager.get_expert_queue()
     return {"status": "success", "queue": res}
+
 
 @app.post("/api/expert/action")
 def expert_action(payload: dict = Body(...)):
@@ -441,10 +615,12 @@ def expert_action(payload: dict = Body(...)):
     res = db_manager.update_expert_case_state(escalation_id, state, expert_response)
     return res
 
+
 @app.get("/api/outbreaks")
 def get_outbreaks():
     res = db_manager.get_outbreaks()
     return {"status": "success", "outbreaks": res}
+
 
 @app.post("/api/outbreaks/verify")
 def verify_outbreak(payload: dict = Body(...)):
@@ -455,10 +631,12 @@ def verify_outbreak(payload: dict = Body(...)):
     res = db_manager.confirm_outbreak(outbreak_id, status)
     return res
 
+
 @app.get("/api/governance")
 def get_governance():
     res = db_manager.get_governance_metadata()
     return {"status": "success", "governance": res}
+
 
 @app.post("/api/governance/rollback")
 def rollback_governance(payload: dict = Body(...)):
@@ -467,6 +645,7 @@ def rollback_governance(payload: dict = Body(...)):
         return {"status": "error", "message": "Missing content_id"}
     res = db_manager.rollback_governance_version(content_id)
     return res
+
 
 @app.post("/api/observability/log")
 def log_observability(payload: dict = Body(...)):
@@ -479,19 +658,22 @@ def log_observability(payload: dict = Body(...)):
         route=payload.get("route", ""),
         safety_decision=payload.get("safety_decision", ""),
         latency=float(payload.get("latency", 0.0)),
-        device_tier=payload.get("device_tier", "")
+        device_tier=payload.get("device_tier", ""),
     )
     return res
+
 
 @app.get("/api/observability/logs")
 def get_observability_logs():
     res = db_manager.get_observability_logs()
     return {"status": "success", "logs": res}
 
+
 @app.post("/api/privacy/preferences")
 def save_privacy(payload: dict = Body(...)):
     res = db_manager.save_privacy_preferences(payload)
     return res
+
 
 @app.post("/api/privacy/export")
 def export_privacy(payload: dict = Body(...)):
@@ -499,11 +681,13 @@ def export_privacy(payload: dict = Body(...)):
     res = db_manager.export_farm_data(user_id)
     return {"status": "success", "data": res}
 
+
 @app.post("/api/privacy/delete")
 def delete_privacy(payload: dict = Body(...)):
     user_id = payload.get("user_id", "user")
     res = db_manager.delete_farm_data(user_id)
     return res
+
 
 @app.get("/api/evaluation/run")
 def run_evaluation():
@@ -521,8 +705,8 @@ def run_evaluation():
             "diagnosis_top_3_accuracy": 0.96,
             "translation_acceptance": 0.95,
             "farmer_task_completion": 0.85,
-            "false_alert_rate": 0.02
-        }
+            "false_alert_rate": 0.02,
+        },
     }
 
 
@@ -530,11 +714,14 @@ def run_evaluation():
 # Ask Expert — Cloud Gemini Streaming Endpoint
 # ============================================================
 
+
 class ExpertChatRequest(BaseModel):
     """Request body for the Ask Expert cloud chat."""
+
     message: str = Field(..., description="Farmer's question text")
     language: str = Field("en", description="BCP-47 language code")
     context: str = Field("", description="Optional farm context (crop, field, region)")
+
 
 EXPERT_SYSTEM_PROMPT = """You are Krishi Sastri, a wise and experienced agricultural expert consultant backed by cloud AI.
 You have deep knowledge of agronomy, soil science, integrated pest management, irrigation systems, market pricing, government schemes, and sustainable farming practices.
@@ -550,21 +737,38 @@ Guidelines:
 - Never recommend banned or restricted chemicals.
 """
 
+
 @app.post("/api/expert/chat")
 async def expert_chat_stream(req: ExpertChatRequest):
     """Stream an agricultural expert response from Gemini cloud."""
     import json
+
     from fastapi.responses import StreamingResponse
 
-    gemini_api_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
+    gemini_api_key = os.environ.get("GEMINI_API_KEY") or os.environ.get(
+        "GOOGLE_API_KEY"
+    )
     if not gemini_api_key:
+
         async def no_key_gen():
-            yield json.dumps({"text": "⚠️ Cloud expert is unavailable: GEMINI_API_KEY not configured on the server.", "done": True}) + "\n"
+            yield (
+                json.dumps(
+                    {
+                        "text": "⚠️ Cloud expert is unavailable: GEMINI_API_KEY not configured on the server.",
+                        "done": True,
+                    }
+                )
+                + "\n"
+            )
+
         return StreamingResponse(no_key_gen(), media_type="text/plain")
 
     lang_greetings = {
-        "hi": "Ram Ram! ", "mr": "Ram Ram! ", "sw": "Jambo! ",
-        "te": "Namaste! ", "en": ""
+        "hi": "Ram Ram! ",
+        "mr": "Ram Ram! ",
+        "sw": "Jambo! ",
+        "te": "Namaste! ",
+        "en": "",
     }
     greeting = lang_greetings.get(req.language, "")
 
@@ -588,15 +792,18 @@ async def expert_chat_stream(req: ExpertChatRequest):
                 config=genai_types.GenerateContentConfig(
                     system_instruction=EXPERT_SYSTEM_PROMPT,
                     temperature=0.4,
-                    max_output_tokens=1024
-                )
+                    max_output_tokens=1024,
+                ),
             )
             for chunk in response:
                 if chunk.text:
                     yield json.dumps({"text": chunk.text, "done": False}) + "\n"
             yield json.dumps({"text": "", "done": True}) + "\n"
         except Exception as e:
-            yield json.dumps({"text": f"⚠️ Expert consultation failed: {e}", "done": True}) + "\n"
+            yield (
+                json.dumps({"text": f"⚠️ Expert consultation failed: {e}", "done": True})
+                + "\n"
+            )
 
     return StreamingResponse(generate_stream(), media_type="text/plain")
 
@@ -610,5 +817,6 @@ app.mount("/", StaticFiles(directory=ui_dir, html=True), name="ui")
 # Main execution
 if __name__ == "__main__":
     import uvicorn
+
     port = int(os.environ.get("PORT", 8000))
     uvicorn.run(app, host="0.0.0.0", port=port)

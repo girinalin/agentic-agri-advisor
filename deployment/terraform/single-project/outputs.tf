@@ -21,3 +21,18 @@ output "logs_bucket_name" {
   description = "Logs storage bucket name"
   value       = google_storage_bucket.logs_data_bucket.name
 }
+
+output "assets_bucket_name" {
+  description = "Assets storage bucket name"
+  value       = google_storage_bucket.assets_bucket.name
+}
+
+output "firestore_database" {
+  description = "Firestore database name"
+  value       = google_firestore_database.database.name
+}
+
+output "cloud_run_service_url" {
+  description = "Cloud Run service URL"
+  value       = google_cloud_run_v2_service.app.uri
+}

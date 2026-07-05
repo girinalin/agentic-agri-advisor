@@ -20,9 +20,11 @@ def test_activities_logging_flow(server_fixture) -> None:
         "quantity": 5.0,
         "unit": "litres",
         "details": "Sprayed organic neem oil emulsion on tomato plants",
-        "timestamp": "2026-07-02 12:00:00"
+        "timestamp": "2026-07-02 12:00:00",
     }
-    log_res = requests.post(f"{BASE_URL}/api/activities/log", json=payload, headers=HEADERS, timeout=10)
+    log_res = requests.post(
+        f"{BASE_URL}/api/activities/log", json=payload, headers=HEADERS, timeout=10
+    )
     assert log_res.status_code == 200
     log_data = log_res.json()
     assert log_data["status"] == "success"

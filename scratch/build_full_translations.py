@@ -26,7 +26,7 @@ for fname in os.listdir(schema_dir):
         continue
     with open(os.path.join(schema_dir, fname), 'r', encoding='utf-8') as f:
         data = json.load(f)
-        
+
     def recurse(o):
         if isinstance(o, dict):
             for k, v in o.items():
@@ -49,7 +49,7 @@ def extract_defaults_from_schemas():
             continue
         with open(os.path.join(schema_dir, fname), 'r', encoding='utf-8') as f:
             data = json.load(f)
-            
+
         def recurse(o):
             if isinstance(o, dict):
                 for k, v in o.items():
@@ -115,11 +115,11 @@ for lang in languages:
 for k in keys:
     # 1. English default value
     en_val = schema_translations['en'].get(k) or translations['en'].get(k) or defaults.get(k) or clean_key_name(k)
-    
+
     # Update English if not present
     if k not in schema_translations['en'] and k not in translations['en']:
         schema_translations['en'][k] = en_val
-        
+
     # 2. Populate for other languages
     for lang in ['hi', 'mr', 'te', 'sw']:
         if k not in schema_translations[lang] and k not in translations[lang]:
@@ -165,7 +165,7 @@ new_js = """(function() {
   // Strict Translation Fallback Resolver
   function getTranslation(key, langCode) {
     const code = langCode || 'en';
-    
+
     // 1. Try selected language dictionary
     if (SCHEMA_TRANSLATIONS[code] && SCHEMA_TRANSLATIONS[code][key] !== undefined) {
       return SCHEMA_TRANSLATIONS[code][key];
@@ -173,7 +173,7 @@ new_js = """(function() {
     if (TRANSLATIONS[code] && TRANSLATIONS[code][key] !== undefined) {
       return TRANSLATIONS[code][key];
     }
-    
+
     // 2. Try English default fallback
     if (SCHEMA_TRANSLATIONS['en'] && SCHEMA_TRANSLATIONS['en'][key] !== undefined) {
       return SCHEMA_TRANSLATIONS['en'][key];
@@ -181,13 +181,13 @@ new_js = """(function() {
     if (TRANSLATIONS['en'] && TRANSLATIONS['en'][key] !== undefined) {
       return TRANSLATIONS['en'][key];
     }
-    
+
     // 3. Log warning and construct a clean human-readable string as final fallback
     console.warn("[i18n] Missing translation", {
       key: key,
       language: code
     });
-    
+
     const parts = key.split('.');
     const lastPart = parts[parts.length - 1];
     return lastPart
@@ -199,10 +199,10 @@ new_js = """(function() {
 
   function translateSchemaData(obj, langCode) {
     const code = langCode || 'en';
-    
+
     function recurse(o) {
       if (typeof o !== 'object' || o === null) return;
-      
+
       // Translate standard fields if present
       if (o.titleKey) o.title = getTranslation(o.titleKey, code);
       if (o.subtitleKey) o.subtitle = getTranslation(o.subtitleKey, code);
@@ -222,7 +222,7 @@ new_js = """(function() {
           o[baseProp] = getTranslation(dictKey, code);
         }
       });
-      
+
       for (const k in o) {
         if (typeof o[k] === 'object') {
           recurse(o[k]);
@@ -234,12 +234,12 @@ new_js = """(function() {
 
   function applyLanguageTranslation(langCode) {
     const code = langCode || 'en';
-    
+
     // Update the centralized language state object
     window.currentLanguageState = LANGUAGE_CONFIGS[code] || LANGUAGE_CONFIGS['en'];
-    
+
     const dict = TRANSLATIONS[code] || TRANSLATIONS['en'];
-    
+
     const elements = document.querySelectorAll('[data-tr]');
     elements.forEach(el => {
       const key = el.getAttribute('data-tr');
@@ -265,7 +265,7 @@ new_js = """(function() {
 
     const voiceStatus = document.getElementById('voice-status-label');
     const voiceSub = document.getElementById('voice-sub-label');
-    
+
     if (code === 'hi') {
       if (voiceStatus) voiceStatus.textContent = 'बोलकर पूछें';
       if (voiceSub) voiceSub.textContent = 'मैं आपकी भाषा में सुनूँगा';
@@ -288,19 +288,19 @@ new_js = """(function() {
     if (chatTitle && dict['title_chat']) {
       chatTitle.textContent = dict['title_chat'];
     }
-    
+
     // Translate Chat input placeholder
     const userInputField = document.getElementById('user-input-field');
     if (userInputField && dict['chat_placeholder']) {
       userInputField.placeholder = dict['chat_placeholder'];
     }
-    
+
     // Translate Send Button
     const sendBtn = document.getElementById('send-btn');
     if (sendBtn && dict['btn_send']) {
       sendBtn.textContent = dict['btn_send'];
     }
-    
+
     // Translate Auto-Speak Toggle Label
     const ttsToggle = document.getElementById('tts-toggle');
     if (ttsToggle) {
@@ -311,7 +311,7 @@ new_js = """(function() {
         label.appendChild(document.createTextNode(' 🔊 ' + (dict['btn_speak'] || 'Auto-Speak')));
       }
     }
-    
+
     // Update online badge text
     if (typeof window.updateAgentsStatus === 'function') {
       window.updateAgentsStatus();
@@ -336,7 +336,7 @@ new_js = """(function() {
       else if (schemaName === 'regional_risk_map') tabId = 'outbreak';
       else if (schemaName === 'privacy_preferences') tabId = 'settings';
       else return;
-      
+
       window.switchTab(tabId, true);
       return;
     }
@@ -346,7 +346,7 @@ new_js = """(function() {
     else if (schemaName === 'crop_dashboard' || schemaName === 'my_farm_summary' || schemaName === 'detailed_farm_data' || schemaName === 'irrigation_advice' || schemaName === 'pest_alert' || schemaName === 'irrigation_planner') tabId = 'farm';
     else if (schemaName === 'market_insights') tabId = 'market';
     else if (schemaName === 'more_screen' || schemaName === 'farmer_profile' || schemaName === 'simulation') tabId = 'more';
-    
+
     window.switchTab(tabId, true);
   }
 

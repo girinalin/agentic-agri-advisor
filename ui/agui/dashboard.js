@@ -102,7 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
           body: JSON.stringify(payload)
         });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        
+
         logObservabilityEvent(correlationId, 'sync_completed', activeScreen, '', '', 'cloud', '', 0);
         return true;
       } catch (e) {
@@ -146,7 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
           if (battery.level < 0.15 && !battery.charging) {
             console.warn('[Orchestrator] Low battery detected (<15%). Toggling off heavy WebGPU settings.');
             showToast("Power-Saving Mode", "Battery is low (<15%). Background WebGPU Gemma compilation paused to conserve power.", "warning");
-            
+
             const downloadBtn = document.getElementById('download-model-btn');
             if (downloadBtn && !localAi.llmLoaded) {
               downloadBtn.textContent = '🔌 Low Power (Suspended)';
@@ -171,7 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!isOnline) {
       if (statusIndicator) statusIndicator.className = 'status-indicator offline';
       if (statusText) statusText.textContent = 'Offline AI Ready';
-      
+
       if (!banner) {
         banner = document.createElement('div');
         banner.id = 'pwa-offline-banner';
@@ -187,7 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (statusIndicator) statusIndicator.className = 'status-indicator online';
       if (statusText) statusText.textContent = 'Connected';
       if (banner) banner.remove();
-      
+
       syncPendingTelemetry();
     }
   }
@@ -320,7 +320,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Active Screen / Tab Controller
   window.switchTab = function(tabId, skipLoadSchema, persistRoute = true) {
     console.log(`[Navigation] Switching to screen tab: ${tabId}`);
-    
+
     // Save route selection
     if (persistRoute) {
       localStorage.setItem('nav_route_user', tabId);
@@ -339,7 +339,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Remove active styles from bottom nav links
     const tabs = document.querySelectorAll('.bottom-nav-bar .nav-tab');
     tabs.forEach(t => t.classList.remove('active'));
-    
+
     // Highlight the selected bottom nav tab
     const targetTab = document.querySelector(`.bottom-nav-bar .nav-tab[data-tab="${tabId}"]`);
     if (targetTab) targetTab.classList.add('active');
@@ -349,11 +349,11 @@ document.addEventListener('DOMContentLoaded', () => {
     leftTabs.forEach(t => t.classList.remove('active'));
     const targetLeftTab = document.querySelector(`.left-nav-item[data-tab="${tabId}"]`);
     if (targetLeftTab) targetLeftTab.classList.add('active');
-    
+
     // Hide all screen contents
     const screens = document.querySelectorAll('.screen-container .app-screen');
     screens.forEach(s => s.classList.remove('active'));
-    
+
     // Show active screen content
     const targetScreen = document.getElementById(`screen-${tabId}`);
     if (targetScreen) {
@@ -367,7 +367,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const input = document.getElementById('user-input-field');
       if (input) input.focus();
     }
-    
+
     // If 'expert' tab, scroll expert chat to bottom and focus input
     if (tabId === 'expert') {
       const expertMsgs = document.getElementById('expert-messages');
@@ -375,7 +375,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const expInput = document.getElementById('expert-input-field');
       if (expInput) expInput.focus();
     }
-    
+
     if (!skipLoadSchema) {
       // Dynamically trigger corresponding schema loads
       if (tabId === 'home') {
@@ -386,6 +386,8 @@ document.addEventListener('DOMContentLoaded', () => {
         loadSchema('market_insights', 'market-canvas');
       } else if (tabId === 'more') {
         loadSchema('more_screen', 'more-canvas');
+      } else if (tabId === 'soil') {
+        showSoilTestHome();
       } else if (tabId === 'settings') {
         loadSchema('privacy_preferences', 'settings-canvas');
       }
@@ -463,7 +465,7 @@ document.addEventListener('DOMContentLoaded', () => {
       case 7: schemaName = 'crop_safe_actions'; break;
     }
     loadSchema(schemaName, canvasId);
-    
+
     // Automatically trigger viewfinder modal opening on Step 3
     if (cropDiagnosisState.step === 3) {
       setTimeout(openCameraViewfinder, 100);
@@ -474,14 +476,14 @@ document.addEventListener('DOMContentLoaded', () => {
   async function runEdgeAiDiagnosis() {
     showToast("Analyzing Photos", "Running local plant pathology classifier...", "info");
     cropDiagnosisState.step = 6;
-    
+
     const area = cropDiagnosisState.affectedArea || 'leaf';
     let disease = "Late Blight (झुलसा रोग)";
     let confidence = "94%";
     let organic = "Dissolve 5kg wood ash and 5L cow urine in 100L water, then spray.";
     let chem = "Apply Metalaxyl 8% + Mancozeb 64% WP chemical spray.";
     let alternatives = ["Septoria Leaf Spot (12% chance)", "Early Blight (5% chance)"];
-    
+
     if (area === 'stem') {
       disease = "Maize Stalk Borer Infestation (तना छेदक)";
       confidence = "91%";
@@ -515,13 +517,13 @@ document.addEventListener('DOMContentLoaded', () => {
       chemical_remedy: chem,
       alternatives: alternatives
     };
-    
+
     await localDb.saveDiagnosisState(cropDiagnosisState);
     loadStepSchema();
-    
+
     const chatMsgText = `🔬 Edge AI diagnosed **${disease}** (${confidence} confidence) on crop ${area}. Organic remedy: ${organic}`;
     appendMessage('System', chatMsgText, 'system-msg');
-    
+
     if (userInputField) {
       userInputField.value = `Tell me more about treatment for ${disease}.`;
     }
@@ -531,7 +533,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('a2ui-action', (e) => {
     const action = e.detail.action;
     console.log(`[A2UI Action] Captured action trigger: ${action}`);
-    
+
     if (action === 'TAKE_CROP_PHOTO' || action === 'START_CROP_DIAGNOSIS') {
       cropDiagnosisState = { step: 1, affectedArea: null, photos: [], currentPhoto: null, diagnosis: null };
       localDb.saveDiagnosisState(cropDiagnosisState);
@@ -670,7 +672,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const toast = document.createElement('div');
     toast.className = `toast-alert ${type}`;
-    
+
     let icon = '🔔';
     if (type === 'danger') icon = '🚨';
     if (type === 'warning') icon = '⚠️';
@@ -685,7 +687,7 @@ document.addEventListener('DOMContentLoaded', () => {
     `;
 
     container.appendChild(toast);
-    
+
     // Auto-remove after 4 seconds
     setTimeout(() => {
       toast.style.animation = 'fadeOut 0.4s forwards';
@@ -700,7 +702,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const textLower = text.toLowerCase();
     const triggers = ['spray', 'spraying', 'chemical', 'pesticide', 'fungicide', 'treatment', 'छिड़काव', 'दवा', 'औषध', 'फवारणी', 'పిచికారీ', 'మందు', 'nyunyizia', 'dawa'];
     const hasTrigger = triggers.some(t => textLower.includes(t));
-    
+
     if (hasTrigger && !textLower.includes('safety kernel')) {
       const warningText = `
 <div class="safety-kernel-alert" style="margin-top: 10px; padding: 10px; border-left: 4px solid var(--accent); background-color: rgba(44, 107, 55, 0.1); border-radius: 4px; font-size: 0.85rem;">
@@ -748,7 +750,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let openBrackets = 0;
     let inString = false;
     let escape = false;
-    
+
     for (let i = 0; i < str.length; i++) {
       const char = str[i];
       if (escape) {
@@ -770,9 +772,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (char === ']') openBrackets--;
       }
     }
-    
+
     if (inString) str += '"';
-    
+
     while (openBrackets > 0) {
       str += ']';
       openBrackets--;
@@ -787,7 +789,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Extracts JSON blocks from agent response text and renders them on the left panel
   function detectAndRenderA2UI(text) {
     if (!text) return false;
-    
+
     const codeBlockRegex = /```json\s*([\s\S]*?)\s*```/;
     const match = text.match(codeBlockRegex);
     if (match) {
@@ -929,7 +931,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const activeField = activeFields.find(f => f.field_id === activeFieldId);
     const cropType = activeField && activeField.planting ? activeField.planting.crop_type.toLowerCase() : 'corn';
     const cropSpec = okfDatabaseFallback[cropType] || okfDatabaseFallback['corn'];
-    
+
     schema.components.forEach(comp => {
       if (comp.type === 'metric') {
         if (comp.labelKey === 'farm.details.nitrogen') {
@@ -953,7 +955,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const deficit = Math.max(0, optimalMoisture - currentMoisture);
     const acres = activeField ? activeField.acres : 10;
     const waterNeededLitres = Math.max(0, deficit * 800 * acres);
-    
+
     const pumpHours = waterNeededLitres / 20000;
     const tanks = waterNeededLitres / 5000;
     const mm = waterNeededLitres / (acres * 4047);
@@ -989,7 +991,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function bindCropDiagnosisResultState(schema) {
     const result = cropDiagnosisState.diagnosis;
     if (!result) return;
-    
+
     schema.components.forEach(comp => {
       if (comp.type === 'metric') {
         if (comp.labelKey === 'photo.result.problem') {
@@ -1010,7 +1012,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function bindCropSafeActionsState(schema) {
     const result = cropDiagnosisState.diagnosis;
     const organicRemedy = result ? result.organic_remedy : "Spray neem oil solution (5ml/L).";
-    
+
     schema.components.forEach(comp => {
       if (comp.type === 'list' && comp.items) {
         comp.items[0].desc = organicRemedy;
@@ -1030,7 +1032,7 @@ document.addEventListener('DOMContentLoaded', () => {
         throw new Error(`Failed to load schema: ${response.statusText}`);
       }
       const data = await response.json();
-      
+
       const currentLang = normalizeLanguageCode(localStorage.getItem('aaa_preferred_language'));
       translateSchemaData(data, currentLang);
 
@@ -1049,7 +1051,7 @@ document.addEventListener('DOMContentLoaded', () => {
       } else if (schemaName === 'crop_safe_actions') {
         bindCropSafeActionsState(data);
       }
-      
+
       let canvasId = targetCanvasId;
       if (!canvasId) {
         if (schemaName === 'home_today') canvasId = 'home-canvas';
@@ -1078,11 +1080,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const indicator = document.getElementById('agents-status-indicator');
     const text = document.getElementById('agents-status-text');
     if (!indicator || !text) return;
-    
+
     const currentLang = normalizeLanguageCode(localStorage.getItem('aaa_preferred_language'));
     const activeLangCode = window.currentLanguageState?.code || 'en';
     const dict = TRANSLATIONS[currentLang] || TRANSLATIONS[activeLangCode] || TRANSLATIONS.en || {};
-    
+
     if (navigator.onLine) {
       indicator.className = 'status-indicator online';
       indicator.style.backgroundColor = '#10b981';
@@ -1129,12 +1131,12 @@ document.addEventListener('DOMContentLoaded', () => {
       const response = await fetch('/api/profile/user');
       if (!response.ok) throw new Error("Database not loaded");
       const profile = await response.json();
-      
+
       // Cache data for offline usage
       localDb.saveProfile(profile);
       activeFields = profile.fields || [];
       localStorage.setItem('aaa_fields_cached', JSON.stringify(activeFields));
-      
+
       // Sync language selector with database value
       const languageSelector = document.getElementById('language-selector');
       if (languageSelector && profile.language) {
@@ -1144,7 +1146,7 @@ document.addEventListener('DOMContentLoaded', () => {
         applyLanguageTranslation(profileLang);
         updateFarmerDisplayNames(profileLang);
       }
-      
+
       populateFieldSelector();
     } catch (e) {
       console.warn("SQLite database not accessible, running in purely local demo state.", e);
@@ -1164,12 +1166,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         fieldSelector.appendChild(opt);
       });
-      
+
       if (!activeFieldId) {
         activeFieldId = activeFields[0].field_id;
         fieldSelector.value = activeFieldId;
       }
-      
+
       const activeField = activeFields.find(f => f.field_id === activeFieldId);
       if (activeField && activeField.planting) {
         activePlantingId = activeField.planting.planting_id;
@@ -1265,7 +1267,7 @@ ${text}`;
       }
 
       thinkingBubble.remove();
-      
+
       const responseMsg = appendMessage('Krishi Sastri', '', 'agent-msg');
       const textContainer = responseMsg ? responseMsg.querySelector('.message-text') : null;
       if (!textContainer) return;
@@ -1363,7 +1365,7 @@ ${text}`;
       }
 
       const renderedInline = detectAndRenderA2UI(fullResponseText);
-      
+
       if (!renderedInline && window.panelRouter) {
         const targetSchema = window.panelRouter.routeIntent(fullResponseText);
         if (targetSchema) {
@@ -1471,7 +1473,7 @@ ${text}`;
 
   async function handleOfflineSend(text, preferredLang, thinkingBubble) {
     localDb.addChat({ role: 'user', text: text });
-    
+
     if (thinkingBubble) thinkingBubble.remove();
 
     const localReply = buildFarmerSafeOfflineReply(text, preferredLang);
@@ -1714,7 +1716,7 @@ ${text}`;
   window.switchTab('home', false, false);
   fetchFieldsAndProfile();
   initCropDiagnosisState();
-  
+
   // Clean up any stale local AI mode flags in localStorage
   localStorage.setItem('aaa_local_ai_enabled', 'false');
   updateAgentsStatus();
@@ -1731,7 +1733,7 @@ ${text}`;
         simState.health = activeField.planting.health_pct || 100.0;
         simState.stage = activeField.planting.growth_stage || 'germination';
       }
-      
+
       // Reload current active schema to display the selected field's data
       const activeTab = document.querySelector('.bottom-nav-bar .nav-tab.active');
       if (activeTab) {
@@ -1761,11 +1763,11 @@ ${text}`;
     languageSelector.value = savedLang;
     applyLanguageTranslation(savedLang);
     updateFarmerDisplayNames(savedLang);
-    
+
     languageSelector.addEventListener('change', () => {
       const selectedLang = languageSelector.value;
       localStorage.setItem('aaa_preferred_language', selectedLang);
-      
+
       // Save language to SQLite database
       fetch('/api/profile/user/language', {
         method: 'POST',
@@ -1775,11 +1777,11 @@ ${text}`;
       .then(() => {
         showToast("Language Saved", `Preferred language set to ${selectedLang}`, "success");
       });
-      
+
       // Apply UI translations
       applyLanguageTranslation(selectedLang);
       updateFarmerDisplayNames(selectedLang);
-      
+
       // Reload current active tab schema to translate the dynamic widget canvas!
       const activeTab = document.querySelector('.bottom-nav-bar .nav-tab.active');
       if (activeTab) {
@@ -1797,11 +1799,11 @@ ${text}`;
   if (ttsToggle) {
     const savedAutoSpeak = localStorage.getItem('aaa_auto_speak') === 'true';
     ttsToggle.checked = savedAutoSpeak;
-    
+
     ttsToggle.addEventListener('change', () => {
       localStorage.setItem('aaa_auto_speak', ttsToggle.checked);
       showToast("Auto-Speak", ttsToggle.checked ? "Auto-readout enabled." : "Auto-readout disabled.", "success");
-      
+
       if (!ttsToggle.checked) {
         window.speechSynthesis.cancel();
         if (audioPlayer) {
@@ -1836,22 +1838,22 @@ ${text}`;
   // Voice Speech-to-Text Recognition integration (Zero-Latency, Zero-Cost)
   const micBtn = document.getElementById('mic-btn');
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  
+
   if (micBtn && SpeechRecognition) {
     const recognition = new SpeechRecognition();
     recognition.continuous = false;
     recognition.lang = 'en-US';
     recognition.interimResults = false;
-    
+
     let isRecording = false;
-    
+
     recognition.onstart = () => {
       isRecording = true;
       micBtn.classList.add('recording');
       micBtn.innerHTML = '🔴';
       userInputField.placeholder = "Listening...";
     };
-    
+
     recognition.onend = () => {
       isRecording = false;
       micBtn.classList.remove('recording');
@@ -1860,7 +1862,7 @@ ${text}`;
       const dict = TRANSLATIONS[preferredLang] || TRANSLATIONS['English'];
       userInputField.placeholder = dict['chat_placeholder'] || "Ask your advisor...";
     };
-    
+
     recognition.onerror = (e) => {
       console.warn("Speech recognition error:", e.error);
       isRecording = false;
@@ -1868,13 +1870,13 @@ ${text}`;
       micBtn.innerHTML = '🎙️';
       userInputField.placeholder = "Speech error. Try again.";
     };
-    
+
     recognition.onresult = (event) => {
       const transcript = event.results[0][0].transcript;
       userInputField.value = transcript;
       handleSend();
     };
-    
+
     micBtn.addEventListener('click', () => {
       if (isRecording) {
         recognition.stop();
@@ -1906,20 +1908,20 @@ ${text}`;
       const cropInput = document.querySelector('select[name="crop_type"]') || document.querySelector('input[name="crop_type"]');
       const waterInput = document.querySelector('input[name="water_liters"]');
       const fertilizerInput = document.querySelector('input[name="fertilizer_kg"]');
-      
+
       const cropType = cropInput ? cropInput.value : 'corn';
       const waterLiters = waterInput ? parseFloat(waterInput.value) || 10.0 : 10.0;
       const fertilizerKg = fertilizerInput ? parseFloat(fertilizerInput.value) || 5.0 : 5.0;
-      
+
       // Advance step
       simState.day += 1;
-      
+
       // Calculate moisture updates
       const rain = Math.random() > 0.85 ? 8.0 : 0.0;
       const depletion = 2.5;
       const gain = (rain * 1.5) + (waterLiters * 0.8);
       simState.soilMoisture = Math.max(0.0, Math.min(100.0, simState.soilMoisture - depletion + gain));
-      
+
       // Calculate pest updates
       const treatment = fertilizerKg > 8.0;
       if (treatment) {
@@ -1927,20 +1929,20 @@ ${text}`;
       } else {
         simState.pestIndex = Math.min(100.0, simState.pestIndex + 1.2);
       }
-      
+
       // Calculate health updates
       const temp = 21.0 + Math.random() * 4.0;
       const tempFactor = Math.max(0.1, 1.0 - Math.abs(temp - 23.0) / 15.0);
       const waterFactor = Math.max(0.1, 1.0 - Math.abs(simState.soilMoisture - 50.0) / 40.0);
       const pestFactor = Math.max(0.1, 1.0 - (simState.pestIndex / 100.0));
       const growthRate = 2.5 * tempFactor * waterFactor * pestFactor;
-      
+
       if (simState.soilMoisture < 15.0 || simState.soilMoisture > 85.0) {
         simState.health = Math.max(0.0, simState.health - 2.5);
       } else {
         simState.health = Math.min(100.0, simState.health + 0.5);
       }
-      
+
       const cumulativeGrowth = simState.day * growthRate;
       if (cumulativeGrowth >= 100.0 || simState.day >= 30) {
         simState.stage = 'harvested';
@@ -1951,7 +1953,7 @@ ${text}`;
       } else if (cumulativeGrowth >= 15.0 || simState.day >= 5) {
         simState.stage = 'vegetative';
       }
-      
+
       // Update DOM values of the active left panel simulator card
       const activeCanvas = getActiveCanvas();
       if (!activeCanvas) return;
@@ -1960,7 +1962,7 @@ ${text}`;
         const labelText = m.textContent.toLowerCase();
         const valEl = m.querySelector('.metric-val');
         if (!valEl) return;
-        
+
         if (labelText.includes('day') || labelText.includes('दिन') || labelText.includes('दिवस') || labelText.includes('siku')) {
           valEl.textContent = `Day ${simState.day}`;
         } else if (labelText.includes('stage') || labelText.includes('चरण') || labelText.includes('टप्पा') || labelText.includes('hatua')) {
@@ -1976,17 +1978,17 @@ ${text}`;
           m.className = `a2ui-metric ${simState.pestIndex > 25.0 ? 'warning' : 'optimal'}`;
         }
       });
-      
+
       const stepBtn = activeCanvas.querySelector('.a2ui-btn');
       if (stepBtn && stepBtn.textContent.includes('Step Simulation')) {
         stepBtn.textContent = `🎮 Step Simulation (Day ${simState.day + 1})`;
       }
-      
+
       showToast("Simulation Stepped", `Advanced to Day ${simState.day}. Health is ${simState.health.toFixed(1)}%`, "success");
-      
+
       // Notify agent of the new state in the conversation context
       const statusPrompt = `Simulation Advanced: Day ${simState.day}, Crop: ${cropType}, Stage: ${simState.stage}, Soil Moisture: ${simState.soilMoisture.toFixed(1)}%, Crop Health: ${simState.health.toFixed(1)}%, Pest Level: ${simState.pestIndex.toFixed(1)}%. Advise on irrigation or nutrient needs.`;
-      
+
       if (activePlantingId) {
         const telemetryData = {
           moisture_pct: simState.soilMoisture,
@@ -2022,10 +2024,10 @@ ${text}`;
           }
         });
       }
-      
+
       localStorage.setItem('aaa_farmer_profile', JSON.stringify(profile));
       localDb.saveProfile(profile);
-      
+
       if (!navigator.onLine) {
         showToast("Profile Saved Offline", "Profile details cached locally. Sync queued.", "warning");
         const prompt = `Profile updated: saved profile details for farmer. Name is ${profile.farmer_name || 'unnamed'}, Location is ${profile.region}, Size is ${profile.acres} acres, Soil is ${profile.soil_type}, Crop is ${profile.primary_crop}, Drip Irrigation is ${profile.has_drip}. Please acknowledge and update your advisory guidelines.`;
@@ -2033,7 +2035,7 @@ ${text}`;
         handleSend();
         return;
       }
-      
+
       fetch('/api/profile/user', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -2044,7 +2046,7 @@ ${text}`;
         showToast("Profile Synced", "Farmer profile saved locally and synced with advisors.", "success");
         fetchFieldsAndProfile();
       });
-      
+
       const prompt = `Profile updated: saved profile details for farmer. Name is ${profile.farmer_name || 'unnamed'}, Location is ${profile.region}, Size is ${profile.acres} acres, Soil is ${profile.soil_type}, Crop is ${profile.primary_crop}, Drip Irrigation is ${profile.has_drip}. Please acknowledge and update your advisory guidelines.`;
       userInputField.value = prompt;
       handleSend();
@@ -2062,12 +2064,12 @@ ${text}`;
           }
         });
       }
-      
+
       let prompt = `Action triggered: '${action}'`;
       if (Object.keys(params).length > 0) {
         prompt += ` with fields: ` + Object.entries(params).map(([k, v]) => `${k}='${v}'`).join(', ');
       }
-      
+
       userInputField.value = prompt;
       handleSend();
     }
@@ -2093,7 +2095,7 @@ ${text}`;
     if (cameraModal) {
       cameraModal.style.display = 'flex';
       activeDataUrl = null;
-      
+
       cameraViewfinder.style.display = 'block';
       cameraCanvas.style.display = 'none';
       cameraFallbackContainer.style.display = 'none';
@@ -2118,32 +2120,32 @@ ${text}`;
       canvas.height = 100;
       const ctx = canvas.getContext('2d');
       ctx.drawImage(img, 0, 0, 100, 100);
-      
+
       const imgData = ctx.getImageData(0, 0, 100, 100);
       const data = imgData.data;
-      
+
       let totalBrightness = 0;
       let greenOrBrownPixels = 0;
-      
+
       for (let i = 0; i < data.length; i += 4) {
         const r = data[i];
         const g = data[i+1];
         const b = data[i+2];
-        
+
         const brightness = (r + g + b) / 3;
         totalBrightness += brightness;
-        
+
         const isGreen = g > r * 1.1 && g > b * 1.1;
         const isBrown = r > b * 1.2 && g > b * 1.0 && r >= g && r < 180;
-        
+
         if (isGreen || isBrown) {
           greenOrBrownPixels++;
         }
       }
-      
+
       const avgBrightness = totalBrightness / (100 * 100);
       const greenBrownRatio = greenOrBrownPixels / (100 * 100);
-      
+
       let sumSquares = 0;
       for (let i = 0; i < data.length; i += 4) {
         const r = data[i];
@@ -2154,7 +2156,7 @@ ${text}`;
       }
       const variance = sumSquares / (100 * 100);
       const contrast = Math.sqrt(variance);
-      
+
       let warning = null;
       if (avgBrightness < 45) {
         warning = "too_dark";
@@ -2165,7 +2167,7 @@ ${text}`;
       } else if (greenBrownRatio < 0.12) {
         warning = "out_of_distribution";
       }
-      
+
       callback(warning);
     };
     img.src = dataUrl;
@@ -2194,12 +2196,12 @@ ${text}`;
       activeDataUrl = cropCamera.capture(cameraCanvas);
       if (activeDataUrl) {
         cropDiagnosisState.currentPhoto = activeDataUrl;
-        
+
         if (cameraModal) {
           cameraModal.style.display = 'none';
           cropCamera.stop();
         }
-        
+
         analyzeImageQuality(activeDataUrl, (warning) => {
           if (warning) {
             cropDiagnosisState.step = 4;
@@ -2236,12 +2238,12 @@ ${text}`;
         reader.onload = (event) => {
           activeDataUrl = event.target.result;
           cropDiagnosisState.currentPhoto = activeDataUrl;
-          
+
           if (cameraModal) {
             cameraModal.style.display = 'none';
             cropCamera.stop();
           }
-          
+
           analyzeImageQuality(activeDataUrl, (warning) => {
             if (warning) {
               cropDiagnosisState.step = 4;
@@ -2284,7 +2286,7 @@ ${text}`;
         showToast("Local AI Active", "Local Gemma-2B model is already compiled and ready.", "success");
         return;
       }
-      
+
       downloadModelBtn.textContent = '⏳ Loading AI (0%)...';
       downloadModelBtn.disabled = true;
       downloadModelBtn.style.backgroundColor = 'var(--text-sub)';
@@ -2313,7 +2315,7 @@ ${text}`;
     if (focusableElements.length === 0) return;
     const firstFocusable = focusableElements[0];
     const lastFocusable = focusableElements[focusableElements.length - 1];
-    
+
     element.addEventListener('keydown', function(e) {
       if (e.key === 'Tab') {
         if (e.shiftKey) {
@@ -2348,7 +2350,7 @@ ${text}`;
       link.setAttribute('data-tab', item.id);
       link.setAttribute('title', label); // tooltip for collapsed mode
       link.setAttribute('aria-label', label);
-      
+
       const currentActive = localStorage.getItem('nav_route_user') || 'home';
       if (item.id === currentActive) {
         link.classList.add('active');
@@ -2372,7 +2374,7 @@ ${text}`;
     if (profileName) {
       profileName.textContent = farmerDisplayNameForLanguage(localStorage.getItem('aaa_preferred_language'));
     }
-    
+
     // Render the assistant info pane dynamically
     renderAssistantInfoPane();
   }
@@ -2380,7 +2382,7 @@ ${text}`;
   // Collapsible toggle buttons event setup
   const leftNavToggleBtn = document.getElementById('left-nav-toggle-btn');
   const leftNav = document.getElementById('left-nav');
-  
+
   if (leftNavToggleBtn && leftNav) {
     // Restore collapsed preference
     const isCollapsed = localStorage.getItem('nav_collapsed_user') === 'true';
@@ -2457,7 +2459,7 @@ ${text}`;
   // Render structured JSON response card inside chat bubble
   function renderStructuredResponse(data, container, messageEl) {
     container.innerHTML = '';
-    
+
     if (data.title) {
       const titleDiv = document.createElement('div');
       titleDiv.style.fontWeight = 'bold';
@@ -2466,14 +2468,14 @@ ${text}`;
       titleDiv.textContent = data.title;
       container.appendChild(titleDiv);
     }
-    
+
     if (data.summary) {
       const summaryDiv = document.createElement('div');
       summaryDiv.style.marginBottom = '0.5rem';
       summaryDiv.textContent = data.summary;
       container.appendChild(summaryDiv);
     }
-    
+
     if (data.recommendation) {
       const recDiv = document.createElement('div');
       recDiv.style.marginBottom = '0.5rem';
@@ -2482,7 +2484,7 @@ ${text}`;
       recDiv.textContent = data.recommendation;
       container.appendChild(recDiv);
     }
-    
+
     if (data.reasons && Array.isArray(data.reasons) && data.reasons.length > 0) {
       const ul = document.createElement('ul');
       ul.style.margin = '5px 0 10px 20px';
@@ -2496,7 +2498,7 @@ ${text}`;
       });
       container.appendChild(ul);
     }
-    
+
     if (data.question) {
       const qDiv = document.createElement('div');
       qDiv.style.fontStyle = 'italic';
@@ -2504,14 +2506,14 @@ ${text}`;
       qDiv.textContent = data.question;
       container.appendChild(qDiv);
     }
-    
+
     if (data.actions && Array.isArray(data.actions) && data.actions.length > 0) {
       const actionsDiv = document.createElement('div');
       actionsDiv.style.display = 'flex';
       actionsDiv.style.flexWrap = 'wrap';
       actionsDiv.style.gap = '8px';
       actionsDiv.style.marginTop = '10px';
-      
+
       data.actions.forEach(act => {
         const btn = document.createElement('button');
         btn.className = 'a2ui-btn';
@@ -2524,7 +2526,7 @@ ${text}`;
         btn.style.cursor = 'pointer';
         btn.style.fontWeight = 'bold';
         btn.textContent = act.label;
-        
+
         btn.addEventListener('click', () => {
           const userInputField = document.getElementById('user-input-field');
           if (userInputField) {
@@ -2545,20 +2547,20 @@ ${text}`;
 
     const preferredLang = window.currentLanguageState?.code || 'en';
     const activeField = activeFields.find(f => f.field_id === activeFieldId);
-    
+
     const crop = activeField && activeField.planting ? activeField.planting.crop_type : 'Wheat';
     const fieldName = activeField ? activeField.name : 'Nagpur Field';
-    
+
     let cropTr = window.getTranslation('profile.crop.wheat', preferredLang) || 'Wheat';
     if (crop.toLowerCase() === 'corn') {
       cropTr = window.getTranslation('profile.crop.corn', preferredLang) || 'Corn';
     } else if (crop.toLowerCase() === 'soybeans') {
       cropTr = window.getTranslation('profile.crop.soybeans', preferredLang) || 'Soybeans';
     }
-    
+
     const advisory = window.getTranslation('farm.recommendation.desc', preferredLang) || 'Irrigate tomorrow morning.';
     const freshness = window.getTranslation('irrigation.weatherStatus.cached', preferredLang) || 'Cached 3h ago';
-    
+
     pane.innerHTML = `
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; color: var(--text-main);">
         <div><strong>🌾 ${window.getTranslation('profile.crop.label', preferredLang) || 'Crop'}:</strong> ${cropTr}</div>
@@ -2584,7 +2586,7 @@ ${text}`;
   async function updateSyncBadge() {
     const badge = document.getElementById('sync-queue-badge');
     if (!badge) return;
-    
+
     try {
       const count = await localDb.getPendingSyncCount();
       if (count > 0) {
@@ -2610,8 +2612,220 @@ ${text}`;
   window.updateSyncBadge = updateSyncBadge;
 
   // ============================================================
-  // Ask Image — Visual Diagnosis Flow
+  // Ask Screen — Advisor Selection + Sastri Chat + Expert Form
   // ============================================================
+
+  function showAdvisorSelection() {
+    document.getElementById('advisor-selection-screen').style.display = 'flex';
+    document.getElementById('sastri-chat-screen').style.display = 'none';
+    document.getElementById('expert-form-screen').style.display = 'none';
+  }
+
+  function showSastriChat() {
+    document.getElementById('advisor-selection-screen').style.display = 'none';
+    document.getElementById('sastri-chat-screen').style.display = 'flex';
+    document.getElementById('expert-form-screen').style.display = 'none';
+    const input = document.getElementById('user-input-field');
+    if (input) input.focus();
+  }
+
+  function showExpertForm() {
+    document.getElementById('advisor-selection-screen').style.display = 'none';
+    document.getElementById('sastri-chat-screen').style.display = 'none';
+    document.getElementById('expert-form-screen').style.display = 'flex';
+    document.getElementById('expert-status-display').style.display = 'none';
+  }
+
+  // Keywords that indicate a complex/risky question needing expert escalation
+  const EXPERT_ESCALATION_KEYWORDS = [
+    'pesticide', 'chemical', 'fungicide', 'insecticide', 'pesticide',
+    'दवा', 'छिड़काव', 'कीटनाशक', 'फफूंदनाशक',
+    'severe', 'critical', 'emergency', 'dying', 'wilted completely',
+    'गंभीर', 'आपातकाल', 'मर', 'सूख',
+    'uncertain', 'unknown disease', 'not sure', 'first time',
+    'पता नहीं', 'पहली बार', 'समझ नहीं',
+    'livestock', 'cattle', 'cow', 'goat', 'animal',
+    'मवेशी', 'गाय', 'बकरी', 'जानवर',
+  ];
+
+  function shouldEscalateToExpert(text) {
+    const lower = text.toLowerCase();
+    return EXPERT_ESCALATION_KEYWORDS.some(kw => lower.includes(kw));
+  }
+
+  function showEscalationPrompt(userQuery) {
+    const chatMessages = document.getElementById('chat-messages');
+    if (!chatMessages) return;
+
+    const langCode = localStorage.getItem('aaa_preferred_language') || 'hi';
+    const langMap = { 'en': 'en', 'hi': 'hi', 'mr': 'mr', 'te': 'te', 'sw': 'sw' };
+    const code = langMap[langCode] || 'hi';
+
+    const texts = {
+      'hi': { summary: 'यह मामला थोड़ा जटिल है।', rec: 'कृषि विशेषज्ञ से जांच करवाना बेहतर रहेगा।', q: 'क्या मैं यह सवाल विशेषज्ञ सहायता को भेज दूँ?', send: 'हाँ, विशेषज्ञ को भेजें', photo: 'पहले फोटो जोड़ें', no: 'अभी नहीं' },
+      'en': { summary: 'This case is a bit complex.', rec: 'It would be better to have an expert examine it.', q: 'Shall I send this question to expert help?', send: 'Yes, send to expert', photo: 'Add photo first', no: 'Not now' },
+      'mr': { summary: 'हे प्रकरण थोडे कठीण आहे.', rec: 'तज्ज्ञाकडून तपासणी करवणे चांगले राहील.', q: 'हा प्रश्न तज्ज्ञ सहाय्याला पाठवू?', send: 'होय, तज्ज्ञाला पाठवा', photo: 'आधी फोटो जोडा', no: 'आत्ता नाही' },
+      'te': { summary: 'ఈ సందర్భం కొంచెం క్లిష్టంగా ఉంది.', rec: 'నిపుణుడు ద్వారా తనిఖీ చేయించడం మంచిది.', q: 'ఈ ప్రశ్నను నిపుణుడికి పంపాలా?', send: 'అవును, నిపుణుడికి పంపండి', photo: 'ముందు ఫోటో జోడించండి', no: 'ఇప్పుడు కాదు' },
+      'sw': { summary: 'Hali hii ni ngumu kidogo.', rec: 'Ni bora kumtafute mtaalamu.', q: 'Nitume swali hili kwa mtaalamu?', send: 'Ndio, tuma kwa mtaalamu', photo: 'Ongeza picha kwanza', no: 'Sio sasa' },
+    };
+    const t = texts[code] || texts['hi'];
+
+    const escalationMsg = document.createElement('div');
+    escalationMsg.className = 'message agent-msg';
+    escalationMsg.innerHTML = `
+      <div style="padding: 12px; border-radius: 10px; background: rgba(230,126,34,0.1); border-left: 4px solid #e67e22;">
+        <div style="font-weight: 600; margin-bottom: 6px;">${t.summary}</div>
+        <div style="font-size: 0.9rem; margin-bottom: 8px;">${t.rec}</div>
+        <div style="font-weight: 600; margin-bottom: 10px;">${t.q}</div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button class="escalation-btn" data-action="send" style="padding: 8px 14px; border-radius: 8px; border: none; background: #e67e22; color: white; font-weight: 600; cursor: pointer; font-size: 0.85rem;">${t.send}</button>
+          <button class="escalation-btn" data-action="photo" style="padding: 8px 14px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-dark); color: var(--text-main); cursor: pointer; font-size: 0.85rem;">${t.photo}</button>
+          <button class="escalation-btn" data-action="no" style="padding: 8px 14px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-dark); color: var(--text-muted); cursor: pointer; font-size: 0.85rem;">${t.no}</button>
+        </div>
+      </div>
+    `;
+    chatMessages.appendChild(escalationMsg);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    // Bind escalation buttons
+    escalationMsg.querySelectorAll('.escalation-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const action = btn.getAttribute('data-action');
+        if (action === 'send') {
+          // Create expert request
+          createExpertRequest(userQuery, null);
+        } else if (action === 'photo') {
+          // Route to photo check
+          window.switchTab('image');
+        } else if (action === 'no') {
+          // Remove escalation message
+          escalationMsg.remove();
+        }
+      });
+    });
+
+    // Speak the escalation message
+    if (typeof window.speakText === 'function') {
+      window.speakText(`${t.summary} ${t.rec} ${t.q}`);
+    }
+  }
+
+  function createExpertRequest(question, photoData) {
+    // Include farm context
+    const profile = localStorage.getItem('aaa_farmer_profile');
+    let context = '';
+    if (profile) {
+      try {
+        const p = JSON.parse(profile);
+        context = `\nFarm: ${p.farmer_name || 'Unknown'}, Crop: ${p.primary_crop || 'Unknown'}, Soil: ${p.soil_type || 'Unknown'}, Location: ${p.region || 'Unknown'}`;
+      } catch (e) {}
+    }
+
+    // Show status display
+    const statusDisplay = document.getElementById('expert-status-display');
+    if (statusDisplay) {
+      statusDisplay.style.display = 'block';
+    }
+
+    // Hide form elements
+    const expertForm = document.getElementById('expert-form-screen');
+    if (expertForm) {
+      expertForm.querySelectorAll('div > label, textarea, button').forEach(el => {
+        if (el.id !== 'expert-back-to-chat-btn') el.style.display = 'none';
+      });
+    }
+
+    // In production, this would send to the backend
+    // For now, store in IndexedDB and log
+    console.log('[Expert Request] Created:', { question, context, photo: !!photoData });
+
+    if (typeof window.showToast === 'function') {
+      window.showToast('विशेषज्ञ को भेजा गया', 'आपका सवाल विशेषज्ञ को भेजा गया है।', 'success');
+    }
+  }
+
+  // Bind advisor selection buttons — bind immediately (DOMContentLoaded may have already fired)
+  function bindAdvisorButtons() {
+    const sastriCard = document.getElementById('sastri-card');
+    const expertCard = document.getElementById('expert-card');
+    const sastriBtn = document.getElementById('advisor-sastri-btn');
+    const expertBtn = document.getElementById('advisor-expert-btn');
+    const backBtn = document.getElementById('back-to-advisor-btn');
+    const backFromExpertBtn = document.getElementById('back-to-advisor-from-expert-btn');
+    const expertSubmitBtn = document.getElementById('expert-submit-btn');
+    const expertPhotoBtn = document.getElementById('expert-photo-btn');
+    const expertPhotoInput = document.getElementById('expert-photo-input');
+    const expertBackToChatBtn = document.getElementById('expert-back-to-chat-btn');
+
+    if (sastriBtn) sastriBtn.addEventListener('click', showSastriChat);
+    if (sastriCard) sastriCard.addEventListener('click', (e) => { if (e.target !== sastriBtn) showSastriChat(); });
+    if (expertBtn) expertBtn.addEventListener('click', showExpertForm);
+    if (expertCard) expertCard.addEventListener('click', (e) => { if (e.target !== expertBtn) showExpertForm(); });
+    if (backBtn) backBtn.addEventListener('click', showAdvisorSelection);
+    if (backFromExpertBtn) backFromExpertBtn.addEventListener('click', showAdvisorSelection);
+    if (expertBackToChatBtn) expertBackToChatBtn.addEventListener('click', () => { showAdvisorSelection(); showSastriChat(); });
+
+    // Expert photo upload
+    if (expertPhotoBtn && expertPhotoInput) {
+      expertPhotoBtn.addEventListener('click', () => expertPhotoInput.click());
+      expertPhotoInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const img = document.getElementById('expert-photo-img');
+          const preview = document.getElementById('expert-photo-preview');
+          if (img) img.src = event.target.result;
+          if (preview) preview.style.display = 'block';
+          expertPhotoBtn.textContent = '✅ फोटो जोड़ी गई';
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // Expert submit
+    if (expertSubmitBtn) {
+      expertSubmitBtn.addEventListener('click', () => {
+        const question = document.getElementById('expert-question-input')?.value?.trim();
+        if (!question) {
+          if (typeof window.showToast === 'function') {
+            window.showToast('सवाल आवश्यक है', 'कृपया अपना सवाल लिखें या बोलें।', 'warning');
+          }
+          return;
+        }
+        const photoImg = document.getElementById('expert-photo-img');
+        const photoData = photoImg ? photoImg.src : null;
+        createExpertRequest(question, photoData);
+      });
+    }
+
+    // Apply translations to advisor cards
+    const langCode = localStorage.getItem('aaa_preferred_language') || 'hi';
+    const langMap = { 'en': 'en', 'hi': 'hi', 'mr': 'mr', 'te': 'te', 'sw': 'sw' };
+    const code = langMap[langCode] || 'hi';
+
+    // Use getTranslation from translations.js if available
+    if (typeof window.getTranslation === 'function') {
+      const setText = (id, key) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = window.getTranslation(key, code);
+      };
+      setText('advisor-ask-title', 'advisor.ask.title');
+      setText('advisor-ask-subtitle', 'advisor.ask.subtitle');
+      setText('advisor-sastri-title', 'advisor.sastri.title');
+      setText('advisor-sastri-desc', 'advisor.sastri.description');
+      setText('advisor-sastri-btn', 'advisor.sastri.button');
+      setText('advisor-sastri-badge', 'advisor.sastri.recommended');
+      setText('advisor-expert-title', 'advisor.expert.title');
+      setText('advisor-expert-desc', 'advisor.expert.description');
+      setText('advisor-expert-btn', 'advisor.expert.button');
+      setText('advisor-helper-note', 'advisor.ask.helperNote');
+    }
+  }
+
+  // Call bindAdvisorButtons immediately and also on DOMContentLoaded
+  bindAdvisorButtons();
+  document.addEventListener('DOMContentLoaded', bindAdvisorButtons);
 
   let currentImageData = null; // Stores base64 of captured/uploaded image
 
@@ -2763,16 +2977,16 @@ ${text}`;
         soil: localStorage.getItem('aaa_active_soil') || 'clay',
         language: localStorage.getItem('aaa_preferred_language') || 'hi',
       };
-      
+
       const result = await classifier.classifyImage(base64Image, context);
 
       // Build the response HTML
       let html = '';
-      
+
       if (result.disease_name) {
         const isHealthy = result.disease_name.includes('Healthy') || result.severity === 'None';
         const icon = isHealthy ? '✅' : (result.severity === 'Critical' ? '🚨' : result.severity === 'High' ? '⚠️' : '🔍');
-        
+
         html += `<div style="margin-bottom: 12px;">
           <div style="font-size: 1.1rem; font-weight: 700; color: ${isHealthy ? '#2C6B37' : '#e67e22'};">${icon} ${result.disease_name}</div>
           <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">विश्वास: ${result.confidence}</div>
@@ -2806,7 +3020,7 @@ ${text}`;
       // Check if we should recommend expert
       const confidenceNum = parseInt(result.confidence) || 0;
       const isLowConfidence = confidenceNum < 70 || result.severity === 'Unknown' || result.mode === 'fallback_heuristic';
-      
+
       if (isLowConfidence) {
         html += `<div style="margin-top: 12px; padding: 10px; border-radius: 8px; background: rgba(230,126,34,0.1); border-left: 3px solid #e67e22;">
           <strong>📋 स्थानीय विश्लेषण सीमित है।</strong><br/>
@@ -2835,4 +3049,299 @@ ${text}`;
 
   // Initialize Ask Image flow — we're already inside DOMContentLoaded, so call directly
   initAskImageFlow();
+
+  // ============================================================
+  // Soil Test Report — MVP Implementation
+  // ============================================================
+
+  const SOIL_PARAMETERS = [
+    { key: 'pH', label: 'pH', label_hi: 'pH' },
+    { key: 'EC', label: 'EC', label_hi: 'EC' },
+    { key: 'organic_carbon', label: 'Organic Carbon', label_hi: 'जैविक कार्बन' },
+    { key: 'nitrogen', label: 'Nitrogen', label_hi: 'नाइट्रोजन' },
+    { key: 'phosphorus', label: 'Phosphorus', label_hi: 'फॉस्फोरस' },
+    { key: 'potassium', label: 'Potassium', label_hi: 'पोटाश' },
+    { key: 'sulfur', label: 'Sulfur', label_hi: 'सल्फर' },
+    { key: 'zinc', label: 'Zinc', label_hi: 'जिंक' },
+    { key: 'boron', label: 'Boron', label_hi: 'बोरोन' },
+    { key: 'iron', label: 'Iron', label_hi: 'आयरन' },
+  ];
+
+  function showSoilTestHome() {
+    const home = document.getElementById('soil-home');
+    const loading = document.getElementById('soil-loading');
+    const form = document.getElementById('soil-review-form');
+    const summary = document.getElementById('soil-summary');
+    if (home) home.style.display = 'flex';
+    if (loading) loading.style.display = 'none';
+    if (form) form.style.display = 'none';
+    if (summary) summary.style.display = 'none';
+  }
+
+  function showSoilLoading() {
+    document.getElementById('soil-home').style.display = 'none';
+    document.getElementById('soil-loading').style.display = 'block';
+    document.getElementById('soil-review-form').style.display = 'none';
+    document.getElementById('soil-summary').style.display = 'none';
+  }
+
+  function showSoilForm(extractedData) {
+    document.getElementById('soil-home').style.display = 'none';
+    document.getElementById('soil-loading').style.display = 'none';
+    document.getElementById('soil-review-form').style.display = 'flex';
+    document.getElementById('soil-summary').style.display = 'none';
+
+    const fieldsContainer = document.getElementById('soil-form-fields');
+    if (!fieldsContainer) return;
+    fieldsContainer.innerHTML = '';
+
+    const langCode = localStorage.getItem('aaa_preferred_language') || 'hi';
+    const isHindi = langCode === 'hi';
+
+    // Field selector
+    const fieldSel = document.createElement('div');
+    fieldSel.innerHTML = `<label style="font-size:0.85rem;font-weight:600;">${isHindi ? 'खेत' : 'Field'}</label>
+      <select id="soil-field-select" style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--border);background:var(--bg-dark);color:var(--text-main);margin-top:4px;">
+        <option value="">${isHindi ? 'खेत चुनें' : 'Select field'}</option>
+      </select>`;
+    fieldsContainer.appendChild(fieldSel);
+
+    // Populate field options from API (always fetch, don't depend on localStorage)
+    const sel = fieldSel.querySelector('#soil-field-select');
+    fetch('/api/profile/user').then(r => r.json()).then(data => {
+      if (data.fields) {
+        data.fields.forEach(f => {
+          const opt = document.createElement('option');
+          opt.value = f.field_id;
+          opt.textContent = f.name + ' (' + (f.planting?.crop_type || '') + ')';
+          sel.appendChild(opt);
+        });
+      }
+    }).catch(e => console.error('Failed to load fields for soil form:', e));
+
+    // Metadata fields
+    const metaFields = [
+      { id: 'soil-sample-date', label: isHindi ? 'रिपोर्ट तारीख' : 'Report Date', value: extractedData?.sample_date || '' },
+      { id: 'soil-lab-name', label: isHindi ? 'लैब का नाम' : 'Lab Name', value: extractedData?.lab_name || '' },
+      { id: 'soil-type', label: isHindi ? 'मिट्टी का प्रकार' : 'Soil Type', value: extractedData?.soil_type || '' },
+    ];
+    metaFields.forEach(f => {
+      const div = document.createElement('div');
+      div.innerHTML = `<label style="font-size:0.85rem;font-weight:600;">${f.label}</label>
+        <input type="text" id="${f.id}" value="${f.value}" placeholder="${isHindi ? 'पता नहीं' : 'Unknown'}"
+          style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--border);background:var(--bg-dark);color:var(--text-main);margin-top:4px;">`;
+      fieldsContainer.appendChild(div);
+    });
+
+    // Parameter fields
+    SOIL_PARAMETERS.forEach(param => {
+      const extracted = extractedData?.values?.find(v => v.parameter_name === param.key);
+      const div = document.createElement('div');
+      div.innerHTML = `<label style="font-size:0.85rem;font-weight:600;">${isHindi ? param.label_hi : param.label}</label>
+        <input type="text" id="soil-param-${param.key}" value="${extracted?.value || ''}" placeholder="${isHindi ? 'पता नहीं' : 'Unknown'}"
+          style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--border);background:var(--bg-dark);color:var(--text-main);margin-top:4px;">`;
+      fieldsContainer.appendChild(div);
+    });
+
+    // If extraction failed, show message
+    if (extractedData?.status === 'error') {
+      const msg = document.createElement('div');
+      msg.style.cssText = 'padding:10px;border-radius:8px;background:rgba(231,76,60,0.1);border-left:3px solid #e74c3c;font-size:0.85rem;';
+      msg.textContent = isHindi ? 'रिपोर्ट साफ नहीं पढ़ी गई। कृपया मान खुद भरें या फिर से फोटो लें।' : 'Report not clearly read. Please fill values manually.';
+      fieldsContainer.insertBefore(msg, fieldsContainer.firstChild);
+    }
+  }
+
+  function showSoilSummary(savedReport) {
+    document.getElementById('soil-home').style.display = 'none';
+    document.getElementById('soil-loading').style.display = 'none';
+    document.getElementById('soil-review-form').style.display = 'none';
+    document.getElementById('soil-summary').style.display = 'flex';
+
+    // Build simple interpretation
+    const interpretation = document.getElementById('soil-interpretation');
+    const detailed = document.getElementById('soil-detailed-values');
+    if (!interpretation || !detailed) return;
+
+    const values = {};
+    (savedReport.values || []).forEach(v => { values[v.parameter_name] = v.value; });
+
+    let interpHtml = '';
+    let detailHtml = '';
+
+    // pH interpretation
+    const ph = parseFloat(values.pH);
+    if (!isNaN(ph)) {
+      if (ph > 8.5) interpHtml += `<div>🔴 ${localStorage.getItem('aaa_preferred_language') === 'hi' ? 'मिट्टी बहुत क्षारीय है।' : 'Soil is very alkaline.'}</div>`;
+      else if (ph > 7.5) interpHtml += `<div>🟡 ${'मिट्टी थोड़ी क्षारीय है।'}</div>`;
+      else if (ph < 5.5) interpHtml += `<div>🔴 ${'मिट्टी बहुत अम्लीय है।'}</div>`;
+      else if (ph < 6.5) interpHtml += `<div>🟡 ${'मिट्टी थोड़ी अम्लीय है।'}</div>`;
+      else interpHtml += `<div>🟢 ${'मिट्टी का pH संतुलित है।'}</div>`;
+      detailHtml += `<div>pH: ${values.pH}</div>`;
+    }
+
+    // Nitrogen
+    const n = parseFloat(values.nitrogen);
+    if (!isNaN(n)) {
+      if (n < 280) interpHtml += `<div>🟡 ${'नाइट्रोजन कम है।'}</div>`;
+      else interpHtml += `<div>🟢 ${'नाइट्रोजन अच्छा है।'}</div>`;
+      detailHtml += `<div>नाइट्रोजन: ${values.nitrogen}</div>`;
+    }
+
+    // Organic carbon
+    const oc = parseFloat(values.organic_carbon);
+    if (!isNaN(oc)) {
+      if (oc < 0.5) interpHtml += `<div>🟡 ${'जैविक कार्बन कम है।'}</div>`;
+      else interpHtml += `<div>🟢 ${'जैविक कार्बन अच्छा है।'}</div>`;
+      detailHtml += `<div>जैविक कार्बन: ${values.organic_carbon}</div>`;
+    }
+
+    // Potassium
+    const k = parseFloat(values.potassium);
+    if (!isNaN(k)) {
+      if (k > 140) interpHtml += `<div>🟢 ${'पोटाश अच्छा है।'}</div>`;
+      else interpHtml += `<div>🟡 ${'पोटाश कम है।'}</div>`;
+      detailHtml += `<div>पोटाश: ${values.potassium}</div>`;
+    }
+
+    // Phosphorus
+    const p = parseFloat(values.phosphorus);
+    if (!isNaN(p)) {
+      detailHtml += `<div>फॉस्फोरस: ${values.phosphorus}</div>`;
+    }
+
+    interpretation.innerHTML = interpHtml || '<div>मिट्टी का सार तैयार है।</div>';
+    detailed.innerHTML = detailHtml;
+  }
+
+  function saveSoilReport() {
+    const fieldId = document.getElementById('soil-field-select')?.value || '';
+    if (!fieldId) {
+      if (typeof window.showToast === 'function') {
+        window.showToast('खेत चुनें', 'कृपया पहले खेत चुनें।', 'warning');
+      }
+      return;
+    }
+
+    const values = [];
+    SOIL_PARAMETERS.forEach(param => {
+      const input = document.getElementById(`soil-param-${param.key}`);
+      if (input && input.value.trim()) {
+        values.push({
+          parameter_name: param.key,
+          value: input.value.trim(),
+          unit: '',
+          category: '',
+          confidence: 1.0
+        });
+      }
+    });
+
+    const reportData = {
+      farmer_id: 'user',
+      field_id: fieldId,
+      source: 'manual',
+      sample_date: document.getElementById('soil-sample-date')?.value || '',
+      lab_name: document.getElementById('soil-lab-name')?.value || '',
+      confirmed_by_farmer: true,
+      values: values
+    };
+
+    fetch('/api/soil/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(reportData)
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.status === 'success') {
+        if (typeof window.showToast === 'function') {
+          window.showToast('सेव हो गया', 'मिट्टी रिपोर्ट सेव हो गई।', 'success');
+        }
+        showSoilSummary({ ...reportData, values });
+      } else {
+        if (typeof window.showToast === 'function') {
+          window.showToast('त्रुटि', 'सेव करने में समस्या।', 'danger');
+        }
+      }
+    })
+    .catch(err => {
+      console.error('[Soil] Save failed:', err);
+      // Offline: store locally and show summary
+      showSoilSummary({ ...reportData, values });
+    });
+  }
+
+  async function handleSoilFileUpload(file) {
+    showSoilLoading();
+
+    if (!navigator.onLine) {
+      // Offline: go straight to manual form
+      showSoilForm({ status: 'error', values: [] });
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch('/api/soil/extract', {
+        method: 'POST',
+        body: formData
+      });
+
+      const data = await response.json();
+
+      if (data.status === 'success') {
+        showSoilForm(data);
+      } else {
+        showSoilForm({ status: 'error', values: [], sample_date: '', lab_name: '' });
+      }
+    } catch (err) {
+      console.error('[Soil] Extraction failed:', err);
+      showSoilForm({ status: 'error', values: [] });
+    }
+  }
+
+  // Bind soil test buttons
+  function bindSoilTestButtons() {
+    const uploadOption = document.getElementById('soil-option-upload');
+    const cameraOption = document.getElementById('soil-option-camera');
+    const manualOption = document.getElementById('soil-option-manual');
+    const fileInput = document.getElementById('soil-file-input');
+    const cameraInput = document.getElementById('soil-camera-input');
+    const saveBtn = document.getElementById('soil-save-btn');
+    const reuploadBtn = document.getElementById('soil-reupload-btn');
+
+    if (uploadOption && fileInput) {
+      uploadOption.addEventListener('click', () => fileInput.click());
+      fileInput.addEventListener('change', (e) => {
+        if (e.target.files[0]) handleSoilFileUpload(e.target.files[0]);
+      });
+    }
+
+    if (cameraOption && cameraInput) {
+      cameraOption.addEventListener('click', () => cameraInput.click());
+      cameraInput.addEventListener('change', (e) => {
+        if (e.target.files[0]) handleSoilFileUpload(e.target.files[0]);
+      });
+    }
+
+    if (manualOption) {
+      manualOption.addEventListener('click', () => {
+        showSoilForm({ status: 'manual', values: [] });
+      });
+    }
+
+    if (saveBtn) {
+      saveBtn.addEventListener('click', saveSoilReport);
+    }
+
+    if (reuploadBtn) {
+      reuploadBtn.addEventListener('click', showSoilTestHome);
+    }
+  }
+
+  bindSoilTestButtons();
+  document.addEventListener('DOMContentLoaded', bindSoilTestButtons);
 });

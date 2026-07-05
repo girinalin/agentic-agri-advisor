@@ -170,7 +170,9 @@ def register_artifact(
         raise FileNotFoundError(f"Evidence artifact does not exist: {path}")
 
     manifest = load_manifest()
-    artifacts = [a for a in manifest.get("artifacts", []) if a.get("artifactId") != artifact_id]
+    artifacts = [
+        a for a in manifest.get("artifacts", []) if a.get("artifactId") != artifact_id
+    ]
     record = {
         "artifactId": artifact_id,
         "artifactType": artifact_type,
@@ -209,7 +211,9 @@ def validate_manifest(allow_stale: bool = False) -> tuple[bool, list[str]]:
         if artifact.get("sha256") != sha256_file(path):
             errors.append(f"sha256 mismatch for {artifact_id}")
         if not allow_stale and artifact.get("commitSha") != current_commit:
-            errors.append(f"stale artifact for {artifact_id}: {artifact.get('commitSha')}")
+            errors.append(
+                f"stale artifact for {artifact_id}: {artifact.get('commitSha')}"
+            )
         if artifact.get("status") == "PASS" and artifact.get("exitCode") != 0:
             errors.append(f"invalid PASS artifact without zero exit: {artifact_id}")
     return not errors, errors

@@ -1,3 +1,8 @@
+> **⚠️ SUPERSEDED** — This document is kept for historical reference.
+> The authoritative version is now [docs/05-testing/evaluation-and-safety-report.md](05-testing/evaluation-and-safety-report.md).
+
+---
+
 # Evaluation & Safety Kernel — Implementation Report
 
 > Date: 2026-07-03

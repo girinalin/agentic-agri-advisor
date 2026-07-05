@@ -26,3 +26,24 @@ resource "google_storage_bucket" "logs_data_bucket" {
 
   depends_on = [resource.google_project_service.services]
 }
+
+# Bucket for PWA static assets and model files
+resource "google_storage_bucket" "assets_bucket" {
+  name                        = "${var.project_id}-${var.project_name}-assets"
+  location                    = var.region
+  project                     = var.project_id
+  uniform_bucket_level_access = true
+
+  depends_on = [resource.google_project_service.services]
+}
+
+# Firestore database in Native mode
+resource "google_firestore_database" "database" {
+  name                            = "(default)"
+  location_id                     = var.region == "us-east1" ? "nam5" : var.region
+  type                            = "FIRESTORE_NATIVE"
+  point_in_time_recovery_enable   = false
+  delete_protection_state         = "DELETE_PROTECTION_DISABLED"
+
+  depends_on = [resource.google_project_service.services]
+}

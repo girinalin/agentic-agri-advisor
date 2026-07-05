@@ -6,6 +6,7 @@ from mcp.server.fastmcp import FastMCP
 
 mcp = FastMCP("TTS-Voice-Server")
 
+
 @mcp.tool()
 async def text_to_speech(text: str, output_path: str) -> str:
     """Generate audio feedback for the farmer from text.
@@ -29,9 +30,7 @@ async def text_to_speech(text: str, output_path: str) -> str:
             response = client.models.generate_content(
                 model="gemini-2.0-flash",
                 contents=f"Read this text out loud verbatim: {text}",
-                config=types.GenerateContentConfig(
-                    response_modalities=["AUDIO"]
-                )
+                config=types.GenerateContentConfig(response_modalities=["AUDIO"]),
             )
 
             audio_bytes = None
@@ -41,16 +40,21 @@ async def text_to_speech(text: str, output_path: str) -> str:
                     break
 
             if audio_bytes:
-                os.makedirs(os.path.dirname(os.path.abspath(output_path)), exist_ok=True)
+                os.makedirs(
+                    os.path.dirname(os.path.abspath(output_path)), exist_ok=True
+                )
                 with open(output_path, "wb") as f:
                     f.write(audio_bytes)
-                return f"Successfully generated Gemini Speech audio file at: {output_path}"
+                return (
+                    f"Successfully generated Gemini Speech audio file at: {output_path}"
+                )
         except Exception as e:
             print(f"Gemini Audio Generation failed: {e}. Falling back to gTTS.")
 
     try:
         from gtts import gTTS
-        tts = gTTS(text=text, lang='en')
+
+        tts = gTTS(text=text, lang="en")
         os.makedirs(os.path.dirname(os.path.abspath(output_path)), exist_ok=True)
         tts.save(output_path)
         return f"Generated speech audio file via gTTS at: {output_path}"

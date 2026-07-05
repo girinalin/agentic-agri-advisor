@@ -1,5 +1,6 @@
 # Placeholder tools for market advisor
 
+
 def get_commodity_price(crop_name: str, region: str) -> dict:
     """Retrieve the current market price for a specific crop and region.
 

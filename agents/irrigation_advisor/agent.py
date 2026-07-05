@@ -17,4 +17,3 @@ irrigation_advisor_agent = Agent(
     ),
     tools=[get_ui_schema],
 )
-

@@ -29,5 +29,5 @@ class WeatherImpactSimulator:
             "temp_c": round(self.current_temp, 1),
             "humidity": round(self.current_humidity, 1),
             "rain_mm": round(self.current_rain, 1),
-            "anomalies": anomalies
+            "anomalies": anomalies,
         }

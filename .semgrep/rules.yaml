@@ -1,0 +1,38 @@
+# Semgrep security rules for Agentic Agriculture Advisor
+# Based on secure-agent-lab patterns + agri-specific threats
+
+rules:
+  # --- Secret Detection ---
+  - id: detect-hardcoded-google-api-key
+    pattern-regex: 'AIzaSy[A-Za-z0-9_\-]*'
+    message: "CRITICAL: Hardcoded Google API key detected. Use environment variables instead."
+    languages: [python, javascript]
+    severity: ERROR
+
+  - id: detect-gemini-key-assignment
+    pattern-regex: 'GEMINI_API_KEY\s*=\s*[A-Za-z0-9]{20,}'
+    message: "CRITICAL: Hardcoded Gemini API key in source code. Move to .env file."
+    languages: [python, javascript]
+    severity: ERROR
+
+  - id: detect-data-gov-key-assignment
+    pattern-regex: 'DATA_GOV_IN_API_KEY\s*=\s*[A-Za-z0-9]{30,}'
+    message: "CRITICAL: Hardcoded data.gov.in API key detected. Use environment variables."
+    languages: [python]
+    severity: ERROR
+
+  # --- Safety Kernel Bypass ---
+  - id: detect-safety-kernel-bypass
+    pattern-regex: 'safety_before_agent\s*=\s*None|safety_after_agent\s*=\s*None'
+    message: "CRITICAL: Safety kernel bypass detected. Never disable safety callbacks."
+    languages: [python]
+    severity: ERROR
+
+  # --- SQL Injection ---
+  - id: detect-raw-sql-fstring
+    pattern: execute($SQL)
+    message: "Check SQL execution for injection — use parameterized queries."
+    languages: [python]
+    severity: WARNING
+    metadata:
+      note: "Review SQL queries for f-string usage"

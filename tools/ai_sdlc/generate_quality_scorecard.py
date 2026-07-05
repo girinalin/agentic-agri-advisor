@@ -1,5 +1,6 @@
-import os
 import json
+import os
+
 
 def generate_scorecard():
     scorecard = {
@@ -14,19 +15,20 @@ def generate_scorecard():
         "Localization": "PASS",
         "Offline Reliability": "PASS",
         "DevOps": "PASS",
-        "Documentation": "PASS"
+        "Documentation": "PASS",
     }
-    
+
     md = "# AI-SDLC Quality Scorecard\n\n"
     md += "| Category | Status | Details |\n"
     md += "| --- | --- | --- |\n"
     for cat, status in scorecard.items():
         md += f"| {cat} | **{status}** | Fully verified by automated pre-PR gates. |\n"
-        
-    os.makedirs('.ai-sdlc/reports', exist_ok=True)
-    with open('.ai-sdlc/reports/quality-scorecard.md', 'w', encoding='utf-8') as f:
+
+    os.makedirs(".ai-sdlc/reports", exist_ok=True)
+    with open(".ai-sdlc/reports/quality-scorecard.md", "w", encoding="utf-8") as f:
         f.write(md)
     print("✅ Quality scorecard generated successfully.")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     generate_scorecard()

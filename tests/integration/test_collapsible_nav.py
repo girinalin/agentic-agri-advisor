@@ -22,6 +22,7 @@ def test_collapsible_nav_elements_served(server_fixture) -> None:
     assert 'id="evaluation-canvas"' in html_content
     assert 'id="audit-canvas"' in html_content
 
+
 def test_observability_logs_endpoint(server_fixture) -> None:
     """Verify that the observability logs retrieval API works."""
     payload = {
@@ -33,9 +34,11 @@ def test_observability_logs_endpoint(server_fixture) -> None:
         "route": "local",
         "safety_decision": "allowed",
         "latency": 0.12,
-        "device_tier": "Chromebook"
+        "device_tier": "Chromebook",
     }
-    res_post = requests.post(f"{BASE_URL}/api/observability/log", json=payload, timeout=10)
+    res_post = requests.post(
+        f"{BASE_URL}/api/observability/log", json=payload, timeout=10
+    )
     assert res_post.status_code == 200
 
     res_get = requests.get(f"{BASE_URL}/api/observability/logs", timeout=10)

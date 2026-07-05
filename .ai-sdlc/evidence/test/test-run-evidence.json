@@ -1,0 +1,12 @@
+{
+  "agent": "Test Agent",
+  "agentId": "test",
+  "status": "FAIL",
+  "toolsRun": [
+    "test-generation",
+    "test-execution"
+  ],
+  "toolsPassed": 0,
+  "toolsTotal": 2,
+  "timestamp": "2026-07-04T23:46:12.247107+00:00"
+}

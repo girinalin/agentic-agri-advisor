@@ -34,7 +34,10 @@ market_advisor_agent = Agent(
         "7. For cotton, note that prices are per quintal of lint cotton, not raw kapas. "
         "For sugarcane, the price is based on raw sugar futures as a market indicator."
     ),
-    tools=[fetch_commodity_price, fetch_mandi_prices, refresh_market_schema, get_ui_schema],
+    tools=[
+        fetch_commodity_price,
+        fetch_mandi_prices,
+        refresh_market_schema,
+        get_ui_schema,
+    ],
 )
-
-

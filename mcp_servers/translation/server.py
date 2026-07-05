@@ -6,17 +6,10 @@ from mcp.server.fastmcp import FastMCP
 mcp = FastMCP("Translation-Server")
 
 MOCK_TRANSLATIONS = {
-    "es": {
-        "hello": "hola",
-        "water": "agua",
-        "corn": "maíz"
-    },
-    "sw": {
-        "hello": "jambo",
-        "water": "maji",
-        "corn": "mahindi"
-    }
+    "es": {"hello": "hola", "water": "agua", "corn": "maíz"},
+    "sw": {"hello": "jambo", "water": "maji", "corn": "mahindi"},
 }
+
 
 @mcp.tool()
 async def translate_text(text: str, target_lang: str) -> str:
@@ -40,8 +33,7 @@ async def translate_text(text: str, target_lang: str) -> str:
         try:
             prompt = f"Translate the following text to language code '{target_lang}'. Output only the translation: {text}"
             response = client.models.generate_content(
-                model="gemini-2.5-flash",
-                contents=prompt
+                model="gemini-2.5-flash", contents=prompt
             )
             return response.text.strip()
         except Exception as e:

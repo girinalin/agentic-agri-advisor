@@ -1,5 +1,10 @@
 import sys
-from tests.integration.test_localization import test_translation_keys_defined, parse_js_dict
+
+from tests.integration.test_localization import (
+    parse_js_dict,
+    test_translation_keys_defined,
+)
+
 
 def validate_translations():
     try:
@@ -10,6 +15,7 @@ def validate_translations():
         print(f"❌ Translation validation failed: {e}")
         return False
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     if not validate_translations():
         sys.exit(1)

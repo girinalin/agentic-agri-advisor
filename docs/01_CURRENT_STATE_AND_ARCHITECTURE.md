@@ -1,3 +1,8 @@
+> **⚠️ SUPERSEDED** — This document is kept for historical reference.
+> The authoritative version is now [docs/02-architecture/architecture-overview.md](02-architecture/architecture-overview.md).
+
+---
+
 # Krishi Sampark — Current State & Architecture Alignment
 
 > Date: 2026-07-02

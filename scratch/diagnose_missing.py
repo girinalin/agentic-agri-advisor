@@ -25,7 +25,7 @@ for fname in os.listdir(schema_dir):
         continue
     with open(os.path.join(schema_dir, fname), 'r', encoding='utf-8') as f:
         data = json.load(f)
-        
+
     def recurse(o):
         if isinstance(o, dict):
             for k, v in o.items():

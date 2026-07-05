@@ -22,12 +22,12 @@ class LocalDb {
 
       request.onupgradeneeded = event => {
         const db = event.target.result;
-        
+
         // Store for farmer profile digital twin
         if (!db.objectStoreNames.contains('profile')) {
           db.createObjectStore('profile', { keyPath: 'key' });
         }
-        
+
         // Store for offline conversation records
         if (!db.objectStoreNames.contains('chats')) {
           db.createObjectStore('chats', { keyPath: 'id', autoIncrement: true });

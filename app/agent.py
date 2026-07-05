@@ -15,6 +15,7 @@ if "GOOGLE_API_KEY" in os.environ:
 else:
     try:
         import google.auth
+
         _, project_id = google.auth.default()
         os.environ["GOOGLE_CLOUD_PROJECT"] = project_id
         os.environ["GOOGLE_CLOUD_LOCATION"] = "global"
@@ -31,4 +32,3 @@ app = App(
     root_agent=coordinator_agent,
     name="app",
 )
-

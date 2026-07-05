@@ -14,27 +14,33 @@ def test_phase4_endpoints(server_fixture) -> None:
     assert len(plans_data["plans"]) >= 2  # plans seeded in init_db
 
     # Complete a plan task
-    complete_payload = {
-        "plan_id": "plan_1",
-        "state": "completed"
-    }
-    complete_res = requests.post(f"{BASE_URL}/api/plans/complete", json=complete_payload, headers=HEADERS, timeout=10)
+    complete_payload = {"plan_id": "plan_1", "state": "completed"}
+    complete_res = requests.post(
+        f"{BASE_URL}/api/plans/complete",
+        json=complete_payload,
+        headers=HEADERS,
+        timeout=10,
+    )
     assert complete_res.status_code == 200
     assert complete_res.json()["status"] == "success"
 
     # 2. Test reminders endpoints
-    response_reminders = requests.get(f"{BASE_URL}/api/reminders/planting_1", timeout=10)
+    response_reminders = requests.get(
+        f"{BASE_URL}/api/reminders/planting_1", timeout=10
+    )
     assert response_reminders.status_code == 200
     reminders_data = response_reminders.json()
     assert reminders_data["status"] == "success"
     assert len(reminders_data["reminders"]) >= 1  # reminders seeded in init_db
 
     # Snooze a reminder
-    reminder_payload = {
-        "reminder_id": "rem_1",
-        "state": "snoozed"
-    }
-    reminder_res = requests.post(f"{BASE_URL}/api/reminders/action", json=reminder_payload, headers=HEADERS, timeout=10)
+    reminder_payload = {"reminder_id": "rem_1", "state": "snoozed"}
+    reminder_res = requests.post(
+        f"{BASE_URL}/api/reminders/action",
+        json=reminder_payload,
+        headers=HEADERS,
+        timeout=10,
+    )
     assert reminder_res.status_code == 200
     assert reminder_res.json()["status"] == "success"
 
@@ -53,9 +59,14 @@ def test_phase4_endpoints(server_fixture) -> None:
         "safety_flags": "none",
         "recent_activities": "Watered yesterday",
         "state": "submitted",
-        "expert_response": ""
+        "expert_response": "",
     }
-    esc_res = requests.post(f"{BASE_URL}/api/escalations", json=escalation_payload, headers=HEADERS, timeout=10)
+    esc_res = requests.post(
+        f"{BASE_URL}/api/escalations",
+        json=escalation_payload,
+        headers=HEADERS,
+        timeout=10,
+    )
     assert esc_res.status_code == 200
     assert esc_res.json()["status"] == "success"
 
@@ -74,8 +85,10 @@ def test_phase4_endpoints(server_fixture) -> None:
         "outcome": "improved",
         "time_to_outcome": "3 days",
         "comment": "Leaves look much greener now!",
-        "farmer_confidence": 0.95
+        "farmer_confidence": 0.95,
     }
-    feed_res = requests.post(f"{BASE_URL}/api/feedback", json=feedback_payload, headers=HEADERS, timeout=10)
+    feed_res = requests.post(
+        f"{BASE_URL}/api/feedback", json=feedback_payload, headers=HEADERS, timeout=10
+    )
     assert feed_res.status_code == 200
     assert feed_res.json()["status"] == "success"

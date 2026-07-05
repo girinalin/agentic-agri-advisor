@@ -42,14 +42,34 @@ resource "google_cloud_run_v2_service" "app" {
         name  = "OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT"
         value = "NO_CONTENT"
       }
+
+      env {
+        name  = "USE_FIRESTORE"
+        value = "1"
+      }
+
+      env {
+        name  = "FIRESTORE_PROJECT_ID"
+        value = var.project_id
+      }
+
+      env {
+        name  = "GOOGLE_CLOUD_PROJECT"
+        value = var.project_id
+      }
+
+      env {
+        name  = "GEMINI_API_KEY"
+        value = var.gemini_api_key
+      }
     }
 
     service_account = google_service_account.app_sa.email
     max_instance_request_concurrency = 8
 
     scaling {
-      min_instance_count = 1
-      max_instance_count = 10
+      min_instance_count = 0
+      max_instance_count = 3
     }
 
     session_affinity = true

@@ -240,7 +240,7 @@ os.makedirs('.ai-sdlc/skills', exist_ok=True)
 for dirname, data in skills_data.items():
     sdir = os.path.join('.ai-sdlc/skills', dirname)
     os.makedirs(sdir, exist_ok=True)
-    
+
     skill_md = f"""---
 name: {data['name']}
 description: {data['description']}
@@ -270,7 +270,7 @@ description: {data['description']}
 3. Run validation scripts using permitted tools.
 4. Record performance evidence to `.ai-sdlc/evidence/` directory.
 """
-    
+
     fpath = os.path.join(sdir, 'SKILL.md')
     with open(fpath, 'w', encoding='utf-8') as f:
         f.write(skill_md)

@@ -93,7 +93,7 @@ new_handle_send = """async function handleSend() {
       }
 
       thinkingBubble.remove();
-      
+
       const responseMsg = appendMessage('Coordinator', '', 'agent-msg');
       const textContainer = responseMsg.querySelector('.message-text');
 
@@ -190,7 +190,7 @@ new_handle_send = """async function handleSend() {
       }
 
       const renderedInline = detectAndRenderA2UI(fullResponseText);
-      
+
       if (!renderedInline && window.panelRouter) {
         const targetSchema = window.panelRouter.routeIntent(fullResponseText);
         if (targetSchema) {
@@ -234,7 +234,7 @@ new_left_nav = """function renderLeftNavigation(mode = 'farmer') {
       link.setAttribute('data-tab', item.id);
       link.setAttribute('title', label); // tooltip for collapsed mode
       link.setAttribute('aria-label', label);
-      
+
       const currentActive = localStorage.getItem('nav_route_user') || (mode === 'expert' ? 'console' : 'home');
       if (item.id === currentActive) {
         link.classList.add('active');
@@ -258,7 +258,7 @@ new_left_nav = """function renderLeftNavigation(mode = 'farmer') {
     if (profileName) {
       profileName.textContent = mode === 'expert' ? 'Dr. Agronomist' : 'माधव जी';
     }
-    
+
     // Render the new assistant info pane dynamically
     renderAssistantInfoPane(mode);
   }
@@ -289,7 +289,7 @@ helpers = """  // Extracts JSON blocks from agent response text
   // Render structured JSON response card inside chat bubble
   function renderStructuredResponse(data, container, messageEl) {
     container.innerHTML = '';
-    
+
     if (data.title) {
       const titleDiv = document.createElement('div');
       titleDiv.style.fontWeight = 'bold';
@@ -298,14 +298,14 @@ helpers = """  // Extracts JSON blocks from agent response text
       titleDiv.textContent = data.title;
       container.appendChild(titleDiv);
     }
-    
+
     if (data.summary) {
       const summaryDiv = document.createElement('div');
       summaryDiv.style.marginBottom = '0.5rem';
       summaryDiv.textContent = data.summary;
       container.appendChild(summaryDiv);
     }
-    
+
     if (data.recommendation) {
       const recDiv = document.createElement('div');
       recDiv.style.marginBottom = '0.5rem';
@@ -314,7 +314,7 @@ helpers = """  // Extracts JSON blocks from agent response text
       recDiv.textContent = data.recommendation;
       container.appendChild(recDiv);
     }
-    
+
     if (data.reasons && Array.isArray(data.reasons) && data.reasons.length > 0) {
       const ul = document.createElement('ul');
       ul.style.margin = '5px 0 10px 20px';
@@ -328,7 +328,7 @@ helpers = """  // Extracts JSON blocks from agent response text
       });
       container.appendChild(ul);
     }
-    
+
     if (data.question) {
       const qDiv = document.createElement('div');
       qDiv.style.fontStyle = 'italic';
@@ -336,14 +336,14 @@ helpers = """  // Extracts JSON blocks from agent response text
       qDiv.textContent = data.question;
       container.appendChild(qDiv);
     }
-    
+
     if (data.actions && Array.isArray(data.actions) && data.actions.length > 0) {
       const actionsDiv = document.createElement('div');
       actionsDiv.style.display = 'flex';
       actionsDiv.style.flexWrap = 'wrap';
       actionsDiv.style.gap = '8px';
       actionsDiv.style.marginTop = '10px';
-      
+
       data.actions.forEach(act => {
         const btn = document.createElement('button');
         btn.className = 'a2ui-btn';
@@ -356,7 +356,7 @@ helpers = """  // Extracts JSON blocks from agent response text
         btn.style.cursor = 'pointer';
         btn.style.fontWeight = 'bold';
         btn.textContent = act.label;
-        
+
         btn.addEventListener('click', () => {
           const userInputField = document.getElementById('user-input-field');
           if (userInputField) {
@@ -377,7 +377,7 @@ helpers = """  // Extracts JSON blocks from agent response text
 
     const preferredLang = window.currentLanguageState?.code || 'en';
     const activeField = activeFields.find(f => f.field_id === activeFieldId);
-    
+
     if (mode === 'expert') {
       pane.innerHTML = `
         <div style="font-weight: bold; margin-bottom: 5px; color: var(--accent);">🔬 Specialist Agents Connectivity</div>
@@ -391,17 +391,17 @@ helpers = """  // Extracts JSON blocks from agent response text
     } else {
       const crop = activeField && activeField.planting ? activeField.planting.crop_type : 'Wheat';
       const fieldName = activeField ? activeField.name : 'Nagpur Field';
-      
+
       let cropTr = window.getTranslation('profile.crop.wheat', preferredLang) || 'Wheat';
       if (crop.toLowerCase() === 'corn') {
         cropTr = window.getTranslation('profile.crop.corn', preferredLang) || 'Corn';
       } else if (crop.toLowerCase() === 'soybeans') {
         cropTr = window.getTranslation('profile.crop.soybeans', preferredLang) || 'Soybeans';
       }
-      
+
       const advisory = window.getTranslation('farm.recommendation.desc', preferredLang) || 'Irrigate tomorrow morning.';
       const freshness = window.getTranslation('irrigation.weatherStatus.cached', preferredLang) || 'Cached 3h ago';
-      
+
       pane.innerHTML = `
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; color: var(--text-main);">
           <div><strong>🌾 ${window.getTranslation('profile.crop.label', preferredLang) || 'Crop'}:</strong> ${cropTr}</div>

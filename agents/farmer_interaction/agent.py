@@ -29,4 +29,3 @@ farmer_interaction_agent = Agent(
     ),
     tools=[get_ui_schema, record_farm_activity_details],
 )
-

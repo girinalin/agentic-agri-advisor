@@ -4,6 +4,7 @@ import sqlite3
 DB_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(DB_DIR, "farm_twin.db")
 
+
 def init_database():
     print(f"Initializing database at: {DB_PATH}")
     conn = sqlite3.connect(DB_PATH)
@@ -212,32 +213,60 @@ def init_database():
     """)
 
     # 14. Insert Default Mock Data
-    cursor.execute("INSERT OR REPLACE INTO farmers VALUES ('user', 'Nalin Giri', 'Hindi')")
+    cursor.execute(
+        "INSERT OR REPLACE INTO farmers VALUES ('user', 'Nalin Giri', 'Hindi')"
+    )
 
     # Fields
-    cursor.execute("INSERT OR REPLACE INTO fields VALUES ('field_1', 'user', 'North Hillside', 'Black Clay (Cotton Soil)', 5.0, 'Drip')")
-    cursor.execute("INSERT OR REPLACE INTO fields VALUES ('field_2', 'user', 'Riverbed Meadow', 'Red Sandy Loam', 8.0, 'Sprinkler')")
+    cursor.execute(
+        "INSERT OR REPLACE INTO fields VALUES ('field_1', 'user', 'North Hillside', 'Black Clay (Cotton Soil)', 5.0, 'Drip')"
+    )
+    cursor.execute(
+        "INSERT OR REPLACE INTO fields VALUES ('field_2', 'user', 'Riverbed Meadow', 'Red Sandy Loam', 8.0, 'Sprinkler')"
+    )
 
     # Plantings
-    cursor.execute("INSERT OR REPLACE INTO plantings VALUES ('planting_1', 'field_1', 'Corn', 'PMH-1', '2026-06-01', 'germination', 45.0, 40.0, 100.0)")
-    cursor.execute("INSERT OR REPLACE INTO plantings VALUES ('planting_2', 'field_2', 'Wheat', 'Lokwan', '2026-06-10', 'vegetative', 55.0, 45.0, 95.0)")
+    cursor.execute(
+        "INSERT OR REPLACE INTO plantings VALUES ('planting_1', 'field_1', 'Corn', 'PMH-1', '2026-06-01', 'germination', 45.0, 40.0, 100.0)"
+    )
+    cursor.execute(
+        "INSERT OR REPLACE INTO plantings VALUES ('planting_2', 'field_2', 'Wheat', 'Lokwan', '2026-06-10', 'vegetative', 55.0, 45.0, 95.0)"
+    )
 
     # Activities
-    cursor.execute("INSERT OR REPLACE INTO activities VALUES ('act_1', 'planting_1', 'irrigation', 2.0, 'hours', 'Irrigated North field', '2026-06-25 08:00:00', 1)")
-    cursor.execute("INSERT OR REPLACE INTO activities VALUES ('act_2', 'planting_1', 'fertilization', 10.0, 'kg', 'Applied Urea nitrogen fertilizer', '2026-06-26 09:30:00', 1)")
+    cursor.execute(
+        "INSERT OR REPLACE INTO activities VALUES ('act_1', 'planting_1', 'irrigation', 2.0, 'hours', 'Irrigated North field', '2026-06-25 08:00:00', 1)"
+    )
+    cursor.execute(
+        "INSERT OR REPLACE INTO activities VALUES ('act_2', 'planting_1', 'fertilization', 10.0, 'kg', 'Applied Urea nitrogen fertilizer', '2026-06-26 09:30:00', 1)"
+    )
 
     # Farm Plans
-    cursor.execute("INSERT OR REPLACE INTO farm_plans VALUES ('plan_1', 'planting_1', 'Irrigate North Field', 'Soil moisture low (34%)', 'high', 'before 9 AM', 'North Hillside', 'Agronomist Guideline', 'irrigation_planner', 'active', '2026-07-02 06:00:00')")
-    cursor.execute("INSERT OR REPLACE INTO farm_plans VALUES ('plan_2', 'planting_2', 'Pest Inspection', 'High risk of Aphids forecast due to temperature rise', 'medium', '2:00 PM', 'Riverbed Meadow', 'Edge AI Diagnosis Model', 'pest_alert', 'active', '2026-07-02 06:00:00')")
-    cursor.execute("INSERT OR REPLACE INTO farm_plans VALUES ('plan_3', 'planting_1', 'Postponed Fertilizer Application', 'High wind speed alert (18 km/h) prevents safe chemical spray', 'low', 'evening', 'North Hillside', 'Safety Kernel', 'none', 'active', '2026-07-02 06:00:00')")
+    cursor.execute(
+        "INSERT OR REPLACE INTO farm_plans VALUES ('plan_1', 'planting_1', 'Irrigate North Field', 'Soil moisture low (34%)', 'high', 'before 9 AM', 'North Hillside', 'Agronomist Guideline', 'irrigation_planner', 'active', '2026-07-02 06:00:00')"
+    )
+    cursor.execute(
+        "INSERT OR REPLACE INTO farm_plans VALUES ('plan_2', 'planting_2', 'Pest Inspection', 'High risk of Aphids forecast due to temperature rise', 'medium', '2:00 PM', 'Riverbed Meadow', 'Edge AI Diagnosis Model', 'pest_alert', 'active', '2026-07-02 06:00:00')"
+    )
+    cursor.execute(
+        "INSERT OR REPLACE INTO farm_plans VALUES ('plan_3', 'planting_1', 'Postponed Fertilizer Application', 'High wind speed alert (18 km/h) prevents safe chemical spray', 'low', 'evening', 'North Hillside', 'Safety Kernel', 'none', 'active', '2026-07-02 06:00:00')"
+    )
 
     # Reminders
-    cursor.execute("INSERT OR REPLACE INTO reminders VALUES ('rem_1', 'planting_1', 'irrigation', 'Water Tomato Crop', 'Fruit development water requirements', '08:00 AM', 'Drip Irrigation Controller', 'active', '2026-07-02 06:00:00')")
-    cursor.execute("INSERT OR REPLACE INTO reminders VALUES ('rem_2', 'planting_2', 'pest inspection', 'Check Leaf Spots', 'Common Rust warning from nearby fields', '04:00 PM', 'Agronomist Team', 'active', '2026-07-02 06:00:00')")
+    cursor.execute(
+        "INSERT OR REPLACE INTO reminders VALUES ('rem_1', 'planting_1', 'irrigation', 'Water Tomato Crop', 'Fruit development water requirements', '08:00 AM', 'Drip Irrigation Controller', 'active', '2026-07-02 06:00:00')"
+    )
+    cursor.execute(
+        "INSERT OR REPLACE INTO reminders VALUES ('rem_2', 'planting_2', 'pest inspection', 'Check Leaf Spots', 'Common Rust warning from nearby fields', '04:00 PM', 'Agronomist Team', 'active', '2026-07-02 06:00:00')"
+    )
 
     # Seed Regional Outbreaks
-    cursor.execute("INSERT OR REPLACE INTO regional_outbreaks VALUES ('out_1', 'Corn', 'yellow margins', 'Nagpur', 4, 'under_review', 0, '2026-07-02 06:00:00')")
-    cursor.execute("INSERT OR REPLACE INTO regional_outbreaks VALUES ('out_2', 'Wheat', 'leaf rust', 'Nagpur', 6, 'confirmed', 1, '2026-07-02 06:00:00')")
+    cursor.execute(
+        "INSERT OR REPLACE INTO regional_outbreaks VALUES ('out_1', 'Corn', 'yellow margins', 'Nagpur', 4, 'under_review', 0, '2026-07-02 06:00:00')"
+    )
+    cursor.execute(
+        "INSERT OR REPLACE INTO regional_outbreaks VALUES ('out_2', 'Wheat', 'leaf rust', 'Nagpur', 6, 'confirmed', 1, '2026-07-02 06:00:00')"
+    )
 
     # Seed OKF Governance versioning
     cursor.execute("""
@@ -248,11 +277,14 @@ def init_database():
     """)
 
     # Seed Privacy Preferences
-    cursor.execute("INSERT OR REPLACE INTO privacy_preferences VALUES ('user', 1, 1, 1, 1, 1, 1)")
+    cursor.execute(
+        "INSERT OR REPLACE INTO privacy_preferences VALUES ('user', 1, 1, 1, 1, 1, 1)"
+    )
 
     conn.commit()
     conn.close()
     print("Database initialization completed successfully.")
+
 
 if __name__ == "__main__":
     init_database()

@@ -198,6 +198,33 @@ my_env.tfvars
 .saved_chats
 .env
 .requirements.txt
+
+# === GCP service account keys (never commit) ===
+*-service-account*.json
+*-credentials.json
+gcp-*.json
+google-*.json
+*.p12
+*.pem
+credentials/
+
+# === Terraform state and secrets (never commit) ===
+*.tfstate
+*.tfstate.*
+deployment/terraform/**/.terraform/
+deployment/terraform/**/*.tfvars
+!deployment/terraform/**/vars/env.tfvars.example
+!deployment/terraform/**/vars/env.tfvars
+
+# === Local database (regenerated, not source code) ===
+data/farm_twin.db
+data/*.db-journal
+data/*.db-wal
+data/*.db-shm
+
+# === Secrets ===
+!config/secrets.template.env
+!.env.example
 .google-agents-cli/
 
 # A2A Inspector

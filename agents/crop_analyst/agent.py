@@ -20,5 +20,3 @@ crop_analyst_agent = Agent(
     ),
     tools=[refresh_crop_schema, get_ui_schema],
 )
-
-

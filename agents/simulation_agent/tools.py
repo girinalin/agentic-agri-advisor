@@ -1,7 +1,9 @@
 import os
 import sys
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../simulation")))
+sys.path.append(
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "../../simulation"))
+)
 
 from env import FarmSimulationEnv
 
@@ -19,7 +21,9 @@ def start_new_simulation(crop_type: str = "corn") -> str:
     return f"New farm simulation env initialized for crop '{crop_type}'."
 
 
-def step_farm_simulation(days: int = 1, irrigation_liters: float = 0.0, treatment_applied: bool = False) -> dict:
+def step_farm_simulation(
+    days: int = 1, irrigation_liters: float = 0.0, treatment_applied: bool = False
+) -> dict:
     """Advance the farm simulation loop by N days with optional input actions.
 
     Args:
@@ -33,10 +37,12 @@ def step_farm_simulation(days: int = 1, irrigation_liters: float = 0.0, treatmen
 
     latest_state = {}
     for _ in range(days):
-        latest_state = env_session.step({
-            "irrigation_liters": irrigation_liters,
-            "treatment_applied": treatment_applied
-        })
+        latest_state = env_session.step(
+            {
+                "irrigation_liters": irrigation_liters,
+                "treatment_applied": treatment_applied,
+            }
+        )
 
     return {
         "status": "success",
@@ -48,8 +54,8 @@ def step_farm_simulation(days: int = 1, irrigation_liters: float = 0.0, treatmen
                 "health": h["crop"]["health"],
                 "moisture": h["soil"]["soil_moisture"],
                 "pest_index": h["pest"]["pest_index"],
-                "price": h["market"]["price_usd"]
+                "price": h["market"]["price_usd"],
             }
             for h in env_session.history
-        ]
+        ],
     }

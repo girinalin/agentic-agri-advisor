@@ -84,7 +84,7 @@ class LocalAiEngine {
       }
 
       console.log('[Local AI] Model cache miss. Downloading Gemma-2B IT model from public Google Cloud Storage bucket (~1.4GB)...');
-      
+
       const response = await fetch(MODEL_URL);
       if (!response.ok) throw new Error(`Failed to fetch model: ${response.statusText}`);
 
@@ -99,7 +99,7 @@ class LocalAiEngine {
 
         chunks.push(value);
         receivedLength += value.length;
-        
+
         const percent = Math.round((receivedLength / contentLength) * 100);
         if (this.onProgressCallback) {
           this.onProgressCallback(percent);
@@ -110,7 +110,7 @@ class LocalAiEngine {
       console.log('[Local AI] Compiling download stream chunks...');
       const modelBlob = new Blob(chunks);
       await cache.put(CACHE_KEY, new Response(modelBlob));
-      
+
       console.log('[Local AI] Local Gemma-2B model cached in browser Cache API successfully.');
       this.llmLoaded = true;
       return true;
@@ -151,7 +151,7 @@ class LocalAiEngine {
    */
   async classifyImage(base64Image) {
     await this.loadClassifier();
-    
+
     // In a real local VLM/TFLite, we pass the image tensor. Here we parse features.
     // Return a mocked agronomic disease finding based on active profile values.
     return new Promise(resolve => {
@@ -374,11 +374,11 @@ class LocalAiEngine {
     if (text.includes('pest') || text.includes('insect') || text.includes('disease') || text.includes('borer') || text.includes('rust') || text.includes('aphid') || text.includes('blight') || text.includes('outbreak') || text.includes('pathology')) {
       activeAgent = dict.pathologistName;
       activeSkill = dict.pathologistSkill;
-      
+
       let diseaseMatch = "Maize Stalk Borer Infestation";
       if (text.includes('rust')) diseaseMatch = "Brown Leaf Rust";
       else if (text.includes('aphid')) diseaseMatch = "Aphids";
-      
+
       const rawDiag = okfGuide.diagnostics[diseaseMatch] || {
         symptom: { English: "General crop leaf damage and pest sightings." },
         organic_remedy: { English: "Spray neem oil solution (5ml/L) early in the morning and isolate infected crops." }
@@ -388,14 +388,14 @@ class LocalAiEngine {
       const remedyVal = (rawDiag.organic_remedy && typeof rawDiag.organic_remedy === 'object') ? (rawDiag.organic_remedy[lang] || rawDiag.organic_remedy.English) : rawDiag.organic_remedy;
 
       response = `[Offline AI - ${activeAgent}] ${dict.pranam} ${dict.triggered} **${activeSkill}** ${dict.skillFor} ${okfGuide.metadata.name} ${dict.crop} \n\n📋 **${dict.symptomLabel}:** ${symptomVal}\n🌱 **${dict.organicLabel}:** ${remedyVal}`;
-    } 
+    }
     else if (text.includes('water') || text.includes('irrigate') || text.includes('irrigation') || text.includes('drip') || text.includes('rain') || text.includes('moisture') || text.includes('watering')) {
       activeAgent = dict.irrigatorName;
       activeSkill = dict.irrigatorSkill;
 
       const specs = okfGuide.specifications;
       response = `[Offline AI - ${activeAgent}] ${dict.ramram} **${activeSkill}** ${dict.skillFor} ${okfGuide.metadata.name} ${dict.crop} \n\n💧 **${dict.optimalMoisture}:** ${specs.soil_moisture.optimal_pct}%\n📉 **${dict.criticalLimit}:** ${specs.soil_moisture.min_pct}%\n🧬 **${dict.dripStrategy}:** ${dict.strategyDesc}`;
-    } 
+    }
     else if (text.includes('soil') || text.includes('nutrient') || text.includes('nitrogen') || text.includes('npk') || text.includes('fertilizer') || text.includes('manure') || text.includes('compost')) {
       activeAgent = dict.analystName;
       activeSkill = dict.analystSkill;
@@ -403,7 +403,7 @@ class LocalAiEngine {
       const specs = okfGuide.specifications;
       const NPK = specs.npk_ratio;
       response = `[Offline AI - ${activeAgent}] ${dict.namaste} **${activeSkill}** ${dict.skillFor} ${okfGuide.metadata.name} ${dict.crop} \n\n🧪 **${dict.targetNpk}:** ${dict.nitrogen}: ${NPK.nitrogen_ppm}, ${dict.phosphorus}: ${NPK.phosphorus_ppm}, ${dict.potassium}: ${NPK.potassium_ppm}\n🧪 **${dict.optimalPh}:** ${specs.optimal_soil_ph}`;
-    } 
+    }
     else {
       activeAgent = dict.coordinatorName;
       activeSkill = dict.coordinatorSkill;

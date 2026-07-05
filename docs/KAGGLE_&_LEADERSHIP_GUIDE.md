@@ -1,7 +1,12 @@
+> **⚠️ SUPERSEDED** — This document is kept for historical reference.
+> The authoritative version is now [docs/08-roadmap/kaggle-capstone-submission-guide.md](08-roadmap/kaggle-capstone-submission-guide.md).
+
+---
+
 # 🌾 Krishi Sampark (Krishi Sastri): Project Presentation & Capstone Submission Guide
-**Target Audience:** Kaggle Capstone Reviewers & Corporate Executive Leadership  
-**Author:** Capstone Project Team  
-**Architecture Framework:** Google ADK & Antigravity SDK  
+**Target Audience:** Kaggle Capstone Reviewers & Corporate Executive Leadership
+**Author:** Capstone Project Team
+**Architecture Framework:** Google ADK & Antigravity SDK
 
 ---
 

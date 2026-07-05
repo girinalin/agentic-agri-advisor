@@ -21,10 +21,12 @@ STREAM_URL = BASE_URL + "/run_sse"
 FEEDBACK_URL = BASE_URL + "/feedback"
 HEADERS = {"Content-Type": "application/json"}
 
+
 def log_output(pipe: Any, log_func: Any) -> None:
     """Log the output from the given pipe."""
     for line in iter(pipe.readline, ""):
         log_func(line.strip())
+
 
 def start_server() -> subprocess.Popen[str]:
     """Start the FastAPI server using subprocess and log its output."""
@@ -59,6 +61,7 @@ def start_server() -> subprocess.Popen[str]:
 
     return process
 
+
 def wait_for_server(timeout: int = 90, interval: int = 1) -> bool:
     """Wait for the server to be ready."""
     start_time = time.time()
@@ -74,18 +77,24 @@ def wait_for_server(timeout: int = 90, interval: int = 1) -> bool:
     logger.error(f"Server did not become ready within {timeout} seconds")
     return False
 
+
 @pytest.fixture(scope="session")
 def server_fixture(request: Any) -> Iterator[subprocess.Popen[str]]:
     """Pytest fixture to start and stop the server for testing."""
     logger.info("Purging database file before E2E tests")
-    db_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "data", "farm_twin.db"))
+    db_path = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), "..", "..", "data", "farm_twin.db")
+    )
     if os.path.exists(db_path):
         try:
             os.remove(db_path)
-            logger.info(f"Successfully deleted database file at {db_path} for fresh test run")
+            logger.info(
+                f"Successfully deleted database file at {db_path} for fresh test run"
+            )
         except Exception as e:
             logger.error(f"Failed to delete database file: {e}")
     from data.init_db import init_database
+
     init_database()
     logger.info("Starting server process")
     server_process = start_server()

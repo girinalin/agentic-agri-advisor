@@ -1,0 +1,124 @@
+# Browser Testing Guide
+
+> **Status:** Active
+> **Last Updated:** 2026-07-04
+> **Owner:** Engineering / QA
+
+---
+
+## Setup
+
+1. Start both servers:
+```bash
+uv run uvicorn app.fast_api_app:app --port 8000 &
+uv run python -m app.agent &
+```
+
+2. Open the app in VS Code integrated browser or Chrome:
+```
+http://localhost:8000/agui/index.html
+```
+
+3. Use cache-busting URL parameter when testing updates:
+```
+http://localhost:8000/agui/index.html?cb={timestamp}
+```
+
+## Test Matrix
+
+### Language & Navigation
+
+| Test | Steps | Expected | Status |
+|------|-------|----------|--------|
+| Language switch | Change dropdown to English | All UI text in English instantly | ✅ |
+| Hindi nav labels | Set language to Hindi | नेवि labels: होम, मेरा खेत, मिट्टी जांच, पूछें | ✅ |
+| Telugu script purity | Set to Telugu, check all text | Zero Devanagari characters | ✅ |
+| nav_soil translation | Click 🧪 in nav | Shows "मिट्टी जांच" not "nav_soil" | ✅ |
+| Cache invalidation | Update JS, reload with ?cb=N | New JS loaded (not cached) | ✅ |
+
+### Voice
+
+| Test | Steps | Expected | Status |
+|------|-------|----------|--------|
+| STT Hindi | Tap 🎙️, speak Hindi | Transcription appears in chat input | ✅ |
+| TTS auto-read | Send query, wait for response | Response read aloud in Hindi | ✅ |
+| TTS language | Switch to Swahili, send query | TTS reads in Swahili (Rafiki voice) | ✅ |
+| Mic state | After response, check mic | Mic shows inactive (not always-on) | ✅ |
+| TTS scope | Response in chat panel | Only reads chat panel content, not other panes | ✅ |
+
+### Advisor Flow
+
+| Test | Steps | Expected | Status |
+|------|-------|----------|--------|
+| Sastri card | Nav → पूछें → tap Sastri | Chat opens with Sastri persona | ✅ |
+| Visheshagya card | Tap Visheshagya | Chat opens with expert mode | ✅ |
+| Escalation prompt | Ask complex question in Sastri | Shows "कृषि विशेषज्ञ से सलाह लें?" | ✅ |
+| Expert form | Click हाँ on escalation | Expert form opens (crop, symptom, photo) | ✅ |
+
+### Soil Test
+
+| Test | Steps | Expected | Status |
+|------|-------|----------|--------|
+| Nav to soil | Click 🧪 मिट्टी जांच | 3 options: upload, camera, manual | ✅ |
+| Manual entry | Click ✏️ मान खुद भरें | Form with field dropdown + 13 fields | ✅ |
+| Field dropdown | Click field selector | Shows "North Hillside (Corn)" and "Riverbed Meadow (Wheat)" | ✅ |
+| Save without field | Fill values, click save without selecting field | Toast: "⚠️ खेत चुनें" | ✅ |
+| Save with field | Select field, fill values, save | Toast: "✅ सेव हो गया" + summary screen | ✅ |
+| Summary interpretations | View summary | Color-coded: 🟢/🟡/🔴 for each parameter | ✅ |
+| Expandable details | Click "विस्तृत जानकारी" | Shows pH, N, P, K, OC values | ✅ |
+
+### Photo Diagnosis
+
+| Test | Steps | Expected | Status |
+|------|-------|----------|--------|
+| Camera capture | Nav → फोटो जांच → capture | Image captured from rear camera | ✅ |
+| File upload | Use file upload fallback | Image loaded | ✅ |
+| Classification | Submit photo | Disease label + confidence returned | ✅ (color heuristic fallback) |
+| Expert delegation | Click "विशेषज्ञ को भेजें" | Routes to expert mode | ✅ |
+
+### Market Prices
+
+| Test | Steps | Expected | Status |
+|------|-------|----------|--------|
+| Price table | Nav → मंडी भाव | Table with 6 crops and prices | ✅ |
+| Currency format | Check prices | Shows ₹ for India, KSh for Kenya | ✅ |
+
+### Offline
+
+| Test | Steps | Expected | Status |
+|------|-------|----------|--------|
+| Airplane mode | Enable, reload app | App loads from cache | ✅ |
+| Offline query | Ask "गेहूँ के लिए पानी" | Rule-based response from OKF cache | ✅ |
+| Activity queue | Log activity offline | Queued in IndexedDB | ✅ |
+| Sync on reconnect | Disable airplane mode | Queue syncs to server | ✅ |
+
+## API Testing
+
+```bash
+# Profile
+curl -s http://localhost:8000/api/profile/user | python3 -m json.tool
+
+# Weather
+curl -s "http://localhost:8000/api/weather?lat=21.15&lon=79.09" | python3 -m json.tool
+
+# Market
+curl -s http://localhost:8000/api/market/price/corn | python3 -m json.tool
+
+# Soil save
+curl -s -X POST http://localhost:8000/api/soil/save \
+  -H "Content-Type: application/json" \
+  -d '{"field_id":"field_1","values":{"ph":7.2,"nitrogen":280,"potassium":140}}' | python3 -m json.tool
+
+# Soil latest
+curl -s http://localhost:8000/api/soil/latest/field_1 | python3 -m json.tool
+
+# Safety validate
+curl -s -X POST http://localhost:8000/api/safety/validate \
+  -H "Content-Type: application/json" \
+  -d '{"chemical":"imidacloprid","dosage":"10ml/L","crop":"cotton"}' | python3 -m json.tool
+```
+
+## Related Documents
+
+- [Test Strategy](test-strategy.md)
+- [Development Guide](../04-engineering/development-guide.md)

@@ -13,24 +13,25 @@ Run: uv run python -m pytest tests/unit/test_safety_kernel.py -v
 """
 
 import json
-import sys
 import os
+import sys
 from pathlib import Path
 
 # Ensure project root on path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
 import pytest
+
 from safety_kernel import (
-    validate_recommendation,
-    get_pending_escalations,
     create_escalation,
+    get_pending_escalations,
+    validate_recommendation,
 )
 from safety_kernel.kernel import (
-    PesticideLimits,
     BANNED_CHEMICALS,
-    _detect_chemicals,
+    PesticideLimits,
     _check_dosage_against_okf,
+    _detect_chemicals,
 )
 
 
@@ -40,7 +41,9 @@ class TestBannedChemicals:
     def test_endosulfan_is_blocked(self):
         """Endosulfan is banned and must never be recommended."""
         text = "You can use endosulfan to control rice stem borer effectively."
-        result = validate_recommendation(text, farmer_name="Test Farmer", query="pest control")
+        result = validate_recommendation(
+            text, farmer_name="Test Farmer", query="pest control"
+        )
         assert not result["is_safe"], "Endosulfan should make recommendation unsafe"
         assert "endosulfan" in result["banned_chemicals"]
         assert any(v["type"] == "banned_chemical" for v in result["violations"])
@@ -57,7 +60,9 @@ class TestBannedChemicals:
         for chem in BANNED_CHEMICALS:
             text = f"I recommend using {chem} for your crop."
             result = validate_recommendation(text)
-            assert chem in result["banned_chemicals"], f"{chem} should be detected as banned"
+            assert chem in result["banned_chemicals"], (
+                f"{chem} should be detected as banned"
+            )
 
     def test_safe_recommendation_passes(self):
         """A recommendation with no chemicals should pass safety check."""
@@ -76,7 +81,9 @@ class TestBannedChemicals:
     def test_escalation_created_for_banned_chemical(self):
         """Banned chemical recommendation should create an escalation."""
         text = "Use endosulfan for your pest problem."
-        result = validate_recommendation(text, farmer_name="Test Farmer", query="pest control")
+        result = validate_recommendation(
+            text, farmer_name="Test Farmer", query="pest control"
+        )
         assert result["escalation"] is not None
         assert result["escalation"]["reason"] == "banned_chemical"
         assert result["escalation"]["status"] == "pending"
@@ -107,7 +114,9 @@ class TestDosageViolations:
         """1 g/liter carbendazim is at the OKF max and should pass."""
         text = "Apply carbendazim at 1 g per liter for rust control."
         result = validate_recommendation(text)
-        assert result["is_safe"], f"1 g/liter carbendazim should be safe: {result['violations']}"
+        assert result["is_safe"], (
+            f"1 g/liter carbendazim should be safe: {result['violations']}"
+        )
 
 
 class TestPHIViolations:
@@ -150,6 +159,7 @@ class TestEscalationQueue:
     def test_resolve_escalation(self):
         """Resolving an escalation should update its status."""
         from safety_kernel import resolve_escalation
+
         esc = create_escalation("Test", "query", "test_reason")
         result = resolve_escalation(
             escalation_id=esc["escalation_id"],

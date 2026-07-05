@@ -17,21 +17,31 @@ import os
 from dataclasses import dataclass, field
 from typing import Optional
 
-
 # ---- ADK callback exports (Task 0.1) ----
 from safety_kernel.kernel import (
-    safety_before_agent,
-    safety_after_agent,
-    validate_recommendation,
     create_escalation,
     get_pending_escalations,
     resolve_escalation,
+    safety_after_agent,
+    safety_before_agent,
+    validate_recommendation,
 )
 
-
 EMERGENCY_PATTERNS: set[str] = {
-    "poison", "poisoning", "toxic", "vomit", "vomiting", "dizzy", "dizziness",
-    "hospital", "doctor", "medical", "swallowed", "inhaled", "burn", "rash"
+    "poison",
+    "poisoning",
+    "toxic",
+    "vomit",
+    "vomiting",
+    "dizzy",
+    "dizziness",
+    "hospital",
+    "doctor",
+    "medical",
+    "swallowed",
+    "inhaled",
+    "burn",
+    "rash",
 }
 
 SAFETY_KEYWORDS: dict[str, dict[str, str]] = {
@@ -42,9 +52,11 @@ SAFETY_KEYWORDS: dict[str, dict[str, str]] = {
     "dichlorvos": {"level": "critical"},
 }
 
+
 @dataclass
 class SafetyCheck:
     """Result of a safety evaluation on an agent response."""
+
     safe: bool = True
     flags: list[str] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
@@ -58,7 +70,9 @@ class SafetyCheck:
         self.warnings.append(warning)
 
 
-def check_response_safety(response_text: str, safety_rules_context: dict = None) -> SafetyCheck:
+def check_response_safety(
+    response_text: str, safety_rules_context: dict = None
+) -> SafetyCheck:
     """Evaluate agent response against OKF safety rules.
 
     Args:
@@ -94,15 +108,26 @@ def check_response_safety(response_text: str, safety_rules_context: dict = None)
     # ---- DOSAGE CHECKS for chemical treatments ----
     if any(kw in text_lower for kw in ["pesticide", "fungicide", "insecticide"]):
         # Check if response includes proper dosage guidance
-        has_dosage = any(phrase in text_lower for phrase in [
-            "follow label", "label instructions", "as per label",
-            "manufacturer instructions", "recommended dosage"
-        ])
+        has_dosage = any(
+            phrase in text_lower
+            for phrase in [
+                "follow label",
+                "label instructions",
+                "as per label",
+                "manufacturer instructions",
+                "recommended dosage",
+            ]
+        )
 
-        has_phil = any(phrase in text_lower for phrase in [
-            "pre-harvest", "harvest interval", "phi",
-            "wait before harvest"
-        ])
+        has_phil = any(
+            phrase in text_lower
+            for phrase in [
+                "pre-harvest",
+                "harvest interval",
+                "phi",
+                "wait before harvest",
+            ]
+        )
 
         if not has_dosage:
             check.add_flag("MISSING_DOSAGE_WARNING")
@@ -129,7 +154,9 @@ def check_response_safety(response_text: str, safety_rules_context: dict = None)
     return check
 
 
-def sanitize_response(response_text: str, safety_rules_context: dict = None) -> tuple[str, SafetyCheck]:
+def sanitize_response(
+    response_text: str, safety_rules_context: dict = None
+) -> tuple[str, SafetyCheck]:
     """Fully sanitize an agent response — return safe version + check result.
 
     Args:
@@ -191,18 +218,18 @@ if __name__ == "__main__":
         # Test 1: Missing dosage info with pesticide mention
         (
             "Apply carbendazim fungicide at 2g per liter of water. Spray weekly.",
-            "⚠️ This should trigger MISSING_DOSAGE_WARNING"
+            "⚠️ This should trigger MISSING_DOSAGE_WARNING",
         ),
         # Test 2: Proper dosage with label instructions
         (
             "Apply carbendazim fungicide following the product label instructions. "
             "The recommended dosage is 2g per liter of water.",
-            "✅ Should be mostly safe with proper label reference"
+            "✅ Should be mostly safe with proper label reference",
         ),
         # Test 3: Banned chemical mention
         (
             "Use carbofuran 3G for pest control. It's very effective.",
-            "❌ Should trigger CRITICAL_CHEMICAL flag"
+            "❌ Should trigger CRITICAL_CHEMICAL flag",
         ),
     ]
 

@@ -28,7 +28,7 @@ badge_func = """  // Update sync queue badge count
   async function updateSyncBadge() {
     const badge = document.getElementById('sync-queue-badge');
     if (!badge) return;
-    
+
     try {
       const count = await localDb.getPendingSyncCount();
       if (count > 0) {

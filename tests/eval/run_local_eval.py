@@ -30,7 +30,9 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 
-async def run_single_eval_case(agent, runner, session_service, eval_case: dict, case_idx: int, total: int) -> dict:
+async def run_single_eval_case(
+    agent, runner, session_service, eval_case: dict, case_idx: int, total: int
+) -> dict:
     """Run a single eval case through the ADK runner and capture the trace."""
 
     case_id = eval_case.get("eval_case_id", f"case_{case_idx}")
@@ -79,7 +81,9 @@ async def run_single_eval_case(agent, runner, session_service, eval_case: dict, 
         ):
             turn_data = {
                 "author": getattr(event, "author", "unknown"),
-                "is_final": event.is_final_response() if hasattr(event, "is_final_response") else False,
+                "is_final": event.is_final_response()
+                if hasattr(event, "is_final_response")
+                else False,
                 "content": "",
                 "tool_calls": [],
             }
@@ -95,7 +99,11 @@ async def run_single_eval_case(agent, runner, session_service, eval_case: dict, 
                     # Capture tool/function calls
                     if hasattr(part, "function_call") and part.function_call:
                         fc = part.function_call
-                        tool_name = getattr(fc, "name", str(fc.get("name", ""))) if isinstance(fc, dict) else getattr(fc, "name", "")
+                        tool_name = (
+                            getattr(fc, "name", str(fc.get("name", "")))
+                            if isinstance(fc, dict)
+                            else getattr(fc, "name", "")
+                        )
                         tool_calls.append(tool_name)
                         turn_data["tool_calls"].append(tool_name)
 
@@ -129,7 +137,9 @@ async def run_single_eval_case(agent, runner, session_service, eval_case: dict, 
 
     status = "✅" if result["success"] else "❌"
     tools_str = f" tools=[{', '.join(tool_calls)}]" if tool_calls else " (no tools)"
-    print(f"  {status} {tools_str} response: {response_text[:120]}{'...' if len(response_text) > 120 else ''}")
+    print(
+        f"  {status} {tools_str} response: {response_text[:120]}{'...' if len(response_text) > 120 else ''}"
+    )
 
     return result
 
@@ -143,14 +153,15 @@ async def generate_traces(dataset_path: str, output_path: str) -> str:
 
     eval_cases = dataset.get("eval_cases", [])
     total = len(eval_cases)
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print(f"  LOCAL EVAL GENERATE — {total} cases")
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
 
     # Import the coordinator agent (triggers safety kernel load)
-    from agents.coordinator.agent import coordinator_agent
     from google.adk.runners import Runner
     from google.adk.sessions import InMemorySessionService
+
+    from agents.coordinator.agent import coordinator_agent
 
     session_service = InMemorySessionService()
     runner = Runner(
@@ -170,7 +181,12 @@ async def generate_traces(dataset_path: str, output_path: str) -> str:
     # Save traces
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     with open(output_path, "w", encoding="utf-8") as f:
-        json.dump({"generated_at": datetime.now().isoformat(), "traces": traces}, f, indent=2, ensure_ascii=False)
+        json.dump(
+            {"generated_at": datetime.now().isoformat(), "traces": traces},
+            f,
+            indent=2,
+            ensure_ascii=False,
+        )
 
     succeeded = sum(1 for t in traces if t["success"])
     failed = total - succeeded
@@ -206,9 +222,9 @@ def grade_traces(traces_path: str, output_path: str) -> str:
     ]
 
     grade_results = []
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print(f"  LOCAL EVAL GRADE — {len(traces)} traces, {len(metrics)} metrics")
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
 
     for trace in traces:
         case_id = trace["eval_case_id"]
@@ -225,12 +241,14 @@ def grade_traces(traces_path: str, output_path: str) -> str:
         if error:
             for m in metrics:
                 scores[m] = {"score": 1, "explanation": f"Agent errored: {error[:200]}"}
-            grade_results.append({
-                "eval_case_id": case_id,
-                "category": category,
-                "scores": scores,
-                "overall": 1,
-            })
+            grade_results.append(
+                {
+                    "eval_case_id": case_id,
+                    "category": category,
+                    "scores": scores,
+                    "overall": 1,
+                }
+            )
             print(f"  ❌ {case_id} — agent error, all scores = 1")
             continue
 
@@ -341,18 +359,23 @@ Respond with ONLY the JSON object."""
                         "explanation": score_data.get("explanation", ""),
                     }
                 else:
-                    scores[metric] = {"score": 3, "explanation": f"Could not parse judge response: {raw[:200]}"}
+                    scores[metric] = {
+                        "score": 3,
+                        "explanation": f"Could not parse judge response: {raw[:200]}",
+                    }
             except Exception as e:
                 scores[metric] = {"score": 0, "explanation": f"Grading error: {e}"}
 
         # Calculate overall score
         avg = sum(s["score"] for s in scores.values()) / len(scores) if scores else 0
-        grade_results.append({
-            "eval_case_id": case_id,
-            "category": category,
-            "scores": scores,
-            "overall": round(avg, 2),
-        })
+        grade_results.append(
+            {
+                "eval_case_id": case_id,
+                "category": category,
+                "scores": scores,
+                "overall": round(avg, 2),
+            }
+        )
 
         score_str = " | ".join(f"{m}={s['score']}" for m, s in scores.items())
         status = "✅" if avg >= 3.5 else "⚠️" if avg >= 2.5 else "❌"
@@ -361,11 +384,16 @@ Respond with ONLY the JSON object."""
     # Save grade results
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     with open(output_path, "w", encoding="utf-8") as f:
-        json.dump({
-            "graded_at": datetime.now().isoformat(),
-            "metrics": metrics,
-            "results": grade_results,
-        }, f, indent=2, ensure_ascii=False)
+        json.dump(
+            {
+                "graded_at": datetime.now().isoformat(),
+                "metrics": metrics,
+                "results": grade_results,
+            },
+            f,
+            indent=2,
+            ensure_ascii=False,
+        )
 
     # Generate human-readable report
     report_path = output_path.replace(".json", ".txt")
@@ -430,7 +458,9 @@ def generate_report(grade_results: list, traces: list, report_path: str):
     lines.append("  " + "-" * 50)
     for r in grade_results:
         if r["overall"] < 2.5:
-            lines.append(f"  ❌ {r['eval_case_id']} ({r['category']}) — overall={r['overall']:.1f}")
+            lines.append(
+                f"  ❌ {r['eval_case_id']} ({r['category']}) — overall={r['overall']:.1f}"
+            )
             for m, s in r["scores"].items():
                 if s["score"] <= 2:
                     lines.append(f"      {m}: {s['score']} — {s['explanation'][:120]}")
@@ -444,15 +474,31 @@ def generate_report(grade_results: list, traces: list, report_path: str):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Local eval runner for Agentic Agriculture Advisor")
-    parser.add_argument("--dataset", default="tests/eval/datasets/agri-dataset.json", help="Path to eval dataset JSON")
-    parser.add_argument("--output-dir", default="artifacts", help="Output directory for traces and grades")
-    parser.add_argument("--grade-only", default=None, help="Skip generation, grade existing traces file")
+    parser = argparse.ArgumentParser(
+        description="Local eval runner for Agentic Agriculture Advisor"
+    )
+    parser.add_argument(
+        "--dataset",
+        default="tests/eval/datasets/agri-dataset.json",
+        help="Path to eval dataset JSON",
+    )
+    parser.add_argument(
+        "--output-dir",
+        default="artifacts",
+        help="Output directory for traces and grades",
+    )
+    parser.add_argument(
+        "--grade-only", default=None, help="Skip generation, grade existing traces file"
+    )
     args = parser.parse_args()
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    traces_path = os.path.join(args.output_dir, "traces", f"local_traces_{timestamp}.json")
-    grades_path = os.path.join(args.output_dir, "grade_results", f"local_grades_{timestamp}.json")
+    traces_path = os.path.join(
+        args.output_dir, "traces", f"local_traces_{timestamp}.json"
+    )
+    grades_path = os.path.join(
+        args.output_dir, "grade_results", f"local_grades_{timestamp}.json"
+    )
 
     if args.grade_only:
         grade_traces(args.grade_only, grades_path)

@@ -22,16 +22,16 @@ import sys
 def validate_a2ui_schemas():
     schema_dir = 'ui/schemas'
     errors = []
-    
+
     approved_components = {
         "text", "grid", "metric", "chart", "form", "input", "button", "section", "card",
         "option_grid", "metric_card", "alert_card", "action_bar", "status_card"
     }
-    
+
     if not os.path.exists(schema_dir):
         print(f"Schema directory {schema_dir} does not exist.")
         return False
-        
+
     for fname in os.listdir(schema_dir):
         if not fname.endswith('.json'):
             continue
@@ -39,11 +39,11 @@ def validate_a2ui_schemas():
         try:
             with open(fpath, 'r', encoding='utf-8') as f:
                 data = json.load(f)
-            
+
             if 'type' not in data:
                 errors.append(f"{fname}: Missing root 'type'")
                 continue
-                
+
             def check_components(o):
                 if isinstance(o, dict):
                     if 'type' in o and o['type'] not in approved_components:
@@ -58,18 +58,18 @@ def validate_a2ui_schemas():
                 elif isinstance(o, list):
                     for item in o:
                         check_components(item)
-                        
+
             check_components(data)
-            
+
         except Exception as e:
             errors.append(f"{fname}: Failed to parse JSON: {e}")
-            
+
     if errors:
         print("--- A2UI Schema Validation Failures ---")
         for err in errors:
             print(f"❌ {err}")
         return False
-        
+
     print("✅ All A2UI schemas successfully validated.")
     return True
 
@@ -227,11 +227,11 @@ def generate_matrix():
             "controls": "Layout-Responsive-Checks"
         }
     }
-    
+
     os.makedirs('.ai-sdlc/reports', exist_ok=True)
     with open('.ai-sdlc/reports/traceability-matrix.json', 'w', encoding='utf-8') as f:
         json.dump(matrix, f, indent=4, ensure_ascii=False)
-        
+
     md = "# Requirements Traceability Matrix\\n\\n"
     md += "| Req ID | Title | ADR | Source Files | Tests | Security & Safety Controls |\\n"
     md += "| --- | --- | --- | --- | --- | --- |\\n"
@@ -239,10 +239,10 @@ def generate_matrix():
         sources = ", ".join(data['source_files'])
         tests = ", ".join(data['tests'])
         md += f"| {req_id} | {data['title']} | {data['adr']} | {sources} | {tests} | {data['controls']} |\\n"
-        
+
     with open('.ai-sdlc/reports/traceability-matrix.md', 'w', encoding='utf-8') as f:
         f.write(md)
-        
+
     print("✅ Traceability matrix reports successfully compiled.")
     return True
 
@@ -275,7 +275,7 @@ def collect_evidence():
             "required_pct": 80.0
         }
     }
-    
+
     os.makedirs('.ai-sdlc/evidence', exist_ok=True)
     with open('.ai-sdlc/evidence/tests.json', 'w', encoding='utf-8') as f:
         json.dump(evidence, f, indent=4)
@@ -304,13 +304,13 @@ def generate_scorecard():
         "DevOps": "PASS",
         "Documentation": "PASS"
     }
-    
+
     md = "# AI-SDLC Quality Scorecard\\n\\n"
     md += "| Category | Status | Details |\\n"
     md += "| --- | --- | --- |\\n"
     for cat, status in scorecard.items():
         md += f"| {cat} | **{status}** | Fully verified by automated pre-PR gates. |\\n"
-        
+
     os.makedirs('.ai-sdlc/reports', exist_ok=True)
     with open('.ai-sdlc/reports/quality-scorecard.md', 'w', encoding='utf-8') as f:
         f.write(md)
@@ -338,7 +338,7 @@ def generate_release_report():
     report += "## Release Board Recommendation\\n"
     report += "**Decision**: **READY**\\n\\n"
     report += "Human approval checkpoint is set to PENDING for final deployment release authorization.\\n"
-    
+
     os.makedirs('.ai-sdlc/reports', exist_ok=True)
     with open('.ai-sdlc/reports/release-readiness.md', 'w', encoding='utf-8') as f:
         f.write(report)
@@ -358,7 +358,7 @@ def check_env():
     for f in files:
         if not os.path.exists(f):
             missing.append(f)
-            
+
     if missing:
         print(f"❌ Missing required environment files: {missing}")
         return False
@@ -382,12 +382,12 @@ def validate_contracts():
             db_code = f.read()
         with open('app/fast_api_app.py', 'r', encoding='utf-8') as f:
             api_code = f.read()
-            
+
         # Check standard endpoints are mapped in FastAPI routes
         endpoints = ['/api/profile', '/api/activities', '/api/plans', '/api/reminders', '/api/escalations']
         for ep in endpoints:
             assert ep in api_code, f"Missing contract endpoint in backend: {ep}"
-            
+
         print("✅ IndexedDB-to-API synchronization contract validated successfully.")
         return True
     except Exception as e:
@@ -408,7 +408,7 @@ def validate_safety():
     try:
         with open('agents/coordinator/agent.py', 'r', encoding='utf-8') as f:
             agent_code = f.read()
-            
+
         assert 'escalate' in agent_code or 'safety' in agent_code.lower(), "Safety Kernel escalation path missing from coordinator instructions"
         print("✅ Agricultural Safety Kernel compliance validated successfully.")
         return True

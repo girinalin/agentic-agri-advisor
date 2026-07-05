@@ -3,11 +3,20 @@
     farmer: [
       { id: 'home', icon: '🏠', trKey: 'nav_home' },
       { id: 'farm', icon: '🌱', trKey: 'nav_farm' },
+      { id: 'soil', icon: '🧪', trKey: 'nav_soil' },
       { id: 'ask', icon: '💬', trKey: 'nav_ask' },
-      { id: 'expert', icon: '☁️', trKey: 'nav_expert' },
       { id: 'image', icon: '📷', trKey: 'nav_image' },
       { id: 'market', icon: '📈', trKey: 'nav_market' },
       { id: 'more', icon: '📋', trKey: 'nav_more' }
+    ],
+    expert: [
+      { id: 'console', icon: '💻', trKey: 'nav_console' },
+      { id: 'consultations', icon: '📥', trKey: 'nav_consultations' },
+      { id: 'outbreak', icon: '🚨', trKey: 'nav_outbreak' },
+      { id: 'governance', icon: '📖', trKey: 'nav_governance' },
+      { id: 'evaluation', icon: '📊', trKey: 'nav_evaluation' },
+      { id: 'audit', icon: '🔍', trKey: 'nav_audit' },
+      { id: 'settings', icon: '⚙️', trKey: 'nav_settings' }
     ]
   };
 
@@ -35,11 +44,28 @@
         "title_chat": "Krishi Sastri Chat Portal",
         "nav_home": "Home",
         "nav_farm": "My Farm",
-        "nav_ask": "Ask Advisor",
-        "nav_expert": "Ask Expert",
-        "nav_image": "Ask Image",
-        "nav_market": "Market",
+        "nav_soil": "Soil Test",
+        "nav_ask": "Ask",
+        "nav_image": "Photo Check",
+        "nav_market": "Market Prices",
         "nav_more": "More",
+        "advisor.ask.title": "Ask",
+        "advisor.ask.subtitle": "Get help from Krishi Sastri or Krishi Visheshagya",
+        "advisor.sastri.title": "Krishi Sastri",
+        "advisor.sastri.description": "Instant local advice. For routine farming questions. Works offline.",
+        "advisor.sastri.button": "Ask Krishi Sastri",
+        "advisor.sastri.recommended": "Recommended",
+        "advisor.expert.title": "Krishi Visheshagya",
+        "advisor.expert.description": "For difficult disease, pest, chemical, fertilizer, or crop loss issues.",
+        "advisor.expert.button": "Send Question to Expert",
+        "advisor.ask.helperNote": "Tip: Ask Krishi Sastri first. If needed, they will suggest expert help.",
+        "advisor.escalation.summary": "This case is a bit complex.",
+        "advisor.escalation.recommendation": "It would be better to have an expert examine it.",
+        "advisor.escalation.question": "Shall I send this question to expert help?",
+        "advisor.escalation.sendToExpert": "Yes, send to expert",
+        "advisor.escalation.addPhotoFirst": "Add photo first",
+        "advisor.escalation.notNow": "Not now",
+        "expertHelp.status.title": "Expert Help Status",
         "expert_title": "Krishi Sastri \u2014 Cloud Expert",
         "expert_subtitle": "Powered by Gemini \u00b7 Deep Agronomic Intelligence",
         "expert_welcome_label": "Cloud Expert:",
@@ -70,11 +96,28 @@
         "title_chat": "कृषि शास्त्री चैट पोर्टल",
         "nav_home": "होम",
         "nav_farm": "मेरा खेत",
-        "nav_ask": "सलाहकार पूछें",
-        "nav_expert": "विशेषज्ञ पूछें",
-        "nav_image": "फसल फोटो पूछें",
-        "nav_market": "मंडी",
+        "nav_soil": "मिट्टी जांच",
+        "nav_ask": "पूछें",
+        "nav_image": "फोटो जांच",
+        "nav_market": "मंडी भाव",
         "nav_more": "अन्य",
+        "advisor.ask.title": "पूछें",
+        "advisor.ask.subtitle": "कृषि शास्त्री या कृषि विशेषज्ञ से मदद लें",
+        "advisor.sastri.title": "कृषि शास्त्री",
+        "advisor.sastri.description": "तुरंत स्थानीय सलाह। साधारण खेती सवालों के लिए। ऑफलाइन भी काम करता है।",
+        "advisor.sastri.button": "कृषि शास्त्री से पूछें",
+        "advisor.sastri.recommended": "सुझाया गया",
+        "advisor.expert.title": "कृषि विशेषज्ञ",
+        "advisor.expert.description": "कठिन बीमारी, कीट, दवा, खाद या नुकसान के मामलों के लिए।",
+        "advisor.expert.button": "विशेषज्ञ को सवाल भेजें",
+        "advisor.ask.helperNote": "सुझाव: पहले कृषि शास्त्री से पूछें। जरूरत होने पर वह विशेषज्ञ सहायता की सलाह देगा।",
+        "advisor.escalation.summary": "यह मामला थोड़ा जटिल है।",
+        "advisor.escalation.recommendation": "कृषि विशेषज्ञ से जांच करवाना बेहतर रहेगा।",
+        "advisor.escalation.question": "क्या मैं यह सवाल विशेषज्ञ सहायता को भेज दूँ?",
+        "advisor.escalation.sendToExpert": "हाँ, विशेषज्ञ को भेजें",
+        "advisor.escalation.addPhotoFirst": "पहले फोटो जोड़ें",
+        "advisor.escalation.notNow": "अभी नहीं",
+        "expertHelp.status.title": "विशेषज्ञ सहायता की स्थिति",
         "expert_title": "कृषि शास्त्री \u2014 क्लाउड विशेषज्ञ",
         "expert_subtitle": "Gemini द्वारा संचालित \u00b7 गहन कृषि बुद्धि",
         "expert_welcome_label": "क्लाउड विशेषज्ञ:",
@@ -105,9 +148,26 @@
         "title_chat": "कृषि शास्त्री चॅट पोर्टल",
         "nav_home": "होम",
         "nav_farm": "माझा शेत",
-        "nav_ask": "सल्लागार विचारा",
-        "nav_expert": "विशेषज्ञ विचारा",
-        "nav_image": "पीक फोटो विचारा",
+        "nav_soil": "माती तपासणी",
+        "nav_ask": "विचारा",
+        "nav_image": "फोटो तपासणी",
+        "advisor.ask.title": "विचारा",
+        "advisor.ask.subtitle": "कृषी शास्त्री किंवा कृषी तज्ज्ञाकडून मदत घ्या",
+        "advisor.sastri.title": "कृषी शास्त्री",
+        "advisor.sastri.description": "त्वरित स्थानिक सल्ला. साध्या शेती प्रश्नांसाठी.",
+        "advisor.sastri.button": "कृषी शास्त्रीला विचारा",
+        "advisor.sastri.recommended": "सुचविले",
+        "advisor.expert.title": "कृषी तज्ज्ञ",
+        "advisor.expert.description": "कठीण रोग, कीड, औषध, खत वा नुकसानाच्या प्रकरणांसाठी.",
+        "advisor.expert.button": "तज्ज्ञाला प्रश्न पाठवा",
+        "advisor.ask.helperNote": "सल्ला: आधी कृषी शास्त्रीला विचारा.",
+        "advisor.escalation.summary": "हे प्रकरण थोडे कठीण आहे.",
+        "advisor.escalation.recommendation": "तज्ज्ञाकडून तपासणी करवणे चांगले राहील.",
+        "advisor.escalation.question": "हा प्रश्न तज्ज्ञ सहाय्याला पाठवू?",
+        "advisor.escalation.sendToExpert": "होय, तज्ज्ञाला पाठवा",
+        "advisor.escalation.addPhotoFirst": "आधी फोटो जोडा",
+        "advisor.escalation.notNow": "आत्ता नाही",
+        "expertHelp.status.title": "तज्ज्ञ सहाय्य स्थिती",
         "nav_market": "बाजार",
         "nav_more": "इतर",
         "expert_title": "कृषि शास्त्री \u2014 क्लाउड विशेषज्ञ",
@@ -140,10 +200,27 @@
         "title_chat": "Krishi Sastri Portal ya Mazungumzo",
         "nav_home": "Nyumbani",
         "nav_farm": "Shamba Langu",
-        "nav_ask": "Uliza Mshauri",
-        "nav_expert": "Uliza Mtaalamu",
-        "nav_image": "Uliza Picha",
-        "nav_market": "Soko",
+        "nav_soil": "Upimaji Udongo",
+        "nav_ask": "Uliza",
+        "nav_image": "Angalia Picha",
+        "nav_market": "Bei ya Soko",
+        "advisor.ask.title": "Uliza",
+        "advisor.ask.subtitle": "Pata msaada kutoka Krishi Sastri au Krishi Visheshagya",
+        "advisor.sastri.title": "Krishi Sastri",
+        "advisor.sastri.description": "Ushauri wa haraka. Kwa maswali ya kawaida. Hufanya nje ya mtandao.",
+        "advisor.sastri.button": "Uliza Krishi Sastri",
+        "advisor.sastri.recommended": "Inapendekezwa",
+        "advisor.expert.title": "Krishi Visheshagya",
+        "advisor.expert.description": "Kwa magonjwa magumu, wadudu, dawa, mbolea, au hasara.",
+        "advisor.expert.button": "Tuma Swali kwa Mtaalamu",
+        "advisor.ask.helperNote": "Lengo: Uliza Krishi Sastri kwanza.",
+        "advisor.escalation.summary": "Hali hii ni ngumu kidogo.",
+        "advisor.escalation.recommendation": "Ni bora kumtafuta mtaalamu.",
+        "advisor.escalation.question": "Nitume swali hili kwa mtaalamu?",
+        "advisor.escalation.sendToExpert": "Ndio, tuma kwa mtaalamu",
+        "advisor.escalation.addPhotoFirst": "Ongeza picha kwanza",
+        "advisor.escalation.notNow": "Sio sasa",
+        "expertHelp.status.title": "Hali ya Msaada wa Mtaalamu",
         "nav_more": "Zaidi",
         "expert_title": "Krishi Sastri \u2014 Mtaalamu wa Wingu",
         "expert_subtitle": "Inayoendeshwa na Gemini \u00b7 Akili ya Kilimo ya Kina",
@@ -175,8 +252,44 @@
         "title_chat": "సలహాదారు చాట్ పోర్టల్",
         "nav_home": "హోమ్",
         "nav_farm": "నా పొలం",
-        "nav_ask": "కృషి శాస్త్రి అడగండి",
-        "nav_image": "పంట ఫోటో అడగండి",
+        "nav_soil": "మట్టి పరీక్ష",
+        "nav_ask": "అడగండి",
+        "nav_image": "ఫోటో తనిఖీ",
+        "advisor.ask.title": "అడగండి",
+        "advisor.ask.subtitle": "కృషి శాస్త్రి లేదా కృషి విశేషజ్ఞ నుండి సహాయం తీసుకోండి",
+        "advisor.sastri.title": "కృషి శాస్త్రి",
+        "advisor.sastri.description": "తక్షణ స్థానిక సలహా. సాధారణ వ్యవసాయ ప్రశ్నల కోసం.",
+        "advisor.sastri.button": "కృషి శాస్త్రిని అడగండి",
+        "advisor.sastri.recommended": "సూచించబడింది",
+        "advisor.expert.title": "కృషి విశేషజ్ఞ",
+        "advisor.expert.description": "కష్టమైన వ్యాధి, పురుగు, మందు, ఎరువు సమస్యల కోసం.",
+        "advisor.expert.button": "నిపుణుడికి ప్రశ్న పంపండి",
+        "advisor.ask.helperNote": "సలహా: ముందు కృషి శాస్త్రిని అడగండి.",
+        "advisor.escalation.summary": "ఈ సందర్భం కొంచెం క్లిష్టంగా ఉంది.",
+        "advisor.escalation.recommendation": "నిపుణుడు ద్వారా తనిఖీ చేయించడం మంచిది.",
+        "advisor.escalation.question": "ఈ ప్రశ్నను నిపుణుడికి పంపాలా?",
+        "advisor.escalation.sendToExpert": "అవును, నిపుణుడికి పంపండి",
+        "advisor.escalation.addPhotoFirst": "ముందు ఫోటో జోడించండి",
+        "advisor.escalation.notNow": "ఇప్పుడు కాదు",
+        "expertHelp.status.title": "నిపుణుడి సహాయ స్థితి",
+        "nav_market": "మార్కెట్ ధరలు",
+        "advisor.ask.title": "అడగండి",
+        "advisor.ask.subtitle": "కృషి శాస్త్రి లేదా కృషి విశేషజ్ఞ నుండి సహాయం తీసుకోండి",
+        "advisor.sastri.title": "కృషి శాస్త్రి",
+        "advisor.sastri.description": "తక్షణ స్థానిక సలహా. సాధారణ వ్యవసాయ ప్రశ్నల కోసం. ఆఫ్‌లైన్‌లో కూడా పని చేస్తుంది.",
+        "advisor.sastri.button": "కృషి శాస్త్రిని అడగండి",
+        "advisor.sastri.recommended": "సూచించబడింది",
+        "advisor.expert.title": "కృషి విశేషజ్ఞ",
+        "advisor.expert.description": "కష్టమైన వ్యాధి, పురుగు, మందు, ఎరువు లేదా నష్టం సమస్యల కోసం.",
+        "advisor.expert.button": "నిపుణుడికి ప్రశ్న పంపండి",
+        "advisor.ask.helperNote": "సలహా: ముందు కృషి శాస్త్రిని అడగండి. అవసరమైతే నిపుణుడి సహాయాన్ని సూచిస్తారు.",
+        "advisor.escalation.summary": "ఈ సందర్భం కొంచెం క్లిష్టంగా ఉంది.",
+        "advisor.escalation.recommendation": "నిపుణుడి ద్వారా తనిఖీ చేయించడం మంచిది.",
+        "advisor.escalation.question": "ఈ ప్రశ్నను నిపుణుడికి పంపాలా?",
+        "advisor.escalation.sendToExpert": "అవును, నిపుణుడికి పంపండి",
+        "advisor.escalation.addPhotoFirst": "ముందు ఫోటో జోడించండి",
+        "advisor.escalation.notNow": "ఇప్పుడు కాదు",
+        "expertHelp.status.title": "నిపుణుడి సహాయ స్థితి",
         "nav_market": "మార్కెట్",
         "nav_more": "మరింత"
     }
@@ -1934,7 +2047,7 @@
 
   function getTranslation(key, langCode) {
     const code = langCode || 'en';
-    
+
     // 1. Try selected language dictionary
     if (SCHEMA_TRANSLATIONS[code] && SCHEMA_TRANSLATIONS[code][key] !== undefined) {
       const value = SCHEMA_TRANSLATIONS[code][key];
@@ -1944,7 +2057,7 @@
       const value = TRANSLATIONS[code][key];
       return isPlaceholderTranslation(value) ? humanizeTranslationKey(key) : value;
     }
-    
+
     // 2. Try English default fallback
     if (SCHEMA_TRANSLATIONS['en'] && SCHEMA_TRANSLATIONS['en'][key] !== undefined) {
       const value = SCHEMA_TRANSLATIONS['en'][key];
@@ -1954,22 +2067,22 @@
       const value = TRANSLATIONS['en'][key];
       return isPlaceholderTranslation(value) ? humanizeTranslationKey(key) : value;
     }
-    
+
     // 3. Log warning and construct a clean human-readable string as final fallback
     console.warn("[i18n] Missing translation", {
       key: key,
       language: code
     });
-    
+
     return humanizeTranslationKey(key);
   }
 
   function translateSchemaData(obj, langCode) {
     const code = langCode || 'en';
-    
+
     function recurse(o) {
       if (typeof o !== 'object' || o === null) return;
-      
+
       // Translate standard fields if present
       if (o.titleKey) o.title = getTranslation(o.titleKey, code);
       if (o.subtitleKey) o.subtitle = getTranslation(o.subtitleKey, code);
@@ -1989,7 +2102,7 @@
           o[baseProp] = getTranslation(dictKey, code);
         }
       });
-      
+
       for (const k in o) {
         if (typeof o[k] === 'object') {
           recurse(o[k]);
@@ -2001,12 +2114,12 @@
 
   function applyLanguageTranslation(langCode) {
     const code = langCode || 'en';
-    
+
     // Update the centralized language state object
     window.currentLanguageState = LANGUAGE_CONFIGS[code] || LANGUAGE_CONFIGS['en'];
-    
+
     const dict = TRANSLATIONS[code] || TRANSLATIONS['en'];
-    
+
     const elements = document.querySelectorAll('[data-tr]');
     elements.forEach(el => {
       const key = el.getAttribute('data-tr');
@@ -2032,7 +2145,7 @@
 
     const voiceStatus = document.getElementById('voice-status-label');
     const voiceSub = document.getElementById('voice-sub-label');
-    
+
     if (code === 'hi') {
       if (voiceStatus) voiceStatus.textContent = 'बोलकर पूछें';
       if (voiceSub) voiceSub.textContent = 'मैं आपकी भाषा में सुनूँगा';
@@ -2055,19 +2168,19 @@
     if (chatTitle && dict['title_chat']) {
       chatTitle.textContent = dict['title_chat'];
     }
-    
+
     // Translate Chat input placeholder
     const userInputField = document.getElementById('user-input-field');
     if (userInputField && dict['chat_placeholder']) {
       userInputField.placeholder = dict['chat_placeholder'];
     }
-    
+
     // Translate Send Button
     const sendBtn = document.getElementById('send-btn');
     if (sendBtn && dict['btn_send']) {
       sendBtn.textContent = dict['btn_send'];
     }
-    
+
     // Translate Auto-Speak Toggle Label
     const ttsToggle = document.getElementById('tts-toggle');
     if (ttsToggle) {
@@ -2078,7 +2191,7 @@
         label.appendChild(document.createTextNode(' 🔊 ' + (dict['btn_speak'] || 'Auto-Speak')));
       }
     }
-    
+
     // Update online badge text
     if (typeof window.updateAgentsStatus === 'function') {
       window.updateAgentsStatus();
@@ -2101,7 +2214,7 @@
     else if (schemaName === 'crop_dashboard' || schemaName === 'my_farm_summary' || schemaName === 'detailed_farm_data' || schemaName === 'irrigation_advice' || schemaName === 'pest_alert' || schemaName === 'irrigation_planner') tabId = 'farm';
     else if (schemaName === 'market_insights') tabId = 'market';
     else if (schemaName === 'more_screen' || schemaName === 'farmer_profile' || schemaName === 'simulation') tabId = 'more';
-    
+
     window.switchTab(tabId, true);
   }
 
