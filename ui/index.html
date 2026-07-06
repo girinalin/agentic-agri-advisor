@@ -2,13 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#2C6B37" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <title>Krishi Sampark</title>
-  <link rel="stylesheet" href="/landing.css?v=49" />
+  <link rel="stylesheet" href="/landing.css?v=53" />
+  <script src="/device.js?v=1"></script>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
   <header class="topbar">
+    <button id="nav-hamburger" class="nav-hamburger" aria-label="Open Menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
     <div class="brand">
       <span class="brand-icon" aria-hidden="true">🌿</span>
       <div>
@@ -39,6 +46,16 @@
     </div>
   </header>
 
+  <!-- Mobile navigation drawer -->
+  <div id="nav-drawer-backdrop" class="nav-drawer-backdrop"></div>
+  <nav id="nav-drawer" class="nav-drawer" aria-label="Mobile Navigation">
+    <a href="#about" data-i18n="landing.header.navAbout">About</a>
+    <a href="#features" data-i18n="landing.header.navFeatures">Features</a>
+    <a href="#how-it-works" data-i18n="landing.header.navHowItWorks">How It Works</a>
+    <a href="#trust" data-i18n="landing.header.navSafetyTrust">Safety & Trust</a>
+    <a href="#contact" data-i18n="landing.header.navContact">Contact</a>
+  </nav>
+
   <main>
     <section class="hero" id="about">
       <div class="hero-copy">
@@ -64,11 +81,7 @@
       </div>
 
       <div class="hero-media">
-        <div class="hero-art" aria-hidden="true">
-          <div class="floating-chip chip-a"><span aria-hidden="true">🎙️</span><small data-i18n="landing.hero.chipVoice">Voice questions</small></div>
-          <div class="floating-chip chip-b"><span aria-hidden="true">📷</span><small data-i18n="landing.hero.chipPhoto">Photo crop check</small></div>
-          <div class="floating-chip chip-c"><span aria-hidden="true">📈</span><small data-i18n="landing.hero.chipMarket">Live mandi trends</small></div>
-        </div>
+        <div class="hero-art" aria-hidden="true"></div>
 
         <aside class="hero-panel" id="trust">
           <h3 data-i18n="landing.hero.trustPanelTitle">Works even with limited internet</h3>
@@ -182,23 +195,64 @@
   </footer>
 
   <div id="guest-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="guest-title">
-    <div class="modal-card">
-      <h3 id="guest-title" data-i18n="landing.auth.guestTitle">Start in Guest Mode</h3>
+    <div class="modal-card modal-card-wide">
+      <h3 id="guest-title" data-i18n="landing.auth.guestTitle">Tell us about your farm</h3>
       <p data-i18n="landing.auth.guestMessage">
-        Guest mode lets you try the app immediately. Your data stays on this device.
-        Sign in with Google to save your farm profile and access it later.
+        Just a few details so we can give you the best farming advice.
+        Your data stays on this device.
       </p>
-      <label for="guest-email" data-i18n="landing.auth.emailOptional">Email (optional)</label>
-      <input id="guest-email" type="email" placeholder="name@example.com" />
+      <div class="guest-form-grid">
+        <div class="guest-form-field">
+          <label for="guest-name" data-i18n="landing.auth.nameLabel">Your Name</label>
+          <input id="guest-name" type="text" placeholder="e.g. Madhav Ji" />
+        </div>
+        <div class="guest-form-field">
+          <label for="guest-email" data-i18n="landing.auth.emailLabel">Email</label>
+          <input id="guest-email" type="email" placeholder="name@example.com" />
+        </div>
+        <div class="guest-form-field">
+          <label for="guest-region" data-i18n="landing.auth.regionLabel">Location</label>
+          <select id="guest-region">
+            <option value="" data-i18n="landing.auth.selectPlaceholder">Select your region</option>
+            <option value="Nagpur District">Nagpur District (Maharashtra)</option>
+            <option value="Pune District">Pune District (Maharashtra)</option>
+            <option value="Indore District">Indore District (Madhya Pradesh)</option>
+            <option value="Hyderabad District">Hyderabad District (Telangana)</option>
+            <option value="Rift Valley Region">Rift Valley Region (Kenya)</option>
+          </select>
+        </div>
+        <div class="guest-form-field">
+          <label for="guest-soil" data-i18n="landing.auth.soilLabel">Soil Type</label>
+          <select id="guest-soil">
+            <option value="" data-i18n="landing.auth.selectPlaceholder">Select soil type</option>
+            <option value="Black Clay (Cotton Soil)">Black Clay (Cotton Soil)</option>
+            <option value="Red Sandy Loam">Red Sandy Loam</option>
+            <option value="Alluvial">Alluvial</option>
+          </select>
+        </div>
+        <div class="guest-form-field">
+          <label for="guest-acres" data-i18n="landing.auth.acresLabel">Field Size (Acres)</label>
+          <input id="guest-acres" type="number" min="0.1" step="0.1" placeholder="e.g. 5" />
+        </div>
+        <div class="guest-form-field">
+          <label for="guest-crop" data-i18n="landing.auth.cropLabel">Primary Crop</label>
+          <select id="guest-crop">
+            <option value="" data-i18n="landing.auth.selectPlaceholder">Select crop</option>
+            <option value="Corn">Maize / Corn</option>
+            <option value="Wheat">Wheat</option>
+            <option value="Soybeans">Soybeans</option>
+            <option value="Rice">Rice</option>
+          </select>
+        </div>
+      </div>
       <div id="guest-error" class="error"></div>
       <div class="modal-actions">
-        <button id="guest-continue" class="btn primary" data-i18n="landing.auth.continue">Continue</button>
-        <button id="guest-skip" class="btn ghost" data-i18n="landing.auth.skip">Skip</button>
+        <button id="guest-continue" class="btn primary" data-i18n="landing.auth.continue">Start Advising</button>
         <button id="guest-close" class="btn ghost" data-i18n="landing.auth.close">Close</button>
       </div>
     </div>
   </div>
 
-  <script src="/landing.js?v=9"></script>
+  <script src="/landing.js?v=13"></script>
 </body>
 </html>

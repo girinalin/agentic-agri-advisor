@@ -6,11 +6,12 @@
   <title>Krishi Sampark - Traditional Agriculture Advisor</title>
   <link rel="manifest" href="/manifest.webmanifest">
   <meta name="theme-color" content="#2C6B37">
-  <link rel="stylesheet" href="/agui/styles.css?v=5">
+  <link rel="stylesheet" href="/agui/styles.css?v=8">
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+  <script src="/device.js?v=1"></script>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
-<body class="dark-theme">
+<body class="light-theme">
   <div class="app-layout">
     <div id="left-nav-backdrop" class="left-nav-backdrop" style="display: none;"></div>
     <!-- Responsive Mobile Shell Container -->
@@ -74,306 +75,251 @@
         </div>
       </header>
 
-      <!-- SCREEN WRAPPER / ACTIVE CANVAS -->
-      <main class="screen-container">
+      <!-- TWO-PANE LAYOUT: Content (left) + Chat (right, always visible) -->
+      <main class="two-pane-container">
 
-        <!-- SCREEN 1: HOME PANEL -->
-        <section id="screen-home" class="app-screen active">
-          <!-- Dynamically loaded via Home Schema -->
-          <div id="home-canvas"></div>
-        </section>
+        <!-- LEFT PANE: Content area — shows nav-selected screens or agent-triggered schemas -->
+        <div class="content-pane">
+          <button id="chat-toggle-btn" class="chat-toggle-btn" title="Show Chat">💬</button>
 
-        <!-- SCREEN 2: MY FARM PANEL -->
-        <section id="screen-farm" class="app-screen">
-          <div id="farm-canvas"></div>
-        </section>
+          <!-- SCREEN 1: HOME PANEL -->
+          <section id="screen-home" class="app-screen active">
+            <div id="home-canvas"></div>
+          </section>
 
-        <!-- SCREEN 3: ASK ADVISOR — Full Screen Chat -->
-        <section id="screen-ask" class="app-screen">
-          <div class="voice-assistant-view">
-            <button id="close-drawer-btn" class="close-drawer-btn" style="display: none; background: none; border: none; font-size: 1.5rem; color: var(--text-main); cursor: pointer; align-self: flex-end; padding: 5px 15px;">✕ Close</button>
+          <!-- SCREEN 2: MY FARM PANEL -->
+          <section id="screen-farm" class="app-screen">
+            <div id="farm-canvas"></div>
+          </section>
 
-            <!-- Advisor Selection Screen — shown first -->
-            <div id="advisor-selection-screen" style="padding: 16px; display: flex; flex-direction: column; gap: 16px; flex-grow: 1; overflow-y: auto;">
+          <!-- SCREEN 3.5: ASK IMAGE — Visual Diagnosis -->
+          <section id="screen-image" class="app-screen">
+            <div style="padding: 16px; display: flex; flex-direction: column; height: 100%; gap: 16px;">
               <div style="text-align: center;">
-                <h2 id="advisor-ask-title" style="font-size: 1.4rem; color: var(--text-main); margin-bottom: 4px;">पूछें</h2>
-                <p id="advisor-ask-subtitle" style="font-size: 0.85rem; color: var(--text-muted);">कृषि शास्त्री या कृषि विशेषज्ञ से मदद लें</p>
+                <h2 style="font-size: 1.3rem; color: var(--text-main); margin-bottom: 4px;">📷 फसल फोटो पूछें</h2>
+                <p style="font-size: 0.85rem; color: var(--text-muted);">फसल की फोटो लें या अपलोड करें। रोग, कीट, या किसी भी समस्या की पहचान।</p>
               </div>
-
-              <!-- Card 1: Krishi Sastri (Recommended) -->
-              <div id="sastri-card" style="padding: 16px; border-radius: 14px; border: 2px solid #2C6B37; background: linear-gradient(135deg, rgba(44,107,55,0.12), rgba(62,142,65,0.06)); cursor: pointer; transition: all 0.3s;">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                  <div style="display: flex; gap: 12px; align-items: center;">
-                    <div style="font-size: 2rem;">👨‍🌾</div>
-                    <div>
-                      <div id="advisor-sastri-title" style="font-size: 1.1rem; font-weight: 700; color: #2C6B37;">कृषि शास्त्री</div>
-                      <div id="advisor-sastri-desc" style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; line-height: 1.4;">तुरंत स्थानीय सलाह। साधारण खेती सवालों के लिए। ऑफलाइन भी काम करता है।</div>
-                    </div>
-                  </div>
-                  <span id="advisor-sastri-badge" style="background: #2C6B37; color: white; font-size: 0.65rem; font-weight: 700; padding: 3px 8px; border-radius: 10px; white-space: nowrap;">सुझाया गया</span>
+              <div id="image-upload-area" style="border: 2px dashed var(--border); border-radius: 12px; padding: 24px; text-align: center; background: var(--bg-dark); transition: all 0.3s;">
+                <div style="font-size: 1rem; font-weight: 600; color: var(--text-main); margin-bottom: 12px;">फोटो लें या अपलोड करें</div>
+                <div style="display: flex; gap: 12px; justify-content: center; align-items: stretch;">
+                  <button id="image-camera-btn" type="button" style="flex: 1; max-width: 160px; padding: 16px 12px; border: none; border-radius: 12px; background: linear-gradient(135deg, #1a5276, #2980b9); color: white; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 6px;">
+                    <span style="font-size: 2rem;">📷</span>
+                    <span style="font-size: 0.9rem; font-weight: 600;">कैमरा</span>
+                    <span style="font-size: 0.7rem; opacity: 0.85;">लाइव फोटो लें</span>
+                  </button>
+                  <button id="image-upload-btn" type="button" style="flex: 1; max-width: 160px; padding: 16px 12px; border: 1px solid var(--border); border-radius: 12px; background: var(--bg-card, var(--bg-dark)); color: var(--text-main); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 6px;">
+                    <span style="font-size: 2rem;">➕</span>
+                    <span style="font-size: 0.9rem; font-weight: 600;">अपलोड</span>
+                    <span style="font-size: 0.7rem; opacity: 0.75;">गैलरी से चुनें</span>
+                  </button>
                 </div>
-                <button id="advisor-sastri-btn" style="margin-top: 12px; width: 100%; padding: 10px; border-radius: 10px; border: none; background: #2C6B37; color: white; font-size: 0.95rem; font-weight: 600; cursor: pointer;">कृषि शास्त्री से पूछें</button>
+                <input type="file" id="image-file-input" accept="image/*" style="display: none;">
               </div>
-
-              <!-- Card 2: Krishi Visheshagya -->
-              <div id="expert-card" style="padding: 16px; border-radius: 14px; border: 2px solid var(--border); background: var(--bg-dark); cursor: pointer; transition: all 0.3s;">
-                <div style="display: flex; gap: 12px; align-items: center;">
-                  <div style="font-size: 2rem;">🔬</div>
-                  <div>
-                    <div id="advisor-expert-title" style="font-size: 1.1rem; font-weight: 700; color: var(--text-main);">कृषि विशेषज्ञ</div>
-                    <div id="advisor-expert-desc" style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; line-height: 1.4;">कठिन बीमारी, कीट, दवा, खाद या नुकसान के मामलों के लिए।</div>
-                  </div>
-                </div>
-                <button id="advisor-expert-btn" style="margin-top: 12px; width: 100%; padding: 10px; border-radius: 10px; border: 2px solid #e67e22; background: rgba(230,126,34,0.1); color: #e67e22; font-size: 0.95rem; font-weight: 600; cursor: pointer;">विशेषज्ञ को सवाल भेजें</button>
+              <div id="image-preview-container" style="display: none; text-align: center;">
+                <img id="image-preview" style="max-width: 100%; max-height: 300px; border-radius: 12px; border: 1px solid var(--border);" alt="Preview">
+                <button id="image-retake-btn" style="margin-top: 8px; padding: 6px 16px; background: var(--bg-dark); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; color: var(--text-main);">फिर से लें</button>
               </div>
-
-              <!-- Helper note -->
-              <div id="advisor-helper-note" style="text-align: center; font-size: 0.78rem; color: var(--text-muted); padding: 8px; border-radius: 8px; background: var(--bg-dark); border: 1px dashed var(--border);">
-                सुझाव: पहले कृषि शास्त्री से पूछें। जरूरत होने पर वह विशेषज्ञ सहायता की सलाह देगा।
+              <div id="image-analysis-result" style="display: none; padding: 16px; border-radius: 12px; background: var(--bg-dark); border: 1px solid var(--border); flex-grow: 1; overflow-y: auto;">
+                <div id="analysis-content"></div>
+              </div>
+              <div id="image-analysis-loading" style="display: none; text-align: center; padding: 20px;">
+                <div style="font-size: 1.5rem; animation: spin 1s linear infinite;">⏳</div>
+                <div style="margin-top: 8px; font-size: 0.9rem; color: var(--text-muted);">विश्लेषण हो रहा है...</div>
               </div>
             </div>
+          </section>
 
-            <!-- Sastri Chat Screen — hidden until Sastri is selected -->
-            <div id="sastri-chat-screen" style="display: none; flex-direction: column; flex-grow: 1; overflow: hidden;">
-              <div style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-bottom: 1px solid var(--border);">
-                <button id="back-to-advisor-btn" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-main);">←</button>
-                <span style="font-weight: 700; color: #2C6B37;">👨‍🌾 कृषि शास्त्री</span>
+          <!-- SCREEN: SOIL TEST -->
+          <section id="screen-soil" class="app-screen">
+            <div id="soil-canvas" style="padding: 16px; display: flex; flex-direction: column; gap: 16px; flex-grow: 1; overflow-y: auto;">
+              <div id="soil-home" style="display: flex; flex-direction: column; gap: 16px;">
+                <div style="text-align: center;">
+                  <h2 style="font-size: 1.3rem; color: var(--text-main);">मिट्टी जांच</h2>
+                  <p style="font-size: 0.85rem; color: var(--text-muted);">मिट्टी रिपोर्ट से खाद और फसल सलाह बेहतर होगी।</p>
+                </div>
+                <div id="soil-option-upload" style="padding: 16px; border-radius: 12px; border: 2px solid var(--border); background: var(--bg-dark); cursor: pointer; text-align: center;">
+                  <div style="font-size: 1.8rem;">📄</div>
+                  <div style="font-weight: 700; margin-top: 6px;">रिपोर्ट अपलोड करें</div>
+                  <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">PDF या फोटो अपलोड करें</div>
+                </div>
+                <div id="soil-option-camera" style="padding: 16px; border-radius: 12px; border: 2px solid var(--border); background: var(--bg-dark); cursor: pointer; text-align: center;">
+                  <div style="font-size: 1.8rem;">📷</div>
+                  <div style="font-weight: 700; margin-top: 6px;">रिपोर्ट की फोटो लें</div>
+                  <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">कागज की रिपोर्ट कैमरे से लें</div>
+                </div>
+                <div id="soil-option-manual" style="padding: 16px; border-radius: 12px; border: 2px solid var(--border); background: var(--bg-dark); cursor: pointer; text-align: center;">
+                  <div style="font-size: 1.8rem;">✏️</div>
+                  <div style="font-weight: 700; margin-top: 6px;">मान खुद भरें</div>
+                  <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">pH, नाइट्रोजन, फॉस्फोरस, पोटाश भरें</div>
+                </div>
+                <input type="file" id="soil-file-input" accept=".pdf,.jpg,.jpeg,.png,.webp" style="display: none;">
+                <input type="file" id="soil-camera-input" accept="image/*" capture="environment" style="display: none;">
               </div>
-
-              <div id="chat-messages" class="chat-messages-container">
-                <div class="message system-msg">
-                  <strong>System:</strong> कृषि शास्त्री से पूछें। अपनी भाषा में बोलें या टाइप करें।
+              <div id="soil-loading" style="display: none; text-align: center; padding: 40px;">
+                <div style="font-size: 1.5rem;">⏳</div>
+                <div style="margin-top: 8px; font-size: 0.9rem; color: var(--text-muted);">रिपोर्ट पढ़ी जा रही है...</div>
+              </div>
+              <div id="soil-review-form" style="display: none; flex-direction: column; gap: 12px;">
+                <h3 style="font-size: 1.1rem; font-weight: 700;">रिपोर्ट की जानकारी जांचें</h3>
+                <p style="font-size: 0.85rem; color: var(--text-muted);">मैंने रिपोर्ट से यह जानकारी पढ़ी है। कृपया जांच लें।</p>
+                <div id="soil-form-fields" style="display: flex; flex-direction: column; gap: 10px;"></div>
+                <div style="display: flex; gap: 8px; margin-top: 8px;">
+                  <button id="soil-save-btn" style="flex: 1; padding: 12px; border-radius: 10px; border: none; background: #2C6B37; color: white; font-weight: 700; cursor: pointer;">सही है, सेव करें</button>
+                  <button id="soil-reupload-btn" style="padding: 12px 16px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg-dark); color: var(--text-main); cursor: pointer;">फिर से अपलोड करें</button>
                 </div>
               </div>
-
-              <div class="text-input-bar" style="margin: 0 10px; display: flex; gap: 8px; align-items: center;">
-                <button id="mic-input-btn" title="Speak" style="background: linear-gradient(135deg, #1a5276, #2980b9); color: white; border: none; border-radius: 50%; width: 44px; height: 44px; font-size: 1.3rem; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">🎙️</button>
-                <input type="text" id="user-input-field" placeholder="लिखकर पूछें..." style="flex: 1;">
-                <button id="send-btn" class="send-action-btn" style="flex-shrink: 0;">➔</button>
-              </div>
-
-              <div id="mic-wave-container-top" style="display: none; justify-content: center; padding: 4px;">
-                <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
-              </div>
-              <div id="voice-status-label-top" style="display: none; text-align: center; font-size: 0.85rem; color: var(--text-muted); padding: 2px;"></div>
-            </div>
-
-            <!-- Expert Request Form — hidden until Expert is selected -->
-            <div id="expert-form-screen" style="display: none; flex-direction: column; flex-grow: 1; overflow-y: auto; padding: 16px; gap: 12px;">
-              <div style="display: flex; align-items: center; gap: 8px;">
-                <button id="back-to-advisor-from-expert-btn" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-main);">←</button>
-                <span style="font-weight: 700; color: #e67e22;">🔬 कृषि विशेषज्ञ</span>
-              </div>
-
-              <div style="padding: 12px; border-radius: 10px; background: rgba(230,126,34,0.1); border: 1px solid #e67e22; font-size: 0.85rem;">
-                विशेषज्ञ जांच के लिए इंटरनेट आवश्यक है। आपका सवाल और फसल की जानकारी विशेषज्ञ को भेजी जाएगी।
-              </div>
-
-              <div>
-                <label style="font-size: 0.9rem; font-weight: 600; display: block; margin-bottom: 6px;">अपना सवाल लिखें या बोलें:</label>
-                <div style="display: flex; gap: 8px; align-items: center;">
-                  <button id="expert-mic-btn" title="Speak" style="background: linear-gradient(135deg, #1a5276, #2980b9); color: white; border: none; border-radius: 50%; width: 44px; height: 44px; font-size: 1.3rem; cursor: pointer; flex-shrink: 0;">🎙️</button>
-                  <textarea id="expert-question-input" placeholder="अपना सवाल यहाँ लिखें..." style="flex: 1; min-height: 80px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-dark); color: var(--text-main); padding: 10px; font-family: inherit; resize: vertical;"></textarea>
+              <div id="soil-summary" style="display: none; flex-direction: column; gap: 16px;">
+                <h3 style="font-size: 1.2rem; font-weight: 700;">मिट्टी का सार</h3>
+                <div id="soil-interpretation" style="padding: 14px; border-radius: 10px; background: var(--bg-dark); border: 1px solid var(--border); font-size: 0.9rem; line-height: 1.6;"></div>
+                <div style="padding: 12px; border-radius: 8px; background: rgba(44,107,55,0.1); border-left: 3px solid #2C6B37; font-size: 0.85rem;">
+                  खाद की सही सलाह के लिए फसल की अवस्था और पिछली खाद की जानकारी भी जरूरी है।
                 </div>
-              </div>
-
-              <div>
-                <label style="font-size: 0.9rem; font-weight: 600; display: block; margin-bottom: 6px;">फसल की फोटो (वैकल्पिक):</label>
-                <button id="expert-photo-btn" style="padding: 10px 16px; border-radius: 8px; border: 2px dashed var(--border); background: var(--bg-dark); color: var(--text-main); cursor: pointer; font-size: 0.9rem;">📷 फोटो जोड़ें</button>
-                <input type="file" id="expert-photo-input" accept="image/*" capture="environment" style="display: none;">
-                <div id="expert-photo-preview" style="display: none; margin-top: 8px;">
-                  <img id="expert-photo-img" style="max-width: 100%; max-height: 200px; border-radius: 8px; border: 1px solid var(--border);">
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                  <button id="soil-fertilizer-advice-btn" style="padding: 10px 14px; border-radius: 8px; border: 1px solid #2C6B37; background: rgba(44,107,55,0.1); color: #2C6B37; cursor: pointer; font-size: 0.85rem;">खाद सलाह देखें</button>
+                  <button id="soil-improve-btn" style="padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-dark); color: var(--text-main); cursor: pointer; font-size: 0.85rem;">मिट्टी सुधार सुझाव</button>
                 </div>
-              </div>
-
-              <button id="expert-submit-btn" style="padding: 12px; border-radius: 10px; border: none; background: #e67e22; color: white; font-size: 1rem; font-weight: 700; cursor: pointer;">विशेषज्ञ को भेजें</button>
-
-              <div id="expert-status-display" style="display: none; padding: 16px; border-radius: 10px; background: var(--bg-dark); border: 1px solid var(--border); text-align: center;">
-                <div style="font-size: 1.5rem;">✅</div>
-                <div style="margin-top: 8px; font-weight: 600;">सवाल विशेषज्ञ को भेजा गया</div>
-                <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">जवाब आने पर आपको सूचित किया जाएगा।</div>
-                <button id="expert-back-to-chat-btn" style="margin-top: 12px; padding: 8px 16px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-dark); color: var(--text-main); cursor: pointer;">वापस जाएं</button>
+                <details style="margin-top: 8px;">
+                  <summary style="cursor: pointer; font-size: 0.85rem; color: var(--text-muted); padding: 8px;">विस्तृत जानकारी</summary>
+                  <div id="soil-detailed-values" style="padding: 12px; border-radius: 8px; background: var(--bg-dark); margin-top: 8px; font-size: 0.85rem;"></div>
+                </details>
               </div>
             </div>
-        </section>
+          </section>
 
-        <!-- SCREEN 3.5: ASK IMAGE — Visual Diagnosis -->
-        <section id="screen-image" class="app-screen">
-          <div style="padding: 16px; display: flex; flex-direction: column; height: 100%; gap: 16px;">
+          <!-- SCREEN 5: MARKET PANEL -->
+          <section id="screen-market" class="app-screen">
+            <div id="market-canvas"></div>
+          </section>
+
+          <!-- SCREEN 5: MORE PANEL -->
+          <section id="screen-more" class="app-screen">
+            <div id="more-canvas"></div>
+          </section>
+
+          <!-- SCREEN 12: SETTINGS -->
+          <section id="screen-settings" class="app-screen">
+            <div id="settings-canvas"></div>
+          </section>
+        </div>
+
+        <!-- RIGHT PANE: Chat — always visible on desktop, slide-in on mobile -->
+        <aside class="chat-pane" id="chat-pane">
+          <!-- Advisor Selection Screen — shown first -->
+          <div id="advisor-selection-screen" style="padding: 16px; display: flex; flex-direction: column; gap: 16px; flex-grow: 1; overflow-y: auto;">
             <div style="text-align: center;">
-              <h2 style="font-size: 1.3rem; color: var(--text-main); margin-bottom: 4px;">📷 फसल फोटो पूछें</h2>
-              <p style="font-size: 0.85rem; color: var(--text-muted);">फसल की फोटो लें या अपलोड करें। रोग, कीट, या किसी भी समस्या की पहचान।</p>
+              <h2 id="advisor-ask-title" data-tr="advisor.ask.title" style="font-size: 1.4rem; color: var(--text-main); margin-bottom: 4px;">पूछें</h2>
+              <p id="advisor-ask-subtitle" data-tr="advisor.ask.subtitle" style="font-size: 0.85rem; color: var(--text-muted);">कृषि शास्त्री या कृषि विशेषज्ञ से मदद लें</p>
             </div>
-
-            <!-- Image capture/upload actions -->
-            <div id="image-upload-area" style="border: 2px dashed var(--border); border-radius: 12px; padding: 24px; text-align: center; background: var(--bg-dark); transition: all 0.3s;">
-              <div style="font-size: 1rem; font-weight: 600; color: var(--text-main); margin-bottom: 12px;">फोटो लें या अपलोड करें</div>
-              <div style="display: flex; gap: 12px; justify-content: center; align-items: stretch;">
-                <button id="image-camera-btn" type="button" style="flex: 1; max-width: 160px; padding: 16px 12px; border: none; border-radius: 12px; background: linear-gradient(135deg, #1a5276, #2980b9); color: white; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 6px;">
-                  <span style="font-size: 2rem;">📷</span>
-                  <span style="font-size: 0.9rem; font-weight: 600;">कैमरा</span>
-                  <span style="font-size: 0.7rem; opacity: 0.85;">लाइव फोटो लें</span>
-                </button>
-                <button id="image-upload-btn" type="button" style="flex: 1; max-width: 160px; padding: 16px 12px; border: 1px solid var(--border); border-radius: 12px; background: var(--bg-card, var(--bg-dark)); color: var(--text-main); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 6px;">
-                  <span style="font-size: 2rem;">➕</span>
-                  <span style="font-size: 0.9rem; font-weight: 600;">अपलोड</span>
-                  <span style="font-size: 0.7rem; opacity: 0.75;">गैलरी से चुनें</span>
-                </button>
+            <div id="sastri-card" style="padding: 16px; border-radius: 14px; border: 2px solid #2C6B37; background: linear-gradient(135deg, rgba(44,107,55,0.12), rgba(62,142,65,0.06)); cursor: pointer; transition: all 0.3s;">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div style="display: flex; gap: 12px; align-items: center;">
+                  <div style="font-size: 2rem;">👨‍🌾</div>
+                  <div>
+                    <div id="advisor-sastri-title" data-tr="advisor.sastri.title" style="font-size: 1.1rem; font-weight: 700; color: #2C6B37;">कृषि शास्त्री</div>
+                    <div id="advisor-sastri-desc" data-tr="advisor.sastri.description" style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; line-height: 1.4;">तुरंत स्थानीय सलाह। साधारण खेती सवालों के लिए। ऑफलाइन भी काम करता है।</div>
+                  </div>
+                </div>
+                <span id="advisor-sastri-badge" data-tr="advisor.sastri.recommended" style="background: #2C6B37; color: white; font-size: 0.65rem; font-weight: 700; padding: 3px 8px; border-radius: 10px; white-space: nowrap;">सुझाया गया</span>
               </div>
-              <input type="file" id="image-file-input" accept="image/*" style="display: none;">
+              <button id="advisor-sastri-btn" data-tr="advisor.sastri.button" style="margin-top: 12px; width: 100%; padding: 10px; border-radius: 10px; border: none; background: #2C6B37; color: white; font-size: 0.95rem; font-weight: 600; cursor: pointer;">कृषि शास्त्री से पूछें</button>
             </div>
-
-            <!-- Image preview -->
-            <div id="image-preview-container" style="display: none; text-align: center;">
-              <img id="image-preview" style="max-width: 100%; max-height: 300px; border-radius: 12px; border: 1px solid var(--border);" alt="Preview">
-              <button id="image-retake-btn" style="margin-top: 8px; padding: 6px 16px; background: var(--bg-dark); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; color: var(--text-main);">फिर से लें</button>
+            <div id="expert-card" style="padding: 16px; border-radius: 14px; border: 2px solid var(--border); background: var(--bg-dark); cursor: pointer; transition: all 0.3s;">
+              <div style="display: flex; gap: 12px; align-items: center;">
+                <div style="font-size: 2rem;">🔬</div>
+                <div>
+                  <div id="advisor-expert-title" data-tr="advisor.expert.title" style="font-size: 1.1rem; font-weight: 700; color: var(--text-main);">कृषि विशेषज्ञ</div>
+                  <div id="advisor-expert-desc" data-tr="advisor.expert.description" style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; line-height: 1.4;">कठिन बीमारी, कीट, दवा, खाद या नुकसान के मामलों के लिए।</div>
+                </div>
+              </div>
+              <button id="advisor-expert-btn" data-tr="advisor.expert.button" style="margin-top: 12px; width: 100%; padding: 10px; border-radius: 10px; border: 2px solid #e67e22; background: rgba(230,126,34,0.1); color: #e67e22; font-size: 0.95rem; font-weight: 600; cursor: pointer;">विशेषज्ञ को सवाल भेजें</button>
             </div>
-
-            <!-- Local analysis result -->
-            <div id="image-analysis-result" style="display: none; padding: 16px; border-radius: 12px; background: var(--bg-dark); border: 1px solid var(--border); flex-grow: 1; overflow-y: auto;">
-              <div id="analysis-content"></div>
-            </div>
-
-            <!-- Loading indicator -->
-            <div id="image-analysis-loading" style="display: none; text-align: center; padding: 20px;">
-              <div style="font-size: 1.5rem; animation: spin 1s linear infinite;">⏳</div>
-              <div style="margin-top: 8px; font-size: 0.9rem; color: var(--text-muted);">विश्लेषण हो रहा है...</div>
+            <div id="advisor-helper-note" data-tr="advisor.ask.helperNote" style="text-align: center; font-size: 0.78rem; color: var(--text-muted); padding: 8px; border-radius: 8px; background: var(--bg-dark); border: 1px dashed var(--border);">
+              सुझाव: पहले कृषि शास्त्री से पूछें। जरूरत होने पर वह विशेषज्ञ सहायता की सलाह देगा।
             </div>
           </div>
-        </section>
 
-        <!-- SCREEN 4: ASK EXPERT — Cloud Gemini Consultation -->
-        <section id="screen-expert" class="app-screen">
-          <div class="voice-assistant-view expert-mode">
-            <!-- Expert mode header badge -->
+          <!-- Sastri Chat Screen — hidden until Sastri is selected -->
+          <div id="sastri-chat-screen" style="display: none; flex-direction: column; flex-grow: 1; overflow: hidden;">
+            <div style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-bottom: 1px solid var(--border);">
+              <button id="back-to-advisor-btn" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-main);">←</button>
+              <span style="font-weight: 700; color: #2C6B37;">👨‍🌾 <span data-tr="advisor.sastri.title">कृषि शास्त्री</span></span>
+            </div>
+            <div id="chat-messages" class="chat-messages-container">
+              <div class="message system-msg">
+                <strong>System:</strong> <span data-tr="sastri.chat.system_msg">कृषि शास्त्री से पूछें। अपनी भाषा में बोलें या टाइप करें।</span>
+              </div>
+            </div>
+            <div class="text-input-bar" style="margin: 0 10px; display: flex; gap: 8px; align-items: center;">
+              <button id="mic-input-btn" title="Speak" style="background: linear-gradient(135deg, #1a5276, #2980b9); color: white; border: none; border-radius: 50%; width: 44px; height: 44px; font-size: 1.3rem; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">🎙️</button>
+              <input type="text" id="user-input-field" data-tr-placeholder="chat_placeholder" placeholder="लिखकर पूछें..." style="flex: 1;">
+              <button id="send-btn" class="send-action-btn" style="flex-shrink: 0;">➔</button>
+            </div>
+            <div id="mic-wave-container-top" style="display: none; justify-content: center; padding: 4px;">
+              <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+            </div>
+            <div id="voice-status-label-top" style="display: none; text-align: center; font-size: 0.85rem; color: var(--text-muted); padding: 2px;"></div>
+          </div>
+
+          <!-- Expert Request Form — hidden until Expert is selected -->
+          <div id="expert-form-screen" style="display: none; flex-direction: column; flex-grow: 1; overflow-y: auto; padding: 16px; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <button id="back-to-advisor-from-expert-btn" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-main);">←</button>
+              <span style="font-weight: 700; color: #e67e22;">🔬 कृषि विशेषज्ञ</span>
+            </div>
+            <div style="padding: 12px; border-radius: 10px; background: rgba(230,126,34,0.1); border: 1px solid #e67e22; font-size: 0.85rem;">
+              विशेषज्ञ जांच के लिए इंटरनेट आवश्यक है। आपका सवाल और फसल की जानकारी विशेषज्ञ को भेजी जाएगी।
+            </div>
+            <div>
+              <label style="font-size: 0.9rem; font-weight: 600; display: block; margin-bottom: 6px;">अपना सवाल लिखें या बोलें:</label>
+              <div style="display: flex; gap: 8px; align-items: center;">
+                <button id="expert-mic-btn" title="Speak" style="background: linear-gradient(135deg, #1a5276, #2980b9); color: white; border: none; border-radius: 50%; width: 44px; height: 44px; font-size: 1.3rem; cursor: pointer; flex-shrink: 0;">🎙️</button>
+                <textarea id="expert-question-input" placeholder="अपना सवाल यहाँ लिखें..." style="flex: 1; min-height: 80px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-dark); color: var(--text-main); padding: 10px; font-family: inherit; resize: vertical;"></textarea>
+              </div>
+            </div>
+            <div>
+              <label style="font-size: 0.9rem; font-weight: 600; display: block; margin-bottom: 6px;">फसल की फोटो (वैकल्पिक):</label>
+              <button id="expert-photo-btn" style="padding: 10px 16px; border-radius: 8px; border: 2px dashed var(--border); background: var(--bg-dark); color: var(--text-main); cursor: pointer; font-size: 0.9rem;">📷 फोटो जोड़ें</button>
+              <input type="file" id="expert-photo-input" accept="image/*" capture="environment" style="display: none;">
+              <div id="expert-photo-preview" style="display: none; margin-top: 8px;">
+                <img id="expert-photo-img" style="max-width: 100%; max-height: 200px; border-radius: 8px; border: 1px solid var(--border);">
+              </div>
+            </div>
+            <button id="expert-submit-btn" style="padding: 12px; border-radius: 10px; border: none; background: #e67e22; color: white; font-size: 1rem; font-weight: 700; cursor: pointer;">विशेषज्ञ को भेजें</button>
+            <div id="expert-status-display" style="display: none; padding: 16px; border-radius: 10px; background: var(--bg-dark); border: 1px solid var(--border); text-align: center;">
+              <div style="font-size: 1.5rem;">✅</div>
+              <div style="margin-top: 8px; font-weight: 600;">सवाल विशेषज्ञ को भेजा गया</div>
+              <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">जवाब आने पर आपको सूचित किया जाएगा।</div>
+              <button id="expert-back-to-chat-btn" style="margin-top: 12px; padding: 8px 16px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-dark); color: var(--text-main); cursor: pointer;">वापस जाएं</button>
+            </div>
+          </div>
+
+          <!-- Expert Chat Screen — Cloud Gemini -->
+          <div id="expert-chat-screen" style="display: none; flex-direction: column; flex-grow: 1; overflow: hidden;">
             <div class="expert-header-badge">
               <span class="expert-cloud-icon">☁️</span>
               <div>
-                <div class="expert-title" data-tr="expert_title">Krishi Sastri — Cloud Expert</div>
+                <div class="expert-title" data-tr="expert_title">Krishi Visheshagya — Cloud Expert</div>
                 <div class="expert-subtitle" data-tr="expert_subtitle">Powered by Gemini · Deep Agronomic Intelligence</div>
               </div>
               <span id="expert-status-dot" class="expert-status-dot online" title="Cloud connected"></span>
             </div>
-
-            <!-- Expert chat history -->
             <div id="expert-messages" class="chat-messages-container">
               <div class="message system-msg expert-system-msg">
                 <strong data-tr="expert_welcome_label">Cloud Expert:</strong>
                 <span data-tr="expert_welcome_msg"> Ask your toughest farming questions. Krishi Sastri will consult Gemini cloud intelligence for you.</span>
               </div>
             </div>
-
-            <!-- Expert input bar -->
             <div class="text-input-bar expert-input-bar">
-              <button id="expert-mic-btn" title="Speak" style="background: linear-gradient(135deg, #7c3aed, #a855f7); color: white; border: none; border-radius: 50%; width: 44px; height: 44px; font-size: 1.3rem; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                🎙️
-              </button>
+              <button id="expert-mic-btn" title="Speak" style="background: linear-gradient(135deg, #7c3aed, #a855f7); color: white; border: none; border-radius: 50%; width: 44px; height: 44px; font-size: 1.3rem; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">🎙️</button>
               <input type="text" id="expert-input-field" placeholder="Ask the cloud expert..." data-tr-placeholder="expert_placeholder">
               <button id="expert-send-btn" class="send-action-btn expert-send-btn" title="Ask Expert">✦</button>
             </div>
           </div>
-        </section>
-
-        <!-- SCREEN: SOIL TEST -->
-        <section id="screen-soil" class="app-screen">
-          <div id="soil-canvas" style="padding: 16px; display: flex; flex-direction: column; gap: 16px; flex-grow: 1; overflow-y: auto;">
-            <!-- Soil Test Home -->
-            <div id="soil-home" style="display: flex; flex-direction: column; gap: 16px;">
-              <div style="text-align: center;">
-                <h2 style="font-size: 1.3rem; color: var(--text-main);">मिट्टी जांच</h2>
-                <p style="font-size: 0.85rem; color: var(--text-muted);">मिट्टी रिपोर्ट से खाद और फसल सलाह बेहतर होगी।</p>
-              </div>
-
-              <div id="soil-option-upload" style="padding: 16px; border-radius: 12px; border: 2px solid var(--border); background: var(--bg-dark); cursor: pointer; text-align: center;">
-                <div style="font-size: 1.8rem;">📄</div>
-                <div style="font-weight: 700; margin-top: 6px;">रिपोर्ट अपलोड करें</div>
-                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">PDF या फोटो अपलोड करें</div>
-              </div>
-
-              <div id="soil-option-camera" style="padding: 16px; border-radius: 12px; border: 2px solid var(--border); background: var(--bg-dark); cursor: pointer; text-align: center;">
-                <div style="font-size: 1.8rem;">📷</div>
-                <div style="font-weight: 700; margin-top: 6px;">रिपोर्ट की फोटो लें</div>
-                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">कागज की रिपोर्ट कैमरे से लें</div>
-              </div>
-
-              <div id="soil-option-manual" style="padding: 16px; border-radius: 12px; border: 2px solid var(--border); background: var(--bg-dark); cursor: pointer; text-align: center;">
-                <div style="font-size: 1.8rem;">✏️</div>
-                <div style="font-weight: 700; margin-top: 6px;">मान खुद भरें</div>
-                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">pH, नाइट्रोजन, फॉस्फोरस, पोटाश भरें</div>
-              </div>
-
-              <input type="file" id="soil-file-input" accept=".pdf,.jpg,.jpeg,.png,.webp" style="display: none;">
-              <input type="file" id="soil-camera-input" accept="image/*" capture="environment" style="display: none;">
-            </div>
-
-            <!-- Soil Loading -->
-            <div id="soil-loading" style="display: none; text-align: center; padding: 40px;">
-              <div style="font-size: 1.5rem;">⏳</div>
-              <div style="margin-top: 8px; font-size: 0.9rem; color: var(--text-muted);">रिपोर्ट पढ़ी जा रही है...</div>
-            </div>
-
-            <!-- Soil Review Form -->
-            <div id="soil-review-form" style="display: none; flex-direction: column; gap: 12px;">
-              <h3 style="font-size: 1.1rem; font-weight: 700;">रिपोर्ट की जानकारी जांचें</h3>
-              <p style="font-size: 0.85rem; color: var(--text-muted);">मैंने रिपोर्ट से यह जानकारी पढ़ी है। कृपया जांच लें।</p>
-
-              <div id="soil-form-fields" style="display: flex; flex-direction: column; gap: 10px;">
-                <!-- Fields populated by JavaScript -->
-              </div>
-
-              <div style="display: flex; gap: 8px; margin-top: 8px;">
-                <button id="soil-save-btn" style="flex: 1; padding: 12px; border-radius: 10px; border: none; background: #2C6B37; color: white; font-weight: 700; cursor: pointer;">सही है, सेव करें</button>
-                <button id="soil-reupload-btn" style="padding: 12px 16px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg-dark); color: var(--text-main); cursor: pointer;">फिर से अपलोड करें</button>
-              </div>
-            </div>
-
-            <!-- Soil Summary -->
-            <div id="soil-summary" style="display: none; flex-direction: column; gap: 16px;">
-              <h3 style="font-size: 1.2rem; font-weight: 700;">मिट्टी का सार</h3>
-              <div id="soil-interpretation" style="padding: 14px; border-radius: 10px; background: var(--bg-dark); border: 1px solid var(--border); font-size: 0.9rem; line-height: 1.6;">
-                <!-- Interpretation populated by JS -->
-              </div>
-
-              <div style="padding: 12px; border-radius: 8px; background: rgba(44,107,55,0.1); border-left: 3px solid #2C6B37; font-size: 0.85rem;">
-                खाद की सही सलाह के लिए फसल की अवस्था और पिछली खाद की जानकारी भी जरूरी है।
-              </div>
-
-              <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                <button id="soil-fertilizer-advice-btn" style="padding: 10px 14px; border-radius: 8px; border: 1px solid #2C6B37; background: rgba(44,107,55,0.1); color: #2C6B37; cursor: pointer; font-size: 0.85rem;">खाद सलाह देखें</button>
-                <button id="soil-improve-btn" style="padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-dark); color: var(--text-main); cursor: pointer; font-size: 0.85rem;">मिट्टी सुधार सुझाव</button>
-              </div>
-
-              <!-- Expandable detailed view -->
-              <details style="margin-top: 8px;">
-                <summary style="cursor: pointer; font-size: 0.85rem; color: var(--text-muted); padding: 8px;">विस्तृत जानकारी</summary>
-                <div id="soil-detailed-values" style="padding: 12px; border-radius: 8px; background: var(--bg-dark); margin-top: 8px; font-size: 0.85rem;">
-                  <!-- Raw values populated by JS -->
-                </div>
-              </details>
-            </div>
-          </div>
-        </section>
-
-        <!-- SCREEN 5: MARKET PANEL -->
-        <section id="screen-market" class="app-screen">
-          <div id="market-canvas"></div>
-        </section>
-
-        <!-- SCREEN 5: MORE PANEL -->
-        <section id="screen-more" class="app-screen">
-          <div id="more-canvas"></div>
-        </section>
-
-
-
-        <!-- SCREEN 12: SETTINGS -->
-        <section id="screen-settings" class="app-screen">
-          <div id="settings-canvas"></div>
-        </section>
+        </aside>
 
       </main>
 
-      <!-- GLOBAL BOTTOM NAVIGATION BAR -->
+      <!-- GLOBAL BOTTOM NAVIGATION BAR (mobile only) -->
       <nav class="bottom-nav-bar">
         <a href="#" data-tab="home" class="nav-tab active">
           <span class="nav-icon">🏠</span>
@@ -383,11 +329,11 @@
           <span class="nav-icon">🌱</span>
           <span class="nav-label" data-tr="nav_farm">My Farm</span>
         </a>
-        <a href="#" data-tab="ask" class="nav-tab nav-tab-center">
+        <a href="#" data-tab="chat" class="nav-tab nav-tab-center">
           <div class="nav-mic-bubble">
-            <span class="nav-icon mic-icon">🎙️</span>
+            <span class="nav-icon mic-icon">💬</span>
           </div>
-          <span class="nav-label" data-tr="nav_ask">Advisor</span>
+          <span class="nav-label" data-tr="nav_ask">Chat</span>
         </a>
         <a href="#" data-tab="market" class="nav-tab">
           <span class="nav-icon">📈</span>
@@ -442,9 +388,9 @@
   <script src="/agui/local_db.js?v=3"></script>
   <script src="/agui/crop_classifier.js?v=3"></script>
   <script src="/agui/local_models.js?v=3"></script>
-  <script src="/agui/pwa_config.js?v=3"></script>
+  <script src="/agui/pwa_config.js?v=4"></script>
   <script src="/agui/device_capabilities.js?v=2"></script>
-  <script src="/agui/dashboard.js?v=16"></script>
+  <script src="/agui/dashboard.js?v=18"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {

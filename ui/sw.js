@@ -1,4 +1,4 @@
-const CACHE_NAME = 'krishi-sampark-cache-v3';
+const CACHE_NAME = 'krishi-sampark-cache-v5';
 const ASSETS_TO_CACHE = [
   '/agui/index.html',
   '/agui/styles.css',
@@ -148,7 +148,7 @@ self.addEventListener('fetch', event => {
           // Fetch updated version in the background to keep cache fresh
           fetch(event.request)
             .then(networkResponse => {
-              if (networkResponse.status === 200) {
+              if (networkResponse.status === 200 && event.request.method === 'GET') {
                 caches.open(CACHE_NAME).then(cache => cache.put(event.request, networkResponse));
               }
             })
@@ -159,7 +159,8 @@ self.addEventListener('fetch', event => {
         // Return from network if not in cache
         return fetch(event.request).then(response => {
           // Do not cache non-200 or non-http responses (e.g. chrome extensions)
-          if (!response || response.status !== 200 || !event.request.url.startsWith('http')) {
+          if (!response || response.status !== 200 || !event.request.url.startsWith('http')
+              || event.request.method !== 'GET') {
             return response;
           }
           const responseToCache = response.clone();

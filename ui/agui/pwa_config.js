@@ -18,9 +18,12 @@
   // In production, these would be set by the deployment environment.
   const isLocalhost = location.hostname === '127.0.0.1' || location.hostname === 'localhost';
 
-  window.ADK_BACKEND_URL = isLocalhost ? 'http://127.0.0.1:8080' : '';  // Same origin in production
+  // The FastAPI app (via get_fast_api_app) serves both the ADK agent endpoints
+  // (/run_sse, /apps/.../sessions) and the static UI on the same port (8000).
+  // So ADK_BACKEND_URL and API_BASE_URL should always be same-origin ('').
+  window.ADK_BACKEND_URL = '';  // Same origin — ADK endpoints served by same FastAPI app
   window.ADK_APP_NAME = 'agents';
-  window.API_BASE_URL = isLocalhost ? 'http://localhost:8000' : '';  // Same origin in production
+  window.API_BASE_URL = '';  // Same origin — TTS/STT/profile endpoints on same server
 
   console.log('[PWA Config] Backend URL:', window.ADK_BACKEND_URL || 'same-origin');
   console.log('[PWA Config] App name:', window.ADK_APP_NAME);

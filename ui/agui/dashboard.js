@@ -478,6 +478,17 @@ document.addEventListener('DOMContentLoaded', () => {
       if (menuToggle) menuToggle.focus();
     }
 
+    // 'chat' tab opens the chat pane on mobile (does not switch content)
+    if (tabId === 'chat') {
+      const chatPane = document.getElementById('chat-pane');
+      if (chatPane) chatPane.classList.add('open');
+      const chatMessages = document.getElementById('chat-messages');
+      if (chatMessages) chatMessages.scrollTop = chatMessages.scrollHeight;
+      const input = document.getElementById('user-input-field');
+      if (input) input.focus();
+      return;
+    }
+
     // Remove active styles from bottom nav links
     const tabs = document.querySelectorAll('.bottom-nav-bar .nav-tab');
     tabs.forEach(t => t.classList.remove('active'));
@@ -492,30 +503,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const targetLeftTab = document.querySelector(`.left-nav-item[data-tab="${tabId}"]`);
     if (targetLeftTab) targetLeftTab.classList.add('active');
 
-    // Hide all screen contents
-    const screens = document.querySelectorAll('.screen-container .app-screen');
+    // Hide all content pane screens (chat pane is separate and always visible)
+    const screens = document.querySelectorAll('.content-pane .app-screen');
     screens.forEach(s => s.classList.remove('active'));
 
-    // Show active screen content
+    // Show active screen content in the content pane
     const targetScreen = document.getElementById(`screen-${tabId}`);
     if (targetScreen) {
       targetScreen.classList.add('active');
-    }
-
-    // If 'ask' tab, scroll chat to bottom and focus input
-    if (tabId === 'ask') {
-      const chatMessages = document.getElementById('chat-messages');
-      if (chatMessages) chatMessages.scrollTop = chatMessages.scrollHeight;
-      const input = document.getElementById('user-input-field');
-      if (input) input.focus();
-    }
-
-    // If 'expert' tab, scroll expert chat to bottom and focus input
-    if (tabId === 'expert') {
-      const expertMsgs = document.getElementById('expert-messages');
-      if (expertMsgs) expertMsgs.scrollTop = expertMsgs.scrollHeight;
-      const expInput = document.getElementById('expert-input-field');
-      if (expInput) expInput.focus();
     }
 
     if (!skipLoadSchema) {
@@ -533,7 +528,6 @@ document.addEventListener('DOMContentLoaded', () => {
       } else if (tabId === 'settings') {
         loadSchema('privacy_preferences', 'settings-canvas');
       }
-      // 'expert' and 'ask' tabs have no schemas — they are self-contained chat UIs
     }
   };
 
@@ -546,6 +540,23 @@ document.addEventListener('DOMContentLoaded', () => {
       window.switchTab(tabId);
     });
   });
+
+  // Chat toggle button (mobile) — opens/closes the chat pane as a slide-in overlay
+  const chatToggleBtn = document.getElementById('chat-toggle-btn');
+  if (chatToggleBtn) {
+    chatToggleBtn.addEventListener('click', () => {
+      const chatPane = document.getElementById('chat-pane');
+      if (chatPane) {
+        chatPane.classList.toggle('open');
+        if (chatPane.classList.contains('open')) {
+          const chatMessages = document.getElementById('chat-messages');
+          if (chatMessages) chatMessages.scrollTop = chatMessages.scrollHeight;
+          const input = document.getElementById('user-input-field');
+          if (input) input.focus();
+        }
+      }
+    });
+  }
 
   // Bind Ask microphone panel buttons
   // Microphone event listener and recognition logic are loaded from voice.js
@@ -789,8 +800,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function getSessionId() {
     if (sessionId) return sessionId;
-    const baseUrl = window.ADK_BACKEND_URL || 'http://127.0.0.1:8080';
-    const appName = window.ADK_APP_NAME || 'agents';
+    const baseUrl = window.ADK_BACKEND_URL ?? '';
+    const appName = window.ADK_APP_NAME ?? 'agents';
     try {
       const resp = await fetch(`${baseUrl}/apps/${appName}/users/user/sessions`, {
         method: 'POST',
@@ -935,6 +946,9 @@ document.addEventListener('DOMContentLoaded', () => {
   function detectAndRenderA2UI(text) {
     if (!text) return false;
 
+    // Render agent-triggered schemas into the content pane, not the chat pane
+    const contentCanvas = document.querySelector('.content-pane') || aguiCanvas;
+
     const codeBlockRegex = /```json\s*([\s\S]*?)\s*```/;
     const match = text.match(codeBlockRegex);
     if (match) {
@@ -948,7 +962,7 @@ document.addEventListener('DOMContentLoaded', () => {
           if (data.title && data.title.toLowerCase().includes('simulator')) {
             bindSimulationState(data);
           }
-          window.renderA2UIPayload(data, aguiCanvas);
+          window.renderA2UIPayload(data, contentCanvas);
           return true;
         }
       } catch (e) {
@@ -969,7 +983,7 @@ document.addEventListener('DOMContentLoaded', () => {
           if (data.title && data.title.toLowerCase().includes('simulator')) {
             bindSimulationState(data);
           }
-          window.renderA2UIPayload(data, aguiCanvas);
+          window.renderA2UIPayload(data, contentCanvas);
           return true;
         }
       } catch (e) {
@@ -1391,8 +1405,8 @@ ${text}`;
 
     try {
       const activeSessionId = await getSessionId();
-      const baseUrl = window.ADK_BACKEND_URL || 'http://127.0.0.1:8080';
-      const appName = window.ADK_APP_NAME || 'agents';
+      const baseUrl = window.ADK_BACKEND_URL ?? '';
+      const appName = window.ADK_APP_NAME ?? 'agents';
       const response = await fetch(`${baseUrl}/run_sse`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1514,8 +1528,9 @@ ${text}`;
       if (!renderedInline && window.panelRouter) {
         const targetSchema = window.panelRouter.routeIntent(fullResponseText);
         if (targetSchema) {
+          // Render schema in the content pane — chat stays open in the right pane
           loadSchema(targetSchema);
-          showToast("Workspace Synced", `Panel switched to ${targetSchema.replace('_', ' ')} based on advisor reply.`, "success");
+          showToast("Panel Updated", `${targetSchema.replace('_', ' ')} loaded in content panel.`, "info");
         }
       }
 
@@ -1942,6 +1957,9 @@ ${text}`;
       // Apply UI translations
       applyLanguageTranslation(selectedLang);
       updateFarmerDisplayNames(selectedLang);
+
+      // Notify other modules (e.g. voice.js) that language changed
+      window.dispatchEvent(new Event('languageChanged'));
 
       // Reload current active tab schema to translate the dynamic widget canvas!
       const activeTab = document.querySelector('.bottom-nav-bar .nav-tab.active');
