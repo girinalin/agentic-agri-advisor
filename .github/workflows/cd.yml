@@ -380,6 +380,15 @@ jobs:
           --region=us-east1 \
           --no-confirm-project 2>&1 | tee agents_cli_deploy.log
 
+    - name: Ensure Cloud Run public invoker (post-deploy)
+      run: |
+        set -euo pipefail
+        gcloud run services add-iam-policy-binding agentic-agri-advisor \
+          --project="${{ secrets.GCP_PROJECT_ID }}" \
+          --region=us-east1 \
+          --member="allUsers" \
+          --role="roles/run.invoker"
+
     - name: Upload agents-cli deploy log
       uses: actions/upload-artifact@v5
       if: always()

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#2C6B37" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <title>Krishi Sampark</title>
+  <link rel="stylesheet" href="/landing.css?v=53" />
+  <script src="/device.js?v=1"></script>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <button id="nav-hamburger" class="nav-hamburger" aria-label="Open Menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="brand">
+      <span class="brand-icon" aria-hidden="true">🌿</span>
+      <div>
+        <div class="brand-title" data-i18n="landing.header.brandTitle">Krishi Sampark</div>
+        <div class="brand-sub" data-i18n="landing.header.brandSubtitle">Smart farming help in your language</div>
+      </div>
+    </div>
+
+    <nav class="nav-links" aria-label="Primary">
+      <a href="#about" data-i18n="landing.header.navAbout">About</a>
+      <a href="#features" data-i18n="landing.header.navFeatures">Features</a>
+      <a href="#how-it-works" data-i18n="landing.header.navHowItWorks">How It Works</a>
+      <a href="#trust" data-i18n="landing.header.navSafetyTrust">Safety & Trust</a>
+      <a href="#contact" data-i18n="landing.header.navContact">Contact</a>
+    </nav>
+
+    <div class="top-actions">
+      <select id="language-selector" aria-label="Language">
+        <option value="en">English</option>
+        <option value="hi">Hindi</option>
+        <option value="mr">Marathi</option>
+        <option value="te">Telugu</option>
+        <option value="sw">Swahili</option>
+      </select>
+      <button id="header-guest-btn" class="btn ghost" data-i18n="landing.hero.continueAsGuest">Continue as Guest</button>
+      <button id="header-google-fallback" class="btn google-fallback" type="button" data-i18n="landing.hero.signInWithGoogle">Sign in with Google</button>
+      <div id="header-google-btn" class="google-btn"></div>
+    </div>
+  </header>
+
+  <!-- Mobile navigation drawer -->
+  <div id="nav-drawer-backdrop" class="nav-drawer-backdrop"></div>
+  <nav id="nav-drawer" class="nav-drawer" aria-label="Mobile Navigation">
+    <a href="#about" data-i18n="landing.header.navAbout">About</a>
+    <a href="#features" data-i18n="landing.header.navFeatures">Features</a>
+    <a href="#how-it-works" data-i18n="landing.header.navHowItWorks">How It Works</a>
+    <a href="#trust" data-i18n="landing.header.navSafetyTrust">Safety & Trust</a>
+    <a href="#contact" data-i18n="landing.header.navContact">Contact</a>
+  </nav>
+
+  <main>
+    <section class="hero" id="about">
+      <div class="hero-copy">
+        <h1 data-i18n="landing.hero.title">Your farming companion for better decisions</h1>
+        <p data-i18n="landing.hero.description">
+          Ask questions, check crop problems, understand soil reports, plan irrigation,
+          and view mandi prices in your own language.
+        </p>
+        <div class="hero-actions">
+          <button id="hero-guest-btn" class="btn primary" data-i18n="landing.hero.continueAsGuest">Continue as Guest</button>
+          <button id="hero-google-fallback" class="btn google-fallback" type="button" data-i18n="landing.hero.signInWithGoogle">Sign in with Google</button>
+          <div id="hero-google-btn" class="google-btn"></div>
+        </div>
+        <div id="auth-status" class="auth-status" aria-live="polite"></div>
+        <div class="voice-highlight" aria-live="polite">
+          <span aria-hidden="true">🎙️</span>
+          <strong data-i18n="landing.hero.voiceAssistTitle">Voice Assist</strong>
+          <span id="voice-highlight-text" data-i18n="landing.hero.voiceAssistText">Tap mic and ask your farming question in your language</span>
+        </div>
+        <p class="trust-note" data-i18n="landing.hero.trustNote">
+          No technical knowledge required. Built for farmers, students, and agriculture advisors.
+        </p>
+      </div>
+
+      <div class="hero-media">
+        <div class="hero-art" aria-hidden="true"></div>
+
+        <aside class="hero-panel" id="trust">
+          <h3 data-i18n="landing.hero.trustPanelTitle">Works even with limited internet</h3>
+          <div class="trust-list">
+            <div class="trust-item"><span aria-hidden="true">🗣️</span><p data-i18n="landing.hero.trust1">Local language support (5+ languages)</p></div>
+            <div class="trust-item"><span aria-hidden="true">📶</span><p data-i18n="landing.hero.trust2">Offline-first - your data stays safe</p></div>
+            <div class="trust-item"><span aria-hidden="true">🛡️</span><p data-i18n="landing.hero.trust3">Safety-checked advice for fertilizers & pesticides</p></div>
+            <div class="trust-item"><span aria-hidden="true">🧑‍🌾</span><p data-i18n="landing.hero.trust4">Expert help for complex issues</p></div>
+            <div class="trust-item"><span aria-hidden="true">🔒</span><p data-i18n="landing.hero.trust5">Privacy aware - your data is protected</p></div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section id="features" class="cards-section">
+      <article class="feature-card"><div class="feature-icon" aria-hidden="true">🎙️</div><h4 data-i18n="landing.features.askTitle">Ask or Speak to Krishi Sastri</h4><p data-i18n="landing.features.askDescription">Ask by text or voice and get simple answers for crop, water, fertilizer, and pest questions.</p></article>
+      <article class="feature-card"><div class="feature-icon" aria-hidden="true">📷</div><h4 data-i18n="landing.features.photoTitle">Crop Photo Check</h4><p data-i18n="landing.features.photoDescription">Take a photo and get guided help for crop health problems.</p></article>
+      <article class="feature-card"><div class="feature-icon" aria-hidden="true">🌱</div><h4 data-i18n="landing.features.soilTitle">Soil Report</h4><p data-i18n="landing.features.soilDescription">Upload a soil test report and understand what it means in simple words.</p></article>
+      <article class="feature-card"><div class="feature-icon" aria-hidden="true">🏪</div><h4 data-i18n="landing.features.marketTitle">Mandi Prices</h4><p data-i18n="landing.features.marketDescription">Check daily market prices and trends in your local market.</p></article>
+      <article class="feature-card"><div class="feature-icon" aria-hidden="true">📅</div><h4 data-i18n="landing.features.planTitle">Today's Farm Plan</h4><p data-i18n="landing.features.planDescription">See simple recommended actions for today's farm activities.</p></article>
+      <article class="feature-card"><div class="feature-icon" aria-hidden="true">🧑‍🌾</div><h4 data-i18n="landing.features.expertTitle">Expert Help</h4><p data-i18n="landing.features.expertDescription">Escalate complex issues to agriculture experts for support.</p></article>
+    </section>
+
+    <section id="how-it-works" class="how-section">
+      <h3 data-i18n="landing.howItWorks.title">How it works</h3>
+      <p class="how-summary" data-i18n="landing.howItWorks.summary">Three quick steps to get simple farm guidance from a photo, voice, or text question.</p>
+      <div class="how-image-wrap" id="how-image-wrap">
+        <img
+          id="how-it-works-image"
+          class="how-image"
+          src="/assets/how-it-works-content.png?v=1"
+          alt="How it works in three steps"
+          loading="lazy"
+        />
+      </div>
+      <div class="how-infographic" id="how-infographic-fallback">
+        <div class="how-step">
+          <div class="num">1</div>
+          <h4 data-i18n="landing.howItWorks.step1Title">Tell us about your farm</h4>
+          <p data-i18n="landing.howItWorks.step1Description">Add your crop, location, soil type, and farm details.</p>
+          <div class="step-badge" aria-hidden="true">🌾</div>
+        </div>
+
+        <div class="connector" aria-hidden="true">→</div>
+
+        <div class="how-step">
+          <div class="num">2</div>
+          <h4 data-i18n="landing.howItWorks.step2Title">Ask, upload, or take a photo</h4>
+          <p data-i18n="landing.howItWorks.step2Description">Ask questions, upload soil report, or take a photo of your crop.</p>
+          <div class="step-badge" aria-hidden="true">📷</div>
+        </div>
+
+        <div class="connector" aria-hidden="true">→</div>
+
+        <div class="how-step">
+          <div class="num">3</div>
+          <h4 data-i18n="landing.howItWorks.step3Title">Get simple guidance and next actions</h4>
+          <p data-i18n="landing.howItWorks.step3Description">Receive easy advice, safety-checked recommendations, and follow next steps.</p>
+          <div class="step-badge" aria-hidden="true">✅</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="conditions-strip">
+      <h3 data-i18n="landing.trust.title">Made for real farming conditions</h3>
+      <div class="conditions-grid">
+        <div class="condition-item"><span aria-hidden="true">📶</span><strong data-i18n="landing.trust.offlineTitle">Offline-first</strong><small data-i18n="landing.trust.offlineDescription">Works with limited internet</small></div>
+        <div class="condition-item"><span aria-hidden="true">🗣️</span><strong data-i18n="landing.trust.languageTitle">Local languages</strong><small data-i18n="landing.trust.languageDescription">Speak your own language</small></div>
+        <div class="condition-item"><span aria-hidden="true">👨‍🌾</span><strong data-i18n="landing.trust.farmerFriendlyTitle">Farmer friendly</strong><small data-i18n="landing.trust.farmerFriendlyDescription">Easy words, simple recommendations</small></div>
+        <div class="condition-item"><span aria-hidden="true">🛡️</span><strong data-i18n="landing.trust.safetyTitle">Safety first</strong><small data-i18n="landing.trust.safetyDescription">Checked advice for fertilizers and pesticides</small></div>
+        <div class="condition-item"><span aria-hidden="true">🧑‍🔬</span><strong data-i18n="landing.trust.expertTitle">Expert network</strong><small data-i18n="landing.trust.expertDescription">Human experts for complex cases</small></div>
+        <div class="condition-item"><span aria-hidden="true">🔒</span><strong data-i18n="landing.trust.privacyTitle">Privacy protected</strong><small data-i18n="landing.trust.privacyDescription">Your data is safe and secure</small></div>
+      </div>
+    </section>
+
+    <section class="capstone-strip" id="contact">
+      <div class="capstone-badge">
+        <span aria-hidden="true">🛡️</span>
+        <strong data-i18n="landing.capstone.title">Krishi Sampark Platform</strong>
+      </div>
+      <p data-i18n="landing.capstone.description">
+        Capstone demo platform for offline-first agriculture intelligence with multilingual guidance,
+        safety-checked recommendations, and expert escalation support.
+      </p>
+      <div class="capstone-art" aria-hidden="true">🌿</div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-brand">
+      <span aria-hidden="true">🌿</span>
+      <div>
+        <strong data-i18n="landing.footer.brandTitle">Krishi Sampark</strong>
+        <small data-i18n="landing.footer.brandSubtitle">Smart farming help in your language</small>
+      </div>
+    </div>
+    <nav class="footer-links" aria-label="Footer">
+      <a href="#about" data-i18n="landing.footer.about">About Us</a>
+      <a href="#" data-i18n="landing.footer.privacy">Privacy Policy</a>
+      <a href="#" data-i18n="landing.footer.terms">Terms of Use</a>
+      <a href="#" data-i18n="landing.footer.help">Help</a>
+      <a href="#contact" data-i18n="landing.footer.contact">Contact Us</a>
+    </nav>
+    <div class="footer-copy" data-i18n="landing.footer.copyright">© 2025 Krishi Sampark. All rights reserved.</div>
+    <div class="footer-social" aria-label="Social Links">
+      <a href="#" aria-label="Facebook">f</a>
+      <a href="#" aria-label="WhatsApp">w</a>
+      <a href="#" aria-label="YouTube">▶</a>
+      <a href="#" aria-label="Email">✉</a>
+    </div>
+  </footer>
+
+  <div id="guest-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="guest-title">
+    <div class="modal-card modal-card-wide">
+      <h3 id="guest-title" data-i18n="landing.auth.guestTitle">Tell us about your farm</h3>
+      <p data-i18n="landing.auth.guestMessage">
+        Just a few details so we can give you the best farming advice.
+        Your data stays on this device.
+      </p>
+      <div class="guest-form-grid">
+        <div class="guest-form-field">
+          <label for="guest-name" data-i18n="landing.auth.nameLabel">Your Name</label>
+          <input id="guest-name" type="text" placeholder="e.g. Madhav Ji" />
+        </div>
+        <div class="guest-form-field">
+          <label for="guest-email" data-i18n="landing.auth.emailLabel">Email</label>
+          <input id="guest-email" type="email" placeholder="name@example.com" />
+        </div>
+        <div class="guest-form-field">
+          <label for="guest-region" data-i18n="landing.auth.regionLabel">Location</label>
+          <select id="guest-region">
+            <option value="" data-i18n="landing.auth.selectPlaceholder">Select your region</option>
+            <option value="Nagpur District">Nagpur District (Maharashtra)</option>
+            <option value="Pune District">Pune District (Maharashtra)</option>
+            <option value="Indore District">Indore District (Madhya Pradesh)</option>
+            <option value="Hyderabad District">Hyderabad District (Telangana)</option>
+            <option value="Rift Valley Region">Rift Valley Region (Kenya)</option>
+          </select>
+        </div>
+        <div class="guest-form-field">
+          <label for="guest-soil" data-i18n="landing.auth.soilLabel">Soil Type</label>
+          <select id="guest-soil">
+            <option value="" data-i18n="landing.auth.selectPlaceholder">Select soil type</option>
+            <option value="Black Clay (Cotton Soil)">Black Clay (Cotton Soil)</option>
+            <option value="Red Sandy Loam">Red Sandy Loam</option>
+            <option value="Alluvial">Alluvial</option>
+          </select>
+        </div>
+        <div class="guest-form-field">
+          <label for="guest-acres" data-i18n="landing.auth.acresLabel">Field Size (Acres)</label>
+          <input id="guest-acres" type="number" min="0.1" step="0.1" placeholder="e.g. 5" />
+        </div>
+        <div class="guest-form-field">
+          <label for="guest-crop" data-i18n="landing.auth.cropLabel">Primary Crop</label>
+          <select id="guest-crop">
+            <option value="" data-i18n="landing.auth.selectPlaceholder">Select crop</option>
+            <option value="Corn">Maize / Corn</option>
+            <option value="Wheat">Wheat</option>
+            <option value="Soybeans">Soybeans</option>
+            <option value="Rice">Rice</option>
+          </select>
+        </div>
+      </div>
+      <div id="guest-error" class="error"></div>
+      <div class="modal-actions">
+        <button id="guest-continue" class="btn primary" data-i18n="landing.auth.continue">Start Advising</button>
+        <button id="guest-close" class="btn ghost" data-i18n="landing.auth.close">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/landing.js?v=14"></script>
+</body>
+</html>

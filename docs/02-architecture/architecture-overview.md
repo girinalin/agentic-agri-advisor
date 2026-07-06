@@ -60,6 +60,8 @@ Krishi Sampark uses a **Router-Specialist multi-agent pattern** built on the Goo
 | Agent-skills-based AI-SDLC | [ADR-AAA-003](adr/ADR-AAA-003-agent-skills-based-ai-sdlc.md) | 10 lifecycle agents, 29 skills, evidence-driven |
 | Edge-cloud advisor routing | [ADR-AAA-004](adr/ADR-AAA-004-edge-cloud-advisor-routing.md) | Simple queries local, complex queries cloud |
 | Agricultural Safety Kernel | [ADR-AAA-005](adr/ADR-AAA-005-agricultural-safety-kernel.md) | Banned chemicals, dosage limits, PHI |
+| Two-pane layout (content + chat) | — | Chat always visible; agent-triggered schemas render in content pane without replacing chat |
+| Same-origin ADK endpoints | — | FastAPI serves both ADK `/run_sse` and static UI on port 8000; no separate port needed |
 
 ## Technology Stack
 
@@ -67,12 +69,11 @@ Krishi Sampark uses a **Router-Specialist multi-agent pattern** built on the Goo
 |-------|-----------|----------------|
 | Agent Framework | Google ADK | `google-adk>=2.0.0` |
 | LLM | Gemini 3.5 Flash | Retry options, temperature-tuned per agent |
-| Backend | FastAPI | Port 8000, SSE streaming |
-| Agent Playground | ADK Playground | Port 8080, `/run_sse` endpoint |
-| Frontend | Vanilla JS PWA | Service worker v3, IndexedDB (11 stores) |
-| Database | SQLite | `farm_twin.db` — farmers, fields, plantings, soil_reports |
+| Backend | FastAPI | Port 8000, SSE streaming, serves ADK + static UI |
+| Frontend | Vanilla JS PWA | Two-pane layout (content + chat), Service worker v5 |
+| Database | SQLite / Firestore | SQLite (local), Firestore emulator (local dev), Firestore (GCP) |
 | MCP Servers | Python | 8 servers (weather, market, okf, rag, image_analysis, tts, stt, translation) |
-| Voice | Web Speech API + edge-tts | Browser-native STT, backend neural TTS fallback |
+| Voice | Web Speech API + edge-tts | Browser-native STT, backend neural TTS (edge-tts) |
 | Local Models | MediaPipe WebGenAI + TFLite | Gemma 2B (WebGPU), PlantVillage classifier (38 labels) |
 
 ## Folder Structure

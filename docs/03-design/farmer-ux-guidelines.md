@@ -33,24 +33,34 @@ Krishi Sampark is designed for **smallholder farmers with limited technical lite
 
 | Color | Usage | Hex |
 |-------|-------|-----|
-| Brand Green | Primary actions, headers | `#2C6B37` / `#3E8E41` |
+| Brand Green | Primary actions, header gradient | `#2C6B37` / `#4CAF50` |
 | Light Green | Backgrounds, cards | `#E8F5E9` |
-| Dark | Text, dark mode bg | `#1A1A2E` / `#0F0F1E` |
+| Cream | Page background (light theme) | `#F5F7F4` |
+| White | Cards, panels | `#FFFFFF` |
 | Warning Yellow | Medium-priority alerts | `#F9A825` |
 | Error Red | Critical alerts, banned chemicals | `#D32F2F` |
 | Success Green | Good status indicators | `#43A047` |
 
+### Theme Modes
+
+- **Light theme** (default): Warm cream background, white cards, green gradient header
+- **Dark theme** (toggle via 🌙): Dark background, dark panels, green accents
+- Header uses `linear-gradient(135deg, #2C6B37, #4CAF50)` in light mode
+
 ## Touch Targets
 
 - Minimum touch target: **44×44 pixels** (WCAG recommendation)
+- Enforced via `@media (pointer: coarse)` on all interactive elements
 - Buttons in nav bar: full-width with icon + text
 - Quick action cards: large tappable areas, no hover-only interactions
+- `touch-action: manipulation` removes 300ms tap delay
+- `-webkit-tap-highlight-color: transparent` removes gray flash on tap
 
 ## Typography
 
 - Primary font: Outfit (Google Web Font), loaded via service worker cache
 - Body text size: 16px minimum (farmers may have vision issues)
-- Heading sizes: H1=28px, H2=24px, H3=20px, body=16px, caption=14px
+- Heading sizes: Fluid via `clamp()` — H1 scales from 28px to 68px based on viewport
 - Line height: 1.5 for readability
 
 ## Voice UX
@@ -70,6 +80,7 @@ Krishi Sampark is designed for **smallholder farmers with limited technical lite
 
 ## Related Documents
 
+- [Responsive Design](responsive-design.md)
 - [Navigation & Screen Flow](navigation-and-screen-flow.md)
 - [Localization Guidelines](localization-guidelines.md)
 - [Accessibility Guidelines](accessibility-guidelines.md)
