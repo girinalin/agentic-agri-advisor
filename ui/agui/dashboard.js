@@ -1510,12 +1510,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Delegate a query to the cloud Expert (Krishi Visheshagya)
   async function delegateToExpert(originalQuery, langCode) {
-    // Switch to Ask tab (Expert screen)
+    // Switch to Ask tab
     window.switchTab('ask');
+
+    // Show the expert form (hide advisor selection and sastri chat)
+    if (typeof showExpertForm === 'function') {
+      showExpertForm();
+    } else {
+      // Manual fallback
+      const advisorSel = document.getElementById('advisor-selection-screen');
+      const sastriChat = document.getElementById('sastri-chat-screen');
+      const expertForm = document.getElementById('expert-form-screen');
+      if (advisorSel) advisorSel.style.display = 'none';
+      if (sastriChat) sastriChat.style.display = 'none';
+      if (expertForm) expertForm.style.display = 'flex';
+    }
 
     // Prepare a well-structured query for the expert
     const savedProfile = localStorage.getItem('aaa_farmer_profile');
-    let expertQuery = originalQuery;
     let context = '';
     if (savedProfile) {
       try {
@@ -1525,16 +1537,28 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Show the expert chat with the prepared query
-    const userInputField = document.getElementById('user-input-field');
-    if (userInputField) {
-      // Pre-fill the input with the original query
-      userInputField.value = originalQuery;
-      // Trigger the expert send
+    // The expert form uses a textarea (expert-question-input), while the expert chat uses an input (expert-input-field)
+    const expertQuestionInput = document.getElementById('expert-question-input');
+    const expertInputField = document.getElementById('expert-input-field');
+    
+    if (expertQuestionInput) {
+      // Pre-fill the expert form textarea with the original query
+      expertQuestionInput.value = originalQuery;
+    }
+    if (expertInputField) {
+      // Also pre-fill the expert chat input
+      expertInputField.value = originalQuery;
+      // Trigger the expert send — this sends to cloud Gemini
       if (typeof sendExpertMessage === 'function') {
         sendExpertMessage();
-      } else if (typeof handleSend === 'function') {
-        handleSend();
       }
+    }
+
+    // Switch to expert chat view (not the form) so the response is visible
+    const expertChatScreen = document.getElementById('expert-chat-screen');
+    if (expertChatScreen) {
+      document.getElementById('expert-form-screen').style.display = 'none';
+      expertChatScreen.style.display = 'flex';
     }
 
     showToast("Sent to Expert", "Your question has been sent to Krishi Visheshagya for deeper analysis.", "info");

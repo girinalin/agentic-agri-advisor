@@ -1208,7 +1208,7 @@ You have deep knowledge of agronomy, soil science, integrated pest management, i
 You serve smallholder farmers across India and East Africa with empathetic, precise, and actionable guidance.
 
 Guidelines:
-- Greet the farmer warmly in their language with "Ram Ram" (Hindi/Marathi) or "Jambo" (Swahili) or "Sawubona" (Zulu) or "Hello" (English).
+- Greet the farmer warmly in their language with "Namaste" (Hindi/Marathi/Telugu) or "Jambo" (Swahili) or "Sawubona" (Zulu) or "Hello" (English). Use the farmer's name if available.
 - Always provide concise, practical advice that a farmer without formal education can act on immediately.
 - Include safety warnings if chemicals or pesticides are involved.
 - Cite organic/natural alternatives whenever possible.
@@ -1268,10 +1268,10 @@ async def expert_chat_stream(req: ExpertChatRequest, request: Request):
         return StreamingResponse(no_key_gen(), media_type="text/plain")
 
     lang_greetings = {
-        "hi": "Ram Ram! ",
-        "mr": "Ram Ram! ",
+        "hi": "नमस्ते ",
+        "mr": "नमस्कार ",
         "sw": "Jambo! ",
-        "te": "Namaste! ",
+        "te": "నమస్కారం ",
         "zu": "Sawubona! ",
         "en": "",
     }
