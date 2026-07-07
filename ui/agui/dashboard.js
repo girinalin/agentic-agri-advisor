@@ -1608,7 +1608,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // The expert form uses a textarea (expert-question-input), while the expert chat uses an input (expert-input-field)
     const expertQuestionInput = document.getElementById('expert-question-input');
     const expertInputField = document.getElementById('expert-input-field');
-    
+
     // Rephrase the query with farm context for the expert
     const rephrasedQuery = context 
       ? `[Context: ${context}] Farmer's question: ${originalQuery}`
@@ -1886,7 +1886,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!navigator.onLine) {
       thinkingEl.remove();
-      appendExpertMessage('Krishi Sastri', '⚠️ No internet connection. The cloud expert requires an active connection. Please try again when online.', 'expert-msg');
+      appendExpertMessage('Krishi Visheshagya', '⚠️ No internet connection. The cloud expert requires an active connection. Please try again when online.', 'expert-msg');
       return;
     }
 
@@ -1912,7 +1912,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // Streaming: response is newline-delimited JSON
-      const { element: msgBubble, textSpan: msgText } = appendExpertMessage('Krishi Sastri', '', 'expert-msg');
+      const { element: msgBubble, textSpan: msgText } = appendExpertMessage('Krishi Visheshagya', '', 'expert-msg');
       let fullText = '';
 
       const reader = resp.body.getReader();
@@ -1946,7 +1946,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     } catch (err) {
       thinkingEl.remove();
-      appendExpertMessage('Krishi Sastri', `⚠️ Could not reach cloud expert: ${err.message}. Please check your connection and try again.`, 'expert-msg');
+      appendExpertMessage('Krishi Visheshagya', `⚠️ Could not reach cloud expert: ${err.message}. Please check your connection and try again.`, 'expert-msg');
     }
   }
 
