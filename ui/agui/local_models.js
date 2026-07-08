@@ -1,12 +1,15 @@
 /**
  * local_models.js
- * In-browser Local LLM (Gemma 2B) and TFLite Crop Disease Classification management.
+ * In-browser Local LLM (Gemma-4-2B) and TFLite Crop Disease Classification management.
  * Integrates with MediaPipe WebGenAI and Tasks-Vision APIs with fallback support.
  */
 
 class LocalAiEngine {
   constructor() {
+    this.modelName = window.KRISHI_LOCAL_MODEL_NAME || "Gemma-4-2B";
+    this.modelUrl = window.KRISHI_LOCAL_MODEL_URL || "/models/gemma-4-2b-it-gpu-int4.bin";
     this.llmLoaded = false;
+    this.llmMode = "not_loaded";
     this.classifierLoaded = false;
     this.webGpuSupported = false;
     this.onProgressCallback = null;
@@ -49,8 +52,18 @@ class LocalAiEngine {
     return this.webGpuSupported;
   }
 
+  getStatus() {
+    return {
+      advisor: "Krishi Sastri",
+      model: this.modelName,
+      mode: this.llmMode,
+      loaded: this.llmLoaded,
+      webGpuSupported: this.webGpuSupported
+    };
+  }
+
   /**
-   * Downloads and caches the client-side Gemma 2B model (~1.4GB) using the Cache API.
+   * Downloads and caches the client-side Gemma-4-2B model using the Cache API.
    * Falls back to high-fidelity client-side dialog simulator if offline or hardware fails.
    * @param {function} onProgress - Callback with percentage loaded
    * @returns {Promise<boolean>} Load status
@@ -61,35 +74,37 @@ class LocalAiEngine {
 
     if (this.llmLoaded) return true;
 
-    const MODEL_URL = "/models/gemma-2b-it-gpu-int4.bin";
-    const CACHE_KEY = "gemma-2b-model";
+    const MODEL_URL = this.modelUrl;
+    const CACHE_KEY = `${this.modelName.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-model`;
 
-    console.log('[Local AI] Checking Cache API for local Gemma-2B model...');
+    console.log(`[Local AI] Checking Cache API for local ${this.modelName} model...`);
 
     try {
       const cache = await caches.open('gemma-model-cache');
       const cachedResponse = await cache.match(CACHE_KEY);
 
       if (cachedResponse) {
-        console.log('[Local AI] Model found in local browser Cache API! Loading instantly...');
+        console.log(`[Local AI] ${this.modelName} found in local browser Cache API! Loading instantly...`);
         if (this.onProgressCallback) this.onProgressCallback(100);
         this.llmLoaded = true;
+        this.llmMode = "cached_model";
         return true;
       }
 
       // If not cached, we need to download it from the network
       if (!navigator.onLine) {
         console.warn('[Local AI] Device is offline and model is not cached. Falling back to offline rule engine.');
+        this.llmMode = "offline_rule_fallback";
         return false;
       }
 
-      console.log('[Local AI] Model cache miss. Downloading Gemma-2B IT model from public Google Cloud Storage bucket (~1.4GB)...');
+      console.log(`[Local AI] Model cache miss. Downloading ${this.modelName} from ${MODEL_URL}...`);
 
       const response = await fetch(MODEL_URL);
       if (!response.ok) throw new Error(`Failed to fetch model: ${response.statusText}`);
 
       const reader = response.body.getReader();
-      const contentLength = +response.headers.get('Content-Length') || 1430000000; // fallback approx size of Gemma 2B
+      const contentLength = +response.headers.get('Content-Length') || 1430000000; // fallback approx size for the local Gemma model
       let receivedLength = 0;
       let chunks = [];
 
@@ -111,11 +126,13 @@ class LocalAiEngine {
       const modelBlob = new Blob(chunks);
       await cache.put(CACHE_KEY, new Response(modelBlob));
 
-      console.log('[Local AI] Local Gemma-2B model cached in browser Cache API successfully.');
+      console.log(`[Local AI] Local ${this.modelName} model cached in browser Cache API successfully.`);
       this.llmLoaded = true;
+      this.llmMode = "cached_model";
       return true;
     } catch (err) {
       console.warn('[Local AI] Actual binary download failed or was aborted. Running client-side simulation.', err);
+      this.llmMode = "simulated_rule_fallback";
       // Fallback: Run the simulated progress bar so the developer playground still works gracefully
       return new Promise(resolve => {
         let progress = 0;
@@ -126,6 +143,7 @@ class LocalAiEngine {
           if (progress === 100) {
             clearInterval(interval);
             this.llmLoaded = true;
+            this.llmMode = "simulated_rule_fallback";
             resolve(true);
           }
         }, 100);
@@ -175,6 +193,9 @@ class LocalAiEngine {
    * @returns {Promise<string>} Translated Krishi Sastri response
    */
   async generateText(prompt, context = {}) {
+    if (!this.llmLoaded) {
+      this.llmMode = this.webGpuSupported ? "rule_fallback_model_not_loaded" : "rule_fallback_no_webgpu";
+    }
     const text = prompt.toLowerCase();
     const crop = (context.crop || 'corn').toLowerCase();
     const soil = (context.soil || 'clay').toLowerCase();

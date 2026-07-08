@@ -39,6 +39,60 @@ document.addEventListener('DOMContentLoaded', () => {
     return 'Madhav Ji';
   }
 
+  function dataUrlToBase64(dataUrl) {
+    const value = String(dataUrl || '');
+    const commaIndex = value.indexOf(',');
+    return commaIndex >= 0 ? value.slice(commaIndex + 1) : value;
+  }
+
+  function contentTypeFromDataUrl(dataUrl, fallback = 'image/jpeg') {
+    const match = String(dataUrl || '').match(/^data:([^;]+);base64,/);
+    return match ? match[1] : fallback;
+  }
+
+  async function uploadCropPhoto(dataUrl, source = 'crop_photo') {
+    if (!dataUrl) return null;
+    if (!navigator.onLine) {
+      return {
+        status: 'offline_queued_locally',
+        bucket: '',
+        object_name: '',
+        gcs_uri: '',
+        public_url: '',
+        size_bytes: dataUrl.length,
+        content_type: contentTypeFromDataUrl(dataUrl),
+      };
+    }
+
+    try {
+      const response = await fetch('/api/uploads/user-content', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          category: 'crop_photos',
+          file_name: `${source}_${Date.now()}.jpg`,
+          content_type: contentTypeFromDataUrl(dataUrl),
+          data_base64: dataUrlToBase64(dataUrl),
+        })
+      });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const data = await response.json();
+      return data.storage || null;
+    } catch (err) {
+      console.warn('[Storage] Crop photo upload failed:', err);
+      return {
+        status: 'error',
+        message: err.message || String(err),
+        bucket: '',
+        object_name: '',
+        gcs_uri: '',
+        public_url: '',
+        size_bytes: dataUrl.length,
+        content_type: contentTypeFromDataUrl(dataUrl),
+      };
+    }
+  }
+
   function updateFarmerDisplayNames(language) {
     const name = farmerDisplayNameForLanguage(language);
     ['header-farmer-name', 'left-nav-profile-name'].forEach(id => {
@@ -585,7 +639,9 @@ document.addEventListener('DOMContentLoaded', () => {
     step: 1,
     affectedArea: null,
     photos: [],
+    photoStorage: [],
     currentPhoto: null,
+    currentPhotoStorage: null,
     diagnosis: null
   };
 
@@ -684,7 +740,8 @@ document.addEventListener('DOMContentLoaded', () => {
       confidence: confidence,
       organic_remedy: organic,
       chemical_remedy: chem,
-      alternatives: alternatives
+      alternatives: alternatives,
+      photo_storage: cropDiagnosisState.photoStorage || []
     };
 
     await localDb.saveDiagnosisState(cropDiagnosisState);
@@ -699,12 +756,12 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Hook Custom A2UI 2.0 Actions Dispatcher
-  document.addEventListener('a2ui-action', (e) => {
+  document.addEventListener('a2ui-action', async (e) => {
     const action = e.detail.action;
     console.log(`[A2UI Action] Captured action trigger: ${action}`);
 
     if (action === 'TAKE_CROP_PHOTO' || action === 'START_CROP_DIAGNOSIS') {
-      cropDiagnosisState = { step: 1, affectedArea: null, photos: [], currentPhoto: null, diagnosis: null };
+      cropDiagnosisState = { step: 1, affectedArea: null, photos: [], photoStorage: [], currentPhoto: null, currentPhotoStorage: null, diagnosis: null };
       localDb.saveDiagnosisState(cropDiagnosisState);
       loadStepSchema();
       showToast("Diagnosis Wizard Started", "Select the affected plant region", "success");
@@ -720,11 +777,17 @@ document.addEventListener('DOMContentLoaded', () => {
       loadStepSchema();
     } else if (action === 'ACCEPT_IMAGE') {
       if (cropDiagnosisState.currentPhoto) {
+        if (!cropDiagnosisState.currentPhotoStorage) {
+          cropDiagnosisState.currentPhotoStorage = await uploadCropPhoto(cropDiagnosisState.currentPhoto, 'crop_wizard_accept');
+        }
         cropDiagnosisState.photos.push(cropDiagnosisState.currentPhoto);
+        if (!Array.isArray(cropDiagnosisState.photoStorage)) cropDiagnosisState.photoStorage = [];
+        cropDiagnosisState.photoStorage.push(cropDiagnosisState.currentPhotoStorage);
         cropDiagnosisState.currentPhoto = null;
+        cropDiagnosisState.currentPhotoStorage = null;
       }
       if (cropDiagnosisState.photos.length === 3) {
-        runEdgeAiDiagnosis();
+        await runEdgeAiDiagnosis();
       } else {
         cropDiagnosisState.step = 5;
         localDb.saveDiagnosisState(cropDiagnosisState);
@@ -732,6 +795,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     } else if (action === 'RETAKE_IMAGE') {
       cropDiagnosisState.currentPhoto = null;
+      cropDiagnosisState.currentPhotoStorage = null;
       cropDiagnosisState.step = 3;
       localDb.saveDiagnosisState(cropDiagnosisState);
       loadStepSchema();
@@ -1500,9 +1564,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const langCode = window.currentLanguageState?.code || 'en';
     const preferredLang = window.currentLanguageState?.displayName || 'English';
 
-    // Krishi Sastri always uses local knowledge (OKF + rule-based + Gemma if available)
-    // Only Krishi Visheshagya (Expert) uses cloud Gemini
-    console.log(`[Triage] Routing to local Krishi Sastri (OKF + rule-based).`);
+    // Krishi Sastri always uses local knowledge (OKF + rule-based + Gemma if available).
+    // Only Krishi Bisesagya (Expert) uses cloud Gemini.
+    console.log('[Triage] Routing to local Krishi Sastri.', localAi.getStatus?.());
     const thinkingBubble = appendMessage('Krishi Sastri', 'Thinking...', 'thinking-msg');
     handleAdvisorLocalAnswer(text, langCode, thinkingBubble);
     return;
@@ -1529,10 +1593,10 @@ document.addEventListener('DOMContentLoaded', () => {
     return complexKeywords.some(kw => lower.includes(kw));
   }
 
-  // Offer to escalate a complex query to the cloud Expert (Krishi Visheshagya)
+  // Offer to escalate a complex query to the cloud Expert (Krishi Bisesagya)
   function offerExpertEscalation(originalQuery, langCode) {
     const escalationMessages = {
-      'en': { text: 'This seems like a complex issue. Shall I send this to Krishi Visheshagya (Expert) for deeper analysis?', yes: 'Yes, ask the Expert', no: 'No, thanks' },
+      'en': { text: 'This seems like a complex issue. Shall I send this to Krishi Bisesagya (Expert) for deeper analysis?', yes: 'Yes, ask the Expert', no: 'No, thanks' },
       'hi': { text: 'यह एक जटिल समस्या लग रही है। क्या मैं इसे कृषि विशेषज्ञ को गहन विश्लेषण के लिए भेजूँ?', yes: 'हाँ, विशेषज्ञ से पूछें', no: 'नहीं, ठीक है' },
       'mr': { text: 'ही एक गुंतागुंतीची समस्या वाटते. मी हे कृषी तज्ज्ञांकडे सविस्तर विश्लेषणासाठी पाठवू?', yes: 'होय, तज्ज्ञांना विचारा', no: 'नाही, ठीक आहे' },
       'te': { text: 'ఇది క్లిష్టమైన సమస్య అనిపిస్తోంది. నేను దీన్ని నిపుణుడికి సవివర విశ్లేషణ కోసం పంపాలా?', yes: 'అవును, నిపుణుడిని అడగండి', no: 'లేదు, సరే' },
@@ -1576,7 +1640,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Delegate a query to the cloud Expert (Krishi Visheshagya)
+  // Delegate a query to the cloud Expert (Krishi Bisesagya)
   async function delegateToExpert(originalQuery, langCode) {
     // Switch to Ask tab
     window.switchTab('ask');
@@ -1632,7 +1696,7 @@ document.addEventListener('DOMContentLoaded', () => {
       expertChatScreen.style.display = 'flex';
     }
 
-    showToast("Sent to Expert", "Your question has been sent to Krishi Visheshagya for deeper analysis.", "info");
+    showToast("Sent to Expert", "Your question has been sent to Krishi Bisesagya for deeper analysis.", "info");
   }
 
   // Advisor mode local answer — searches OKF cache in IndexedDB first
@@ -1707,8 +1771,7 @@ document.addEventListener('DOMContentLoaded', () => {
       try {
         const savedProfile = localStorage.getItem('aaa_farmer_profile');
         const profile = savedProfile ? JSON.parse(savedProfile) : {};
-        const engine = new window.LocalAiEngine();
-        reply = await engine.generateText(text, {
+        reply = await localAi.generateText(text, {
           crop: profile.primary_crop || 'corn',
           soil: profile.soil_type || 'clay',
           language: langName
@@ -1886,7 +1949,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!navigator.onLine) {
       thinkingEl.remove();
-      appendExpertMessage('Krishi Visheshagya', '⚠️ No internet connection. The cloud expert requires an active connection. Please try again when online.', 'expert-msg');
+      appendExpertMessage('Krishi Bisesagya', '⚠️ No internet connection. The cloud expert requires an active connection. Please try again when online.', 'expert-msg');
       return;
     }
 
@@ -1912,7 +1975,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // Streaming: response is newline-delimited JSON
-      const { element: msgBubble, textSpan: msgText } = appendExpertMessage('Krishi Visheshagya', '', 'expert-msg');
+      const { element: msgBubble, textSpan: msgText } = appendExpertMessage('Krishi Bisesagya', '', 'expert-msg');
       let fullText = '';
 
       const reader = resp.body.getReader();
@@ -1946,7 +2009,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     } catch (err) {
       thinkingEl.remove();
-      appendExpertMessage('Krishi Visheshagya', `⚠️ Could not reach cloud expert: ${err.message}. Please check your connection and try again.`, 'expert-msg');
+      appendExpertMessage('Krishi Bisesagya', `⚠️ Could not reach cloud expert: ${err.message}. Please check your connection and try again.`, 'expert-msg');
     }
   }
 
@@ -2569,10 +2632,28 @@ document.addEventListener('DOMContentLoaded', () => {
     img.src = dataUrl;
   }
 
+  async function acceptCropWizardPhoto(dataUrl, source) {
+    const storage = await uploadCropPhoto(dataUrl, source);
+    if (!Array.isArray(cropDiagnosisState.photos)) cropDiagnosisState.photos = [];
+    if (!Array.isArray(cropDiagnosisState.photoStorage)) cropDiagnosisState.photoStorage = [];
+    cropDiagnosisState.photos.push(dataUrl);
+    cropDiagnosisState.photoStorage.push(storage);
+    cropDiagnosisState.currentPhoto = null;
+    cropDiagnosisState.currentPhotoStorage = null;
+
+    if (cropDiagnosisState.photos.length === 3) {
+      await runEdgeAiDiagnosis();
+    } else {
+      cropDiagnosisState.step = 5;
+      await localDb.saveDiagnosisState(cropDiagnosisState);
+      loadStepSchema();
+    }
+  }
+
   // Camera event listeners re-targeted to the crop wizard steps
   if (cameraBtn) {
     cameraBtn.addEventListener('click', async () => {
-      cropDiagnosisState = { step: 1, affectedArea: null, photos: [], currentPhoto: null, diagnosis: null };
+      cropDiagnosisState = { step: 1, affectedArea: null, photos: [], photoStorage: [], currentPhoto: null, currentPhotoStorage: null, diagnosis: null };
       localDb.saveDiagnosisState(cropDiagnosisState);
       loadStepSchema();
     });
@@ -2598,22 +2679,14 @@ document.addEventListener('DOMContentLoaded', () => {
           cropCamera.stop();
         }
 
-        analyzeImageQuality(activeDataUrl, (warning) => {
+        analyzeImageQuality(activeDataUrl, async (warning) => {
           if (warning) {
             cropDiagnosisState.step = 4;
             localDb.saveDiagnosisState(cropDiagnosisState);
             loadStepSchema();
             showToast("Quality Warning", `Poor photo quality: ${warning.replace('_', ' ')}`, "warning");
           } else {
-            cropDiagnosisState.photos.push(activeDataUrl);
-            cropDiagnosisState.currentPhoto = null;
-            if (cropDiagnosisState.photos.length === 3) {
-              runEdgeAiDiagnosis();
-            } else {
-              cropDiagnosisState.step = 5;
-              localDb.saveDiagnosisState(cropDiagnosisState);
-              loadStepSchema();
-            }
+            await acceptCropWizardPhoto(activeDataUrl, 'crop_wizard_capture');
           }
         });
       }
@@ -2640,22 +2713,14 @@ document.addEventListener('DOMContentLoaded', () => {
             cropCamera.stop();
           }
 
-          analyzeImageQuality(activeDataUrl, (warning) => {
+          analyzeImageQuality(activeDataUrl, async (warning) => {
             if (warning) {
               cropDiagnosisState.step = 4;
               localDb.saveDiagnosisState(cropDiagnosisState);
               loadStepSchema();
               showToast("Quality Warning", `Poor photo quality: ${warning.replace('_', ' ')}`, "warning");
             } else {
-              cropDiagnosisState.photos.push(activeDataUrl);
-              cropDiagnosisState.currentPhoto = null;
-              if (cropDiagnosisState.photos.length === 3) {
-                runEdgeAiDiagnosis();
-              } else {
-                cropDiagnosisState.step = 5;
-                localDb.saveDiagnosisState(cropDiagnosisState);
-                loadStepSchema();
-              }
+              await acceptCropWizardPhoto(activeDataUrl, 'crop_wizard_upload');
             }
           });
         };
@@ -2674,12 +2739,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Local Gemma-2B Model Downloader listener
+  // Local Gemma Model Downloader listener
   const downloadModelBtn = document.getElementById('download-model-btn');
   if (downloadModelBtn) {
     downloadModelBtn.addEventListener('click', () => {
       if (localAi.llmLoaded) {
-        showToast("Local AI Active", "Local Gemma-2B model is already compiled and ready.", "success");
+        showToast("Local AI Active", `${localAi.modelName} is already compiled and ready.`, "success");
         return;
       }
 
@@ -2693,7 +2758,7 @@ document.addEventListener('DOMContentLoaded', () => {
           downloadModelBtn.textContent = '🟢 Edge AI Active';
           downloadModelBtn.style.backgroundColor = 'var(--trend-up)';
           downloadModelBtn.disabled = false;
-          showToast("Local LLM Ready", "Gemma-2B successfully cached. Mobile WebGPU active.", "success");
+          showToast("Local LLM Ready", `${localAi.modelName} ready for Krishi Sastri.`, "success");
         }
       });
     });
@@ -3104,6 +3169,14 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('sastri-chat-screen').style.display = 'none';
     document.getElementById('expert-form-screen').style.display = 'flex';
     document.getElementById('expert-status-display').style.display = 'none';
+    latestExpertPhotoStorage = null;
+    latestExpertPhotoUploadPromise = null;
+    const photoImg = document.getElementById('expert-photo-img');
+    const photoPreview = document.getElementById('expert-photo-preview');
+    const expertPhotoBtn = document.getElementById('expert-photo-btn');
+    if (photoImg) photoImg.removeAttribute('src');
+    if (photoPreview) photoPreview.style.display = 'none';
+    if (expertPhotoBtn) expertPhotoBtn.textContent = '📷 फोटो जोड़ें';
   }
 
   // Keywords that indicate a complex/risky question needing expert escalation
@@ -3181,6 +3254,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  let latestExpertPhotoStorage = null;
+  let latestExpertPhotoUploadPromise = null;
+
   async function createExpertRequest(question, photoData) {
     // Include farm context
     const profile = localStorage.getItem('aaa_farmer_profile');
@@ -3193,6 +3269,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const langCode = normalizeLanguageCode(localStorage.getItem('aaa_preferred_language')) || 'en';
+    let requestPhotoStorage = null;
+    if (photoData) {
+      if (!latestExpertPhotoStorage && latestExpertPhotoUploadPromise) {
+        latestExpertPhotoStorage = await latestExpertPhotoUploadPromise;
+      } else if (!latestExpertPhotoStorage) {
+        latestExpertPhotoStorage = await uploadCropPhoto(photoData, 'expert_attachment');
+      }
+      requestPhotoStorage = latestExpertPhotoStorage;
+    }
+    const photoEvidence = requestPhotoStorage?.gcs_uri || requestPhotoStorage?.object_name || '';
+    const expertQuestion = photoEvidence
+      ? `${question}\n\nPhoto evidence: ${photoEvidence}`
+      : question;
 
     // Switch to expert chat view
     const expertForm = document.getElementById('expert-form-screen');
@@ -3203,7 +3292,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Pre-fill the expert chat input and send
     const expertInput = document.getElementById('expert-input-field');
     if (expertInput) {
-      expertInput.value = question;
+      expertInput.value = expertQuestion;
       if (typeof sendExpertMessage === 'function') {
         await sendExpertMessage();
       }
@@ -3253,6 +3342,11 @@ document.addEventListener('DOMContentLoaded', () => {
           if (img) img.src = event.target.result;
           if (preview) preview.style.display = 'block';
           expertPhotoBtn.textContent = '✅ फोटो जोड़ी गई';
+          latestExpertPhotoStorage = null;
+          latestExpertPhotoUploadPromise = uploadCropPhoto(event.target.result, 'expert_attachment');
+          latestExpertPhotoUploadPromise.then(storage => {
+            latestExpertPhotoStorage = storage;
+          });
         };
         reader.readAsDataURL(file);
       });
@@ -3260,7 +3354,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Expert submit
     if (expertSubmitBtn) {
-      expertSubmitBtn.addEventListener('click', () => {
+      expertSubmitBtn.addEventListener('click', async () => {
         const question = document.getElementById('expert-question-input')?.value?.trim();
         if (!question) {
           if (typeof window.showToast === 'function') {
@@ -3270,7 +3364,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         const photoImg = document.getElementById('expert-photo-img');
         const photoData = photoImg ? photoImg.src : null;
-        createExpertRequest(question, photoData);
+        await createExpertRequest(question, photoData);
       });
     }
 
@@ -3445,6 +3539,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (analysisResult) analysisResult.style.display = 'none';
 
     try {
+      const photoStorage = await uploadCropPhoto(base64Image, 'ask_image_analysis');
       // Use the CropClassifier for local diagnosis
       const classifier = new window.CropClassifier();
       const context = {
@@ -3454,6 +3549,7 @@ document.addEventListener('DOMContentLoaded', () => {
       };
 
       const result = await classifier.classifyImage(base64Image, context);
+      result.photo_storage = photoStorage;
 
       // Build the response HTML
       let html = '';
@@ -3541,6 +3637,8 @@ document.addEventListener('DOMContentLoaded', () => {
     { key: 'boron', label: 'Boron', label_hi: 'बोरोन' },
     { key: 'iron', label: 'Iron', label_hi: 'आयरन' },
   ];
+  let latestSoilUploadStorage = null;
+  let latestSoilUploadFileName = '';
 
   function showSoilTestHome() {
     const home = document.getElementById('soil-home');
@@ -3569,6 +3667,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const fieldsContainer = document.getElementById('soil-form-fields');
     if (!fieldsContainer) return;
     fieldsContainer.innerHTML = '';
+    latestSoilUploadStorage = extractedData?.storage || null;
+    latestSoilUploadFileName = extractedData?.file_name || '';
 
     const langCode = localStorage.getItem('aaa_preferred_language') || 'hi';
     const isHindi = langCode === 'hi';
@@ -3715,9 +3815,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const reportData = {
       farmer_id: 'user',
       field_id: fieldId,
-      source: 'manual',
+      source: latestSoilUploadStorage ? 'upload' : 'manual',
+      file_name: latestSoilUploadFileName,
+      storage_bucket: latestSoilUploadStorage?.bucket || '',
+      storage_object: latestSoilUploadStorage?.object_name || '',
+      storage_uri: latestSoilUploadStorage?.gcs_uri || '',
+      storage_public_url: latestSoilUploadStorage?.public_url || '',
+      content_type: latestSoilUploadStorage?.content_type || '',
+      file_size_bytes: latestSoilUploadStorage?.size_bytes || 0,
       sample_date: document.getElementById('soil-sample-date')?.value || '',
       lab_name: document.getElementById('soil-lab-name')?.value || '',
+      extraction_confidence: latestSoilUploadStorage ? 0.8 : 0.0,
       confirmed_by_farmer: true,
       values: values
     };
@@ -3757,12 +3865,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     try {
-      const formData = new FormData();
-      formData.append('file', file);
+      const fileBytes = await file.arrayBuffer();
 
       const response = await fetch('/api/soil/extract', {
         method: 'POST',
-        body: formData
+        headers: {
+          'Content-Type': file.type || 'application/octet-stream',
+          'X-File-Name': file.name || 'soil-report-upload'
+        },
+        body: fileBytes
       });
 
       const data = await response.json();
