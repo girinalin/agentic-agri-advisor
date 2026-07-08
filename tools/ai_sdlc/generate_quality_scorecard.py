@@ -5,6 +5,7 @@ IMPORTANT: Statuses are derived from actual evidence artifacts in
 .ai-sdlc/evidence/evidence-manifest.json. Hard-coded PASS values are
 a violation of the AI-SDLC evidence honesty rules (see .context/08-ai-sdlc.md).
 """
+
 import json
 import os
 from pathlib import Path
@@ -62,7 +63,13 @@ def _load_evidence_statuses() -> dict[str, str]:
         existing = category_status.get(category, "NOT_EXECUTED")
 
         # Worst-case wins: FAIL > WARNING > NOT_EXECUTED > PASS
-        priority = {"FAIL": 0, "WARNING": 1, "NOT_APPLICABLE": 2, "NOT_EXECUTED": 3, "PASS": 4}
+        priority = {
+            "FAIL": 0,
+            "WARNING": 1,
+            "NOT_APPLICABLE": 2,
+            "NOT_EXECUTED": 3,
+            "PASS": 4,
+        }
         if priority.get(status, 3) < priority.get(existing, 3):
             category_status[category] = status
         elif existing == "NOT_EXECUTED":
@@ -72,7 +79,13 @@ def _load_evidence_statuses() -> dict[str, str]:
 
 
 def _status_icon(status: str) -> str:
-    return {"PASS": "✅", "WARNING": "⚠️", "FAIL": "❌", "NOT_EXECUTED": "⏳", "NOT_APPLICABLE": "—"}.get(status, "❓")
+    return {
+        "PASS": "✅",
+        "WARNING": "⚠️",
+        "FAIL": "❌",
+        "NOT_EXECUTED": "⏳",
+        "NOT_APPLICABLE": "—",
+    }.get(status, "❓")
 
 
 def generate_scorecard() -> bool:
@@ -89,7 +102,11 @@ def generate_scorecard() -> bool:
     md += "| --- | --- | --- |\n"
     for cat, status in scorecard.items():
         icon = _status_icon(status)
-        evidence_note = "Evidence present" if status in ("PASS", "WARNING") else "No evidence recorded"
+        evidence_note = (
+            "Evidence present"
+            if status in ("PASS", "WARNING")
+            else "No evidence recorded"
+        )
         md += f"| {cat} | {icon} **{status}** | {evidence_note} |\n"
 
     all_pass = all(s in ("PASS", "NOT_APPLICABLE") for s in scorecard.values())
@@ -111,7 +128,9 @@ def generate_scorecard() -> bool:
     if all_pass:
         print("✅ Quality scorecard generated — all evidenced categories PASS.")
     else:
-        print(f"⚠️  Quality scorecard generated — some categories are NOT_EXECUTED or FAIL. See {out_path}")
+        print(
+            f"⚠️  Quality scorecard generated — some categories are NOT_EXECUTED or FAIL. See {out_path}"
+        )
     return all_pass
 
 

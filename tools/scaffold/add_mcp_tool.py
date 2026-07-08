@@ -13,6 +13,7 @@ Reference:
     .context/05-add-mcp-tool.md — detailed guide
     .context/change-maps/add-mcp-tool.yaml — file checklist
 """
+
 from __future__ import annotations
 
 import argparse
@@ -74,21 +75,21 @@ if __name__ == "__main__":
     mcp.run(transport="stdio")
 '''
 
-REGISTRY_ENTRY = '''\
+REGISTRY_ENTRY = """\
   "{name}": {{
     "type": "stdio",
     "command": "python",
     "args": ["mcp_servers/{name}/server.py"],
     "description": "{description}"
-  }}'''
+  }}"""
 
-AGENT_IMPORT = '''\
-from mcp_servers.{snake_name}.server import get_{snake_name}_data'''
+AGENT_IMPORT = """\
+from mcp_servers.{snake_name}.server import get_{snake_name}_data"""
 
-AGENT_TOOLS_HINT = '''\
+AGENT_TOOLS_HINT = """\
 # In agents/{agent}/agent.py, add to tools=[]:
 #   get_{snake_name}_data,
-# Also update the agent instruction to describe when to call this tool.'''
+# Also update the agent instruction to describe when to call this tool."""
 
 TEST_TEMPLATE = '''\
 """Unit tests for the {name} MCP tool server."""
@@ -172,8 +173,12 @@ def scaffold(name: str, description: str, agent: str | None) -> None:
     print("NEXT: Update agents/AGENTS.md MCP tools table.")
     print()
     print("VALIDATE:")
-    print(f"  python -c \"import ast; ast.parse(open('mcp_servers/{name}/server.py').read()); print('OK')\"")
-    print(f"  uv run python -c \"from mcp_servers.{snake_name}.server import get_{snake_name}_data; print('OK')\"")
+    print(
+        f"  python -c \"import ast; ast.parse(open('mcp_servers/{name}/server.py').read()); print('OK')\""
+    )
+    print(
+        f"  uv run python -c \"from mcp_servers.{snake_name}.server import get_{snake_name}_data; print('OK')\""
+    )
     print("  make test")
 
 
@@ -183,20 +188,40 @@ def main() -> None:
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=__doc__,
     )
-    parser.add_argument("--name", required=True, help="Tool name in kebab-case (e.g. soil-sensors)")
-    parser.add_argument("--description", required=True, help="One-line description of what this tool does")
-    parser.add_argument("--agent", default=None, help="Target agent name (e.g. crop_analyst) to wire the tool to")
+    parser.add_argument(
+        "--name", required=True, help="Tool name in kebab-case (e.g. soil-sensors)"
+    )
+    parser.add_argument(
+        "--description",
+        required=True,
+        help="One-line description of what this tool does",
+    )
+    parser.add_argument(
+        "--agent",
+        default=None,
+        help="Target agent name (e.g. crop_analyst) to wire the tool to",
+    )
 
     args = parser.parse_args()
 
     name = args.name.strip().lower()
     if not re.match(r"^[a-z][a-z0-9-]+$", name):
-        print(f"ERROR: --name must be kebab-case lowercase (e.g. soil-sensors), got: {name!r}", file=sys.stderr)
+        print(
+            f"ERROR: --name must be kebab-case lowercase (e.g. soil-sensors), got: {name!r}",
+            file=sys.stderr,
+        )
         sys.exit(2)
 
-    existing = [p.name for p in (ROOT / "mcp_servers").iterdir() if p.is_dir() and not p.name.startswith("_")]
+    existing = [
+        p.name
+        for p in (ROOT / "mcp_servers").iterdir()
+        if p.is_dir() and not p.name.startswith("_")
+    ]
     if name in existing:
-        print(f"ERROR: mcp_servers/{name}/ already exists. Choose a different name.", file=sys.stderr)
+        print(
+            f"ERROR: mcp_servers/{name}/ already exists. Choose a different name.",
+            file=sys.stderr,
+        )
         sys.exit(2)
 
     print(f"Scaffolding MCP tool: {name}")

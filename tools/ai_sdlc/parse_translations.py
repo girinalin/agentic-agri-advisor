@@ -7,6 +7,7 @@ Used by:
   - tools/ai_sdlc/validate_translations.py  (SDLC gate)
   - tools/ai_sdlc/cli.py  (--translations validation)
 """
+
 from __future__ import annotations
 
 import ast
@@ -50,7 +51,9 @@ def parse_js_dict(js_code: str, dict_name: str) -> dict:
     try:
         return ast.literal_eval(dict_str)
     except (ValueError, SyntaxError) as exc:
-        raise ValueError(f"Could not parse '{dict_name}' as Python literal: {exc}") from exc
+        raise ValueError(
+            f"Could not parse '{dict_name}' as Python literal: {exc}"
+        ) from exc
 
 
 def get_translations(translations_path: str | Path | None = None) -> dict:
