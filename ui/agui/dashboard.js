@@ -4,6 +4,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const userInputField = document.getElementById('user-input-field');
   const sendBtn = document.getElementById('send-btn');
   const aguiCanvas = document.getElementById('agui-canvas');
+  let sastriModelLoadPromise = null;
+  let sastriModelReadyNoticeShown = false;
 
   function normalizeLanguageCode(language) {
     const value = (language || 'en').toString().trim();
@@ -1859,6 +1861,62 @@ document.addEventListener('DOMContentLoaded', () => {
     return copy[langCode] || copy.en;
   }
 
+  function sastriModelReadyNoticeText(langCode) {
+    const copy = {
+      hi: {
+        title: 'स्थानीय AI तैयार',
+        toast: 'कृषि शास्त्री मॉडल डाउनलोड हो गया है। अब अगले सवाल यहीं तुरंत मिलेंगे।',
+        chat: 'स्थानीय कृषि शास्त्री मॉडल तैयार है। अब अगले सवाल का जवाब यहीं तुरंत दूँगा।'
+      },
+      mr: {
+        title: 'स्थानिक AI तयार',
+        toast: 'कृषी शास्त्री मॉडेल डाउनलोड झाले आहे. आता पुढील प्रश्न इथेच पटकन मिळतील.',
+        chat: 'स्थानिक कृषी शास्त्री मॉडेल तयार आहे. आता पुढील प्रश्नाचे उत्तर इथेच पटकन देईन.'
+      },
+      te: {
+        title: 'స్థానిక AI సిద్ధం',
+        toast: 'కృషి శాస్త్రి మోడల్ డౌన్‌లోడ్ అయింది. ఇక తర్వాతి ప్రశ్నలకు ఇక్కడే వెంటనే జవాబు వస్తుంది.',
+        chat: 'స్థానిక కృషి శాస్త్రి మోడల్ సిద్ధంగా ఉంది. ఇక తర్వాతి ప్రశ్నకు ఇక్కడే వెంటనే జవాబు ఇస్తాను.'
+      },
+      sw: {
+        title: 'AI ya karibu iko tayari',
+        toast: 'Mfano wa Krishi Sastri umepakuliwa. Maswali yajayo yatajibiwa hapa haraka.',
+        chat: 'Mfano wa karibu wa Krishi Sastri uko tayari. Nitatoa majibu ya maswali yajayo hapa haraka.'
+      },
+      zu: {
+        title: 'I-AI yasendaweni isilungile',
+        toast: 'Imodeli ye-Krishi Sastri isilandiwe. Imibuzo elandelayo izophendulwa lapha ngokushesha.',
+        chat: 'Imodeli yasendaweni ye-Krishi Sastri isilungile. Ngizophendula imibuzo elandelayo lapha ngokushesha.'
+      },
+      en: {
+        title: 'Local AI Ready',
+        toast: 'Krishi Sastri model has downloaded. Future questions will now answer instantly on this device.',
+        chat: 'Krishi Sastri local model is ready. I will answer the next question directly on this device.'
+      }
+    };
+    return copy[langCode] || copy.en;
+  }
+
+  function sastriExpertRoutingText(langCode) {
+    const copy = {
+      hi: 'स्थानीय मॉडल अभी डाउनलोड हो रहा है। इस सवाल को अभी कृषि विशेषज्ञ के पास भेज रहा हूँ।',
+      mr: 'स्थानिक मॉडेल अजून डाउनलोड होत आहे. हा प्रश्न आत्ता कृषी तज्ज्ञांकडे पाठवत आहे.',
+      te: 'స్థానిక మోడల్ ఇంకా డౌన్‌లోడ్ అవుతోంది. ఈ ప్రశ్నను ఇప్పుడు వ్యవసాయ నిపుణుడికి పంపుతున్నాను.',
+      sw: 'Mfano wa karibu bado unapakuliwa. Ninatuma swali hili kwa mtaalamu wa kilimo sasa.',
+      zu: 'Imodeli yasendaweni isalandiwa. Ngithumela lo mbuzo kuchwepheshe wezolimo manje.',
+      en: 'The local model is still downloading. I am sending this question to Krishi Bisesagya now.'
+    };
+    return copy[langCode] || copy.en;
+  }
+
+  function showSastriModelReadyNotice(langCode) {
+    if (sastriModelReadyNoticeShown) return;
+    sastriModelReadyNoticeShown = true;
+    const copy = sastriModelReadyNoticeText(langCode);
+    showToast(copy.title, copy.toast, 'success');
+    appendMessage('System', copy.chat, 'system-msg');
+  }
+
   function sastriInitialThinkingText(langCode) {
     const copy = {
       hi: 'कृषि शास्त्री सोच रहे हैं...',
@@ -1916,22 +1974,46 @@ document.addEventListener('DOMContentLoaded', () => {
       timeoutId = setTimeout(() => resolve(false), timeoutMs);
     });
 
-    const loadPromise = localAi.loadLlm((progress, stage) => {
+    const progressHandler = (progress, stage) => {
       if (!activeProgress) return;
       updateThinkingBubble(thinkingBubble, sastriModelLoadingText(preferredLang, progress, stage));
-    }).catch(err => {
-      console.warn('[Advisor] Sastri model preparation failed:', err);
-      return false;
-    });
+    };
+
+    if (sastriModelLoadPromise && typeof progressHandler === 'function') {
+      localAi.onProgressCallback = progressHandler;
+    }
+
+    if (!sastriModelLoadPromise) {
+      sastriModelLoadPromise = localAi.loadLlm(progressHandler)
+        .then(loaded => {
+          if (loaded) {
+            showSastriModelReadyNotice(preferredLang);
+          }
+          return !!loaded;
+        })
+        .catch(err => {
+          console.warn('[Advisor] Sastri model preparation failed:', err);
+          return false;
+        })
+        .finally(() => {
+          if (!localAi?.llmLoaded) {
+            sastriModelLoadPromise = null;
+          }
+        });
+    }
+
+    const loadPromise = sastriModelLoadPromise;
 
     const loaded = await Promise.race([loadPromise, timeoutPromise]);
     activeProgress = false;
     if (timeoutId) clearTimeout(timeoutId);
 
     if (!loaded) {
-      updateThinkingBubble(thinkingBubble, preferredLang === 'hi'
-        ? 'स्थानीय जानकारी से तुरंत उत्तर दे रहा हूँ...'
-        : 'Answering now with local fallback...');
+      updateThinkingBubble(thinkingBubble, navigator.onLine
+        ? sastriExpertRoutingText(preferredLang)
+        : (preferredLang === 'hi'
+          ? 'इंटरनेट नहीं है। स्थानीय जानकारी से तुरंत उत्तर दे रहा हूँ...'
+          : 'You are offline. Answering now with local fallback...'));
     }
     return !!loaded;
   }
@@ -2019,6 +2101,14 @@ document.addEventListener('DOMContentLoaded', () => {
     let modelReady = false;
     try {
       modelReady = await prepareSastriModel(preferredLang, thinkingBubble);
+      if (!modelReady && navigator.onLine) {
+        const routingReply = sastriExpertRoutingText(preferredLang);
+        await finalizeSastriBubble(thinkingBubble, routingReply);
+        removeStaleSastriThinkingBubbles(thinkingBubble);
+        localDb.addChat({ role: 'advisor', text: routingReply });
+        setTimeout(() => delegateToExpert(text, preferredLang), 250);
+        return;
+      }
       const answerTimeoutMs = Number(window.KRISHI_MODEL_ANSWER_TIMEOUT_MS || 25000);
       reply = await withUiTimeout(() => localAi.generateText(text, {
         crop: inferredCrop,
