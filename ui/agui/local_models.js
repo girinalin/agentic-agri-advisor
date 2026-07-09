@@ -12,14 +12,10 @@ class LocalAiEngine {
     this.llmEngine = null;
     this.llmConversation = null;
     this.llmLoaded = false;
-    this.llmModelBlob = null;
-    this.llmAssetCached = false;
     this.llmLastInitFailedAt = 0;
     this.llmMode = "not_loaded";
     this.modelInitTimeoutMs = Number(window.KRISHI_MODEL_INIT_TIMEOUT_MS || 45000);
     this.generationTimeoutMs = Number(window.KRISHI_MODEL_GENERATION_TIMEOUT_MS || 20000);
-    this.modelDownloadRetries = Number(window.KRISHI_MODEL_DOWNLOAD_RETRIES || 5);
-    this.modelDownloadRetryDelayMs = Number(window.KRISHI_MODEL_DOWNLOAD_RETRY_DELAY_MS || 3000);
     this.modelInitRetryCooldownMs = Number(window.KRISHI_MODEL_INIT_RETRY_COOLDOWN_MS || 300000);
     this.classifierLoaded = false;
     this.webGpuSupported = false;
@@ -79,77 +75,26 @@ class LocalAiEngine {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
-  parseContentRangeTotal(value) {
-    const match = String(value || "").match(/\/(\d+)$/);
-    return match ? Number(match[1]) : 0;
+  /**
+   * Detects iOS / iPadOS devices (iPhone, iPad, iPod).
+   * These devices cannot cache a 2GB model due to WKWebView Cache Storage
+   * quota limits (~50MB) and iOS memory pressure that kills the browser tab.
+   * Always skip the local model on iOS and route to cloud expert instead.
+   */
+  isIOSDevice() {
+    if (/iPhone|iPad|iPod/.test(navigator.userAgent)) return true;
+    // iPad with iOS 13+ reports as MacIntel but has touch points
+    if (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) return true;
+    return false;
   }
 
-  async downloadModelBlob(url, contentLengthHint = 1430000000) {
-    let receivedLength = 0;
-    let contentLength = 0;
-    let chunks = [];
-    let attempt = 0;
-
-    while (attempt <= this.modelDownloadRetries) {
-      const headers = {};
-      if (receivedLength > 0) {
-        headers.Range = `bytes=${receivedLength}-`;
-      }
-
-      try {
-        const response = await fetch(url, { headers });
-        const isResume = receivedLength > 0;
-        const supportsResume = response.status === 206;
-
-        if (!response.ok && !supportsResume) {
-          throw new Error(`Failed to fetch model: ${response.statusText || response.status}`);
-        }
-
-        if (isResume && !supportsResume) {
-          console.warn('[Local AI] Model host ignored Range resume. Restarting model download from byte 0.');
-          receivedLength = 0;
-          chunks = [];
-        }
-
-        const contentRangeTotal = this.parseContentRangeTotal(response.headers.get('Content-Range'));
-        const headerLength = Number(response.headers.get('Content-Length')) || 0;
-        contentLength = contentRangeTotal || (receivedLength + headerLength) || contentLength || contentLengthHint;
-
-        const reader = response.body.getReader();
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-
-          chunks.push(value);
-          receivedLength += value.length;
-
-          const percent = contentLength
-            ? Math.round((receivedLength / contentLength) * 100)
-            : 0;
-          this.reportProgress(percent, "downloading");
-        }
-
-        if (!contentLength || receivedLength >= contentLength) {
-          this.reportProgress(100, "downloaded");
-          return new Blob(chunks);
-        }
-
-        throw new Error(`Model stream ended early at ${receivedLength}/${contentLength} bytes`);
-      } catch (err) {
-        attempt += 1;
-        if (attempt > this.modelDownloadRetries) {
-          throw err;
-        }
-        console.warn(
-          `[Local AI] Model download interrupted at ${receivedLength} bytes. Retrying ${attempt}/${this.modelDownloadRetries}...`,
-          err
-        );
-        this.reportProgress(contentLength ? Math.round((receivedLength / contentLength) * 100) : 0, "retrying");
-        await this.sleep(this.modelDownloadRetryDelayMs * attempt);
-      }
-    }
-
-    throw new Error('Model download retry loop ended unexpectedly');
+  /**
+   * Returns true when the device is permanently routed to cloud expert mode.
+   * Used by dashboard.js to skip the model loading wait entirely and route
+   * directly to Krishi Bisesagya without showing a download-issue notice.
+   */
+  isCloudOnlyMode() {
+    return this.llmMode.startsWith('cloud_only');
   }
 
   /**
@@ -168,68 +113,12 @@ class LocalAiEngine {
       model: this.modelName,
       mode: this.llmMode,
       loaded: this.llmLoaded,
-      assetCached: this.llmAssetCached,
       webGpuSupported: this.webGpuSupported
     };
   }
 
-  modelCacheKeys() {
-    const legacyKey = `${this.modelName.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-model`;
-    return [this.modelUrl, legacyKey];
-  }
-
-  async getCachedModelBlob(cache) {
-    for (const key of this.modelCacheKeys()) {
-      const cachedResponse = await cache.match(key);
-      if (cachedResponse) {
-        console.log(`[Local AI] ${this.modelName} found in Cache API via key: ${key}`);
-        return cachedResponse.blob();
-      }
-    }
-    return null;
-  }
-
-  async putModelBlobInCache(cache, modelBlob) {
-    for (const key of this.modelCacheKeys()) {
-      try {
-        await cache.put(key, new Response(modelBlob));
-      } catch (err) {
-        console.warn(`[Local AI] Could not cache model with key ${key}. Keeping in memory for this session.`, err);
-      }
-    }
-  }
-
   canRetryModelInit() {
     return !this.llmLastInitFailedAt || (Date.now() - this.llmLastInitFailedAt) >= this.modelInitRetryCooldownMs;
-  }
-
-  async initializeCachedModelBlob(modelBlob, mode) {
-    if (!this.canRetryModelInit()) {
-      this.llmMode = "litert_lm_asset_cached_init_on_cooldown";
-      console.warn('[Local AI] Model asset is cached, but LiteRT-LM initialization is on cooldown after a recent failure.');
-      return false;
-    }
-    this.reportProgress(100, "initializing");
-    try {
-      await this.withTimeout(
-        () => this.initializeLiteRtLm(modelBlob),
-        this.modelInitTimeoutMs,
-        "LiteRT-LM initialization"
-      );
-      this.reportProgress(100, "ready");
-      this.llmLoaded = true;
-      this.llmMode = mode;
-      this.llmLastInitFailedAt = 0;
-      return true;
-    } catch (err) {
-      this.llmEngine = null;
-      this.llmConversation = null;
-      this.llmLoaded = false;
-      this.llmLastInitFailedAt = Date.now();
-      this.llmMode = "litert_lm_asset_cached_init_failed";
-      console.warn('[Local AI] Model asset is cached, but LiteRT-LM initialization failed.', err);
-      return false;
-    }
   }
 
   inferCropFromPrompt(prompt, fallbackCrop = "corn") {
@@ -435,57 +324,64 @@ class LocalAiEngine {
    */
   async loadLlm(onProgress) {
     this.onProgressCallback = onProgress;
-    this.checkHardwareSupport();
 
+    // Standard LiteRT-LM pattern (Google recommended): pass model URL directly to
+    // Engine.create(). LiteRT handles download + streaming internally without
+    // holding a 2GB Blob in the JS heap, which avoids memory crashes on all devices.
+    // The browser HTTP cache handles subsequent loads (GCS sends Cache-Control headers).
+    return this._loadLlmViaUrl();
+  }
+
+  /**
+   * Standard LiteRT-LM URL-based model loading (Google recommended pattern).
+   * Passes the model URL directly to Engine.create() — LiteRT handles download
+   * and streaming internally without accumulating a 2GB Blob in the JS heap.
+   * Works on all devices: iOS, Android, desktop.
+   */
+  async _loadLlmViaUrl() {
     if (this.llmLoaded) return true;
-    if (!this.webGpuSupported) {
-      console.warn('[Local AI] WebGPU is required for LiteRT-LM Web. Falling back to deterministic local advisor.');
-      this.llmMode = "rule_fallback_no_webgpu";
+
+    if (!this.canRetryModelInit()) {
+      this.llmMode = 'cloud_only_init_cooldown';
+      console.warn('[Local AI] Model init on cooldown after recent failure. Routing to cloud expert.');
       return false;
     }
 
-    const MODEL_URL = this.modelUrl;
-    console.log(`[Local AI] Checking Cache API for local ${this.modelName} model...`);
+    this.checkHardwareSupport();
+    if (!this.webGpuSupported) {
+      console.warn('[Local AI] WebGPU not available. Routing to cloud expert (Bisesagya).');
+      this.llmMode = 'cloud_only_no_webgpu';
+      return false;
+    }
+
+    if (!navigator.onLine) {
+      this.llmMode = 'offline_rule_fallback';
+      return false;
+    }
+
+    this.reportProgress(10, 'downloading');
+    console.log(`[Local AI] Loading ${this.modelName} via URL (standard LiteRT pattern): ${this.modelUrl}`);
 
     try {
-      const cache = await caches.open('gemma-model-cache');
-      let modelBlob = this.llmModelBlob;
-      if (modelBlob) {
-        console.log(`[Local AI] ${this.modelName} model asset is already in memory. Skipping download.`);
-        this.llmAssetCached = true;
-        return this.initializeCachedModelBlob(modelBlob, "litert_lm_memory_cached_model");
-      }
-
-      modelBlob = await this.getCachedModelBlob(cache);
-      if (modelBlob) {
-        this.llmModelBlob = modelBlob;
-        this.llmAssetCached = true;
-        return this.initializeCachedModelBlob(modelBlob, "litert_lm_cached_model");
-      }
-
-      // If not cached, we need to download it from the network
-      if (!navigator.onLine) {
-        console.warn('[Local AI] Device is offline and model is not cached. Falling back to offline rule engine.');
-        this.llmMode = "offline_rule_fallback";
-        return false;
-      }
-
-      console.log(`[Local AI] Model cache miss. Downloading ${this.modelName} from ${MODEL_URL}...`);
-
-      modelBlob = await this.downloadModelBlob(MODEL_URL);
-      this.llmModelBlob = modelBlob;
-      this.llmAssetCached = true;
-      console.log('[Local AI] Compiling download stream chunks...');
-      await this.putModelBlobInCache(cache, modelBlob);
-
-      console.log(`[Local AI] Local ${this.modelName} model cached. Initializing LiteRT-LM...`);
-      return this.initializeCachedModelBlob(modelBlob, "litert_lm_cloud_model");
+      await this.withTimeout(
+        () => this.initializeLiteRtLm(this.modelUrl),
+        this.modelInitTimeoutMs,
+        'LiteRT-LM URL initialization'
+      );
+      this.reportProgress(100, 'ready');
+      this.llmLoaded = true;
+      this.llmAssetCached = false;  // Browser HTTP cache handles this — not Cache API
+      this.llmMode = 'litert_lm_url_model';
+      this.llmLastInitFailedAt = 0;
+      console.log(`[Local AI] ${this.modelName} loaded successfully via URL.`);
+      return true;
     } catch (err) {
-      console.warn('[Local AI] LiteRT-LM model download failed. Running deterministic local advisor.', err);
       this.llmEngine = null;
       this.llmConversation = null;
       this.llmLoaded = false;
-      this.llmMode = "rule_fallback_model_unavailable";
+      this.llmLastInitFailedAt = Date.now();
+      this.llmMode = 'cloud_only_init_failed';
+      console.warn('[Local AI] URL model load failed. Routing to cloud expert.', err);
       return false;
     }
   }
@@ -636,7 +532,7 @@ class LocalAiEngine {
    */
   async generateText(prompt, context = {}) {
     if (!this.llmLoaded) {
-      this.llmMode = this.webGpuSupported ? "rule_fallback_model_not_loaded" : "rule_fallback_no_webgpu";
+      this.llmMode = this.webGpuSupported ? "cloud_only_init_failed" : "cloud_only_no_webgpu";
     }
     const text = prompt.toLowerCase();
     const crop = this.inferCropFromPrompt(prompt, context.crop || 'corn');
