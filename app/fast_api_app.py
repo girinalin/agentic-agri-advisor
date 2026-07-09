@@ -1276,6 +1276,43 @@ def favicon():
     return Response(status_code=204)
 
 
+# ============================================================
+# Client-side Error Telemetry (mobile devices without DevTools)
+# ============================================================
+
+class ClientErrorLog(BaseModel):
+    """Browser-side JS error captured from devices without DevTools access."""
+    message: str = Field("", max_length=500)
+    stack: str = Field("", max_length=2000)
+    url: str = Field("", max_length=300)
+    device_type: str = Field("", max_length=50)  # "ios", "android", "desktop"
+    model_mode: str = Field("", max_length=100)   # localAi.llmMode at time of error
+
+
+@app.post("/api/log/client-error")
+async def log_client_error(payload: ClientErrorLog, request: Request) -> dict:
+    """Capture client-side JS errors from mobile devices that have no DevTools.
+
+    Called by the global window.onerror and unhandledrejection handlers in
+    dashboard.js. Errors are logged server-side so iOS/Android crashes are
+    visible without needing a USB-connected debugger.
+    """
+    try:
+        ua = request.headers.get("user-agent", "")[:200]
+        logger.log_struct({
+            "event": "client_error",
+            "message": payload.message,
+            "stack": payload.stack[:500] if payload.stack else "",
+            "url": payload.url,
+            "device_type": payload.device_type,
+            "model_mode": payload.model_mode,
+            "user_agent": ua,
+        }, severity="ERROR")
+    except Exception:
+        pass  # Never let error logging break the app
+    return {"status": "ok"}
+
+
 @app.get("/api/plans/{planting_id}")
 def get_plans(planting_id: str):
     res = db_manager.get_daily_plans(planting_id)

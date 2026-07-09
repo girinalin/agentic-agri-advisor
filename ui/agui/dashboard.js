@@ -1,4 +1,39 @@
 document.addEventListener('DOMContentLoaded', () => {
+  // ============================================================
+  // Global error telemetry — captures JS crashes on iOS/Android
+  // where DevTools is unavailable. Posts to /api/log/client-error.
+  // ============================================================
+  function _deviceType() {
+    if (/iPhone|iPad|iPod/.test(navigator.userAgent)) return 'ios';
+    if (/Android/.test(navigator.userAgent)) return 'android';
+    return 'desktop';
+  }
+  function _reportClientError(message, stack, url) {
+    try {
+      fetch('/api/log/client-error', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: String(message || '').slice(0, 500),
+          stack: String(stack || '').slice(0, 2000),
+          url: String(url || window.location.href).slice(0, 300),
+          device_type: _deviceType(),
+          model_mode: window._localAiMode || ''
+        })
+      }).catch(() => {});
+    } catch (e) {}
+  }
+  window.addEventListener('error', (ev) => {
+    _reportClientError(ev.message, ev.error?.stack, ev.filename);
+  });
+  window.addEventListener('unhandledrejection', (ev) => {
+    _reportClientError(
+      ev.reason?.message || String(ev.reason || 'Unhandled rejection'),
+      ev.reason?.stack,
+      window.location.href
+    );
+  });
+
   // NAV_SECTIONS is loaded from translations.js
   const chatMessages = document.getElementById('chat-messages');
   const userInputField = document.getElementById('user-input-field');
@@ -7,6 +42,10 @@ document.addEventListener('DOMContentLoaded', () => {
   let sastriModelLoadPromise = null;
   let sastriModelReadyNoticeShown = false;
   let sastriModelDownloadIssueNoticeShown = false;
+  // One-shot replay slot: stores the first query that got a rule-based fallback
+  // during model initialisation. Cleared to null BEFORE the replay fires so
+  // even if the replay somehow fails, it can never trigger a second replay.
+  let _sastriPendingReplay = null;  // { text, langCode } | null
   let currentAuthDisplayName = '';
 
   function normalizeLanguageCode(language) {
@@ -376,6 +415,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const localDb = new window.LocalDb();
   const localAi = new window.LocalAiEngine();
   const cropCamera = new window.CropCamera();
+
+  // Expose localAi mode for error telemetry
+  Object.defineProperty(window, '_localAiMode', {
+    get: () => localAi?.llmMode || '',
+    configurable: true
+  });
 
   // Floating Action Buttons (FABs)
   const fabDiagnose = document.getElementById('fab-diagnose');
@@ -1947,12 +1992,12 @@ document.addEventListener('DOMContentLoaded', () => {
       return readyCopy[langCode] || readyCopy.en;
     }
     const copy = {
-      hi: `कृषि शास्त्री मॉडल तैयार हो रहा है${pct}...`,
-      mr: `कृषी शास्त्री मॉडेल तयार होत आहे${pct}...`,
-      te: `కృషి శాస్త్రి మోడల్ సిద్ధమవుతోంది${pct}...`,
-      sw: `Mfano wa Krishi Sastri unaandaliwa${pct}...`,
-      zu: `Imodeli ye-Krishi Sastri iyalungiswa${pct}...`,
-      en: `Preparing Krishi Sastri model${pct}...`
+      hi: `कृषि शास्त्री तैयार हो रहे हैं${pct}...`,
+      mr: `कृषी शास्त्री तयार होत आहेत${pct}...`,
+      te: `కృషి శాస్త్రి సిద్ధమవుతున్నారు${pct}...`,
+      sw: `Krishi Sastri anajiandaa${pct}...`,
+      zu: `U-Krishi Sastri uyalungiswa${pct}...`,
+      en: `Krishi Sastri is getting ready${pct}...`
     };
     return copy[langCode] || copy.en;
   }
@@ -2025,12 +2070,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function sastriExpertRoutingText(langCode) {
     const copy = {
-      hi: 'स्थानीय मॉडल अभी डाउनलोड हो रहा है। तब तक इस सवाल को कृषि विशेषज्ञ के पास भेज रहा हूँ। डाउनलोड पीछे चलता रहेगा।',
-      mr: 'स्थानिक मॉडेल अजून डाउनलोड होत आहे. तोपर्यंत हा प्रश्न कृषी तज्ज्ञांकडे पाठवत आहे. डाउनलोड पार्श्वभूमीत सुरू राहील.',
-      te: 'స్థానిక మోడల్ ఇంకా డౌన్‌లోడ్ అవుతోంది. అప్పటివరకు ఈ ప్రశ్నను వ్యవసాయ నిపుణుడికి పంపుతున్నాను. డౌన్‌లోడ్ నేపథ్యంలో కొనసాగుతుంది.',
-      sw: 'Mfano wa karibu bado unapakuliwa. Kwa sasa ninatuma swali hili kwa mtaalamu wa kilimo. Upakuaji utaendelea nyuma.',
-      zu: 'Imodeli yasendaweni isalandiwa. Okwamanje ngithumela lo mbuzo kuchwepheshe wezolimo. Ukulanda kuzoqhubeka ngemuva.',
-      en: 'The local model is still downloading. Until it is ready, I am sending this question to Krishi Bisesagya. The download will continue in the background.'
+      hi: 'कृषि शास्त्री तैयार हो रहे हैं। तब तक आपका सवाल कृषि विशेषज्ञ के पास भेज रहा हूँ।',
+      mr: 'कृषी शास्त्री तयार होत आहेत. तोपर्यंत हा प्रश्न कृषी तज्ज्ञांकडे पाठवत आहे.',
+      te: 'కృషి శాస్త్రి సిద్ధమవుతున్నారు. అప్పటివరకు ఈ ప్రశ్నను నిపుణుడికి పంపుతున్నాను.',
+      sw: 'Krishi Sastri anajiandaa. Kwa sasa ninatuma swali lako kwa mtaalamu wa kilimo.',
+      zu: 'U-Krishi Sastri uyalungiswa. Okwamanje ngithumela umbuzo wakho kuchwepheshe.',
+      en: 'Krishi Sastri is getting ready. Your question is being sent to Krishi Bisesagya in the meantime.'
     };
     return copy[langCode] || copy.en;
   }
@@ -2041,6 +2086,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const copy = sastriModelReadyNoticeText(langCode);
     showToast(copy.title, copy.toast, 'success');
     appendMessage('System', copy.chat, 'system-msg');
+
+    // Replay the first query that got a rule-based fallback during init.
+    // We clear the slot BEFORE calling handleAdvisorLocalAnswer so that
+    // even if the replay itself somehow triggers another fallback path,
+    // there is no slot left to set — loop is impossible.
+    if (_sastriPendingReplay && localAi.llmLoaded) {
+      const { text, langCode: replayLang } = _sastriPendingReplay;
+      _sastriPendingReplay = null;  // clear FIRST — prevents any loop
+      setTimeout(() => handleAdvisorLocalAnswer(text, replayLang, null), 400);
+    }
   }
 
   function showSastriModelDownloadIssueNotice(langCode) {
@@ -2087,6 +2142,8 @@ document.addEventListener('DOMContentLoaded', () => {
   function updateModelProgressBubble(thinkingBubble, langCode, progress = null, stage = 'downloading') {
     if (!thinkingBubble) return;
     const messageText = thinkingBubble.querySelector('.message-text') || thinkingBubble;
+    // Reserve fixed height so progress bar appearing/disappearing doesn’t shift the chat layout
+    if (!messageText.style.minHeight) messageText.style.minHeight = '80px';
     const pct = Number.isFinite(progress) ? Math.max(0, Math.min(100, progress)) : null;
     const label = document.createElement('div');
     label.className = 'model-progress-label';
@@ -2128,6 +2185,14 @@ document.addEventListener('DOMContentLoaded', () => {
   async function prepareSastriModel(preferredLang, thinkingBubble) {
     if (!localAi || localAi.llmLoaded) return true;
 
+    // Cloud-only devices (iOS, no-WebGPU, low-memory) skip the model entirely.
+    // Return false instantly so handleAdvisorLocalAnswer routes to Bisesagya
+    // without the 8-second wait or a misleading "download issue" toast.
+    if (localAi.isCloudOnlyMode && localAi.isCloudOnlyMode()) {
+      updateThinkingBubble(thinkingBubble, sastriExpertRoutingText(preferredLang));
+      return false;
+    }
+
     const timeoutMs = Number(window.KRISHI_MODEL_FOREGROUND_WAIT_MS || 8000);
     updateModelProgressBubble(thinkingBubble, preferredLang);
     let activeProgress = true;
@@ -2151,7 +2216,9 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(loaded => {
           if (loaded) {
             showSastriModelReadyNotice(preferredLang);
-          } else if (navigator.onLine) {
+          } else if (navigator.onLine && !(localAi.isCloudOnlyMode && localAi.isCloudOnlyMode())) {
+            // Only show "download issue" for genuine download failures,
+            // not for devices permanently routed to cloud (iOS, no-WebGPU).
             showSastriModelDownloadIssueNotice(preferredLang);
           }
           return !!loaded;
@@ -2380,6 +2447,14 @@ document.addEventListener('DOMContentLoaded', () => {
     await finalizeSastriBubble(thinkingBubble, reply);
     removeStaleSastriThinkingBubbles();
     localDb.addChat({ role: 'advisor', text: reply });
+
+    // If the model was initialising and the reply came from the rule-based
+    // fallback (llmLoaded is still false), register a one-shot replay so the
+    // question gets a real LiteRT answer once the model finishes loading.
+    // Only store if the slot is empty (never overwrite — first query wins).
+    if (!localAi.llmLoaded && sastriModelLoadPromise && !_sastriPendingReplay) {
+      _sastriPendingReplay = { text, langCode: preferredLang };
+    }
 
     // Speak the response if TTS is enabled
     if (typeof window.speakText === 'function') {
